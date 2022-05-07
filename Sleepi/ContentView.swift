@@ -17,16 +17,19 @@ private func getHistoricalStocks() -> [Stock] {
     
     var stocks = [Stock]()
     
-    for _ in 1...20 {
-        let stock = Stock(price: (Int.random(in: 0...3) * 100) / 2)
-        stocks.append(stock)
-        print(stock)
-    }
+//    for _ in 1...7 {
+//        let stock = Stock(price: (Int.random(in: 0...3) * 100) / 2)
+//        stocks.append(stock)
+//        print(stock)
+//    }
+    stocks = [Sleepi.Stock(price: 100), Sleepi.Stock(price: 150), Sleepi.Stock(price: 150), Sleepi.Stock(price: 50), Sleepi.Stock(price: 100), Sleepi.Stock(price: 0), Sleepi.Stock(price: 200), Sleepi.Stock(price: 200)]
+    print(stocks.count)
+    print(stocks)
     return stocks
 }
 
 private func getYearlyLabels() -> [String] {
-    return (2015...2021).map { String($0) }
+    return [21, 22, 23, 24, 01, 02, 03, 04].map { String($0) }
 }
 
 struct LineChartView: View {
@@ -73,9 +76,45 @@ struct LineChartView: View {
             HStack {
                 ForEach(labels, id: \.self) { label in
                     Text(label)
-                        .frame(width: screenWidth/CGFloat(labels.count) - 10)
-                        .foregroundColor(Color.black)
+                        .font(.caption)
+                        .frame(width: screenWidth/CGFloat(labels.count) - 3)
                 }
+            }
+            HStack {
+                Text("Bed time")
+                    .font(.caption)
+
+                Spacer()
+                Text("Rise time")
+                    .font(.caption)
+
+            }
+
+            HStack {
+                Circle()
+                    .fill(Color(UIColor(named: "AppDeepSleep")!))
+                    .frame(width: 10, height: 10)
+                Text("Deep Sleep")
+                    .font(.caption)
+                
+                Circle()
+                    .fill(Color(UIColor(named: "AppLightSleep")!))
+                    .frame(width: 10, height: 10)
+                Text("Light Sleep")
+                    .font(.caption)
+
+                Circle()
+                    .fill(Color(UIColor(named: "AppRemSleep")!))
+                    .frame(width: 10, height: 10)
+                Text("Rem Sleep")
+                    .font(.caption)
+
+                Circle()
+                    .fill(Color(UIColor(named: "AppAwakeSleep")!))
+                    .frame(width: 10, height: 10)
+                Text("Awake")
+                    .font(.caption)
+
             }
             
         }
@@ -116,7 +155,10 @@ struct ContentView: View {
                 HStack{
                     Spacer()
                     Text("<")
+                        .font(.title)
                     Text("27 Apr, 2022")
+                        .font(.title)
+
                     Spacer()
                 }.padding()
                 Text("Night Sleep / Nap")
