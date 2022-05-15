@@ -7,9 +7,10 @@
 
 import Foundation
 
-struct Sleep: Identifiable {
+struct Sleep: Identifiable, Equatable {
     let id = UUID()
-    let value: String
+    let value: Int
     let startDate: Date
     let endDate: Date
+    let source: String
 }

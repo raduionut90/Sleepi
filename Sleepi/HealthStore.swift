@@ -27,13 +27,13 @@ class HealthStore {
     func calculateSleep(completion: @escaping ([HKSample]) -> Void) {
         let sleepType = HKObjectType.categoryType(forIdentifier: HKCategoryTypeIdentifier.sleepAnalysis)!
 
-        let startDate = Calendar.current.date(byAdding: .day, value: -7, to: Date())
+        let startDate = Calendar.current.date(byAdding: .day, value: -70, to: Date())
         
         let sortDescriptor = NSSortDescriptor(key: HKSampleSortIdentifierEndDate, ascending: false)
 
         let predicate = HKQuery.predicateForSamples(withStart: startDate, end: Date(), options: .strictStartDate)
 
-        query = HKSampleQuery(sampleType: sleepType, predicate: predicate, limit: 100, sortDescriptors: [sortDescriptor]) { (query, tmpResult, error) -> Void in
+        query = HKSampleQuery(sampleType: sleepType, predicate: predicate, limit: 1000, sortDescriptors: [sortDescriptor]) { (query, tmpResult, error) -> Void in
 
             if error != nil {
                     print("Something went wrong getting sleep analysis: \(String(describing: error))")

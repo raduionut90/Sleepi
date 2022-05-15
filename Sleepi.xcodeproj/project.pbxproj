@@ -14,9 +14,7 @@
 		171535312815C04200B1A499 /* HealthKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 171535302815C04200B1A499 /* HealthKit.framework */; };
 		171535332815C1EA00B1A499 /* HealthStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 171535322815C1EA00B1A499 /* HealthStore.swift */; };
 		171535362815D7F200B1A499 /* Sleep.swift in Sources */ = {isa = PBXBuildFile; fileRef = 171535352815D7F200B1A499 /* Sleep.swift */; };
-		17EA8C8428194D9800545BDD /* SwiftUICharts in Frameworks */ = {isa = PBXBuildFile; productRef = 17EA8C8328194D9800545BDD /* SwiftUICharts */; };
-		17EA8C87281974C900545BDD /* LineChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17EA8C86281974C900545BDD /* LineChartView.swift */; };
-		17EA8C8A28271AE500545BDD /* SwiftUICharts in Frameworks */ = {isa = PBXBuildFile; productRef = 17EA8C8928271AE500545BDD /* SwiftUICharts */; };
+		17EA8C8C28282B6800545BDD /* LineChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17EA8C8B28282B6800545BDD /* LineChartView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -29,7 +27,7 @@
 		171535302815C04200B1A499 /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = System/Library/Frameworks/HealthKit.framework; sourceTree = SDKROOT; };
 		171535322815C1EA00B1A499 /* HealthStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthStore.swift; sourceTree = "<group>"; };
 		171535352815D7F200B1A499 /* Sleep.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sleep.swift; sourceTree = "<group>"; };
-		17EA8C86281974C900545BDD /* LineChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LineChartView.swift; sourceTree = "<group>"; };
+		17EA8C8B28282B6800545BDD /* LineChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LineChartView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -37,9 +35,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				17EA8C8A28271AE500545BDD /* SwiftUICharts in Frameworks */,
 				171535312815C04200B1A499 /* HealthKit.framework in Frameworks */,
-				17EA8C8428194D9800545BDD /* SwiftUICharts in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -105,7 +101,7 @@
 		17EA8C85281974BA00545BDD /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				17EA8C86281974C900545BDD /* LineChartView.swift */,
+				17EA8C8B28282B6800545BDD /* LineChartView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -127,8 +123,6 @@
 			);
 			name = Sleepi;
 			packageProductDependencies = (
-				17EA8C8328194D9800545BDD /* SwiftUICharts */,
-				17EA8C8928271AE500545BDD /* SwiftUICharts */,
 			);
 			productName = Sleepi;
 			productReference = 1715351D2815C02F00B1A499 /* Sleepi.app */;
@@ -159,8 +153,6 @@
 			);
 			mainGroup = 171535142815C02F00B1A499;
 			packageReferences = (
-				17EA8C8228194D9800545BDD /* XCRemoteSwiftPackageReference "ChartView" */,
-				17EA8C8828271AE500545BDD /* XCRemoteSwiftPackageReference "ChartView" */,
 			);
 			productRefGroup = 1715351E2815C02F00B1A499 /* Products */;
 			projectDirPath = "";
@@ -189,9 +181,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				171535232815C02F00B1A499 /* ContentView.swift in Sources */,
-				17EA8C87281974C900545BDD /* LineChartView.swift in Sources */,
 				171535362815D7F200B1A499 /* Sleep.swift in Sources */,
 				171535332815C1EA00B1A499 /* HealthStore.swift in Sources */,
+				17EA8C8C28282B6800545BDD /* LineChartView.swift in Sources */,
 				171535212815C02F00B1A499 /* SleepiApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -405,38 +397,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
-/* Begin XCRemoteSwiftPackageReference section */
-		17EA8C8228194D9800545BDD /* XCRemoteSwiftPackageReference "ChartView" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/AppPear/ChartView";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.0;
-			};
-		};
-		17EA8C8828271AE500545BDD /* XCRemoteSwiftPackageReference "ChartView" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/AppPear/ChartView";
-			requirement = {
-				branch = master;
-				kind = branch;
-			};
-		};
-/* End XCRemoteSwiftPackageReference section */
-
-/* Begin XCSwiftPackageProductDependency section */
-		17EA8C8328194D9800545BDD /* SwiftUICharts */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 17EA8C8228194D9800545BDD /* XCRemoteSwiftPackageReference "ChartView" */;
-			productName = SwiftUICharts;
-		};
-		17EA8C8928271AE500545BDD /* SwiftUICharts */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 17EA8C8828271AE500545BDD /* XCRemoteSwiftPackageReference "ChartView" */;
-			productName = SwiftUICharts;
-		};
-/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 171535152815C02F00B1A499 /* Project object */;
 }
