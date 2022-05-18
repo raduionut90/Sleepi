@@ -10,7 +10,7 @@ import HealthKit
 import SwiftUICharts
 
 struct SleepPoint {
-    let type: Int
+    let type: Double
     let offsetX: Double
 }
 
@@ -22,6 +22,7 @@ struct ContentView: View {
     @State private var startSleep: Date = Date.init(timeIntervalSince1970: 0)
     @State private var endSleep: Date = Date.init(timeIntervalSince1970: 0)
     @State private var timeDiff: Double = 0
+    @State private var heartRates: [HeartRate] = [HeartRate]()
 
     init(){
         sleeps = []
@@ -30,54 +31,59 @@ struct ContentView: View {
         }
     }
 
-    private func getHistoricalStocks() -> [SleepPoint] {
+    private func getSleepPoints() -> [SleepPoint] {
 
         var sleepPoints = [SleepPoint]()
         let screenWidth = UIScreen.main.bounds.width - 30
         var lastEndTime: Date = Date.init(timeIntervalSince1970: 0)
+        
+        print("Sleeps.count: " + "\(sleeps.count)")
+        
+        if (sleeps.count == 0 || timeDiff == 0) {
+            return []
+        }
 
         var offsetX: Double = 0
-        print("sleeps.count: " + "\(sleeps.count)")
         for sleep in sleeps {
             if (lastEndTime != Date.init(timeIntervalSince1970: 0) && lastEndTime < sleep.startDate && timeDiff != 0){
-                print("timediff: " + "\(timeDiff)")
+                let sleepType = (sleep.startDate.timeIntervalSinceReferenceDate - lastEndTime.timeIntervalSinceReferenceDate) < 10 * 60 ?
+                SleepType.RemSleep.rawValue : SleepType.Awake.rawValue
+                
+                print("type: \((sleep.startDate.timeIntervalSinceReferenceDate - lastEndTime.timeIntervalSinceReferenceDate) < 160)")
+                print("type: \((lastEndTime.timeIntervalSinceReferenceDate - sleep.startDate.timeIntervalSinceReferenceDate) )")
 
-                let diff = sleep.startDate.timeIntervalSinceReferenceDate - lastEndTime.timeIntervalSinceReferenceDate
-                let sleepPercent: Double = (diff / timeDiff ) * 100
-                let offsetPercent = (sleepPercent / 100) * screenWidth
-                let sleepPoint = SleepPoint(
-                    type: 150,
+                let startPoint = SleepPoint(
+                    type: sleepType,
                     offsetX: offsetX)
-                offsetX += offsetPercent
-                sleepPoints.append(sleepPoint)
-                let sleepPoint2 = SleepPoint(
-                    type: 150,
+                sleepPoints.append(startPoint)
+
+                let sleepPercent: Double = ( (sleep.startDate.timeIntervalSinceReferenceDate - lastEndTime.timeIntervalSinceReferenceDate) / timeDiff )
+                let offset = (sleepPercent) * screenWidth
+                offsetX += offset
+
+                let endPoint = SleepPoint(
+                    type: sleepType,
                     offsetX: offsetX)
-                sleepPoints.append(sleepPoint2)
+                sleepPoints.append(endPoint)
+
             }
-            
-            print("offsetX: " + "\(offsetX)")
-            print("sleep: " + "\(sleep)")
 
-            print("sleepDiff : " + "\(sleep.endDate.timeIntervalSinceReferenceDate - sleep.startDate.timeIntervalSinceReferenceDate)")
-            print(((sleep.endDate.timeIntervalSinceReferenceDate - sleep.startDate.timeIntervalSinceReferenceDate)/timeDiff)*100)
-            let sleepPercent = ((sleep.endDate.timeIntervalSinceReferenceDate - sleep.startDate.timeIntervalSinceReferenceDate) / timeDiff ) * 100
-            let offsetPercent = (sleepPercent / 100) * screenWidth
-            print("offpercent: " + offsetPercent.description)
+            let startPoint = SleepPoint(
+                type: SleepType.LightSleep.rawValue,
+                offsetX: offsetX)
+            sleepPoints.append(startPoint)
 
-            let sleepPoint = SleepPoint(
-                type: 0,
+            let sleepPercent = ((sleep.endDate.timeIntervalSinceReferenceDate - sleep.startDate.timeIntervalSinceReferenceDate) / timeDiff )
+            let offset = (sleepPercent) * screenWidth
+            offsetX += offset
+
+            let endPoint = SleepPoint(
+                type: SleepType.LightSleep.rawValue,
                 offsetX: offsetX)
-            sleepPoints.append(sleepPoint)
-            offsetX += offsetPercent
-            
-            let sleepPoint2 = SleepPoint(
-                type: 0,
-                offsetX: offsetX)
-            sleepPoints.append(sleepPoint2)
+            sleepPoints.append(endPoint)
+
             lastEndTime = sleep.endDate
         }
-//        print("timediff: " + "\(timeDiff)")
 
         return sleepPoints
     }
@@ -104,12 +110,6 @@ struct ContentView: View {
                 hours.append(h)
             }
         }
-
-//            hours.append(startHour)
-//            hours.append(endHour)
-        
-//        hours = Array(Set(hours))
-//        hours.sort()
         return hours.map { String($0) }
     }
 
@@ -131,9 +131,6 @@ struct ContentView: View {
         return formatter
     }()
     
-//    let prices = getHistoricalStocks().map { Int($0.price) }
-//    let labels = getYearlyLabels()
-    
     func addingDays(nr: Int) -> Void {
         var dateComponent = DateComponents()
         dateComponent.day = nr
@@ -141,18 +138,17 @@ struct ContentView: View {
         self.date = futureDate!
     }
     
-    func reloadSleeps() {
-        
+    func loadSleeps() {
         if let healthStore = healthStore {
             healthStore.requestAuthorization{ success in
                 if success {
-                    healthStore.calculateSleep(){samples in
+                    healthStore.startSleepQuery(date: date){samples in
                         var newSleeps: [Sleep] = []
+                        print("ssamples.count: \(samples.count)")
                         for item in samples {
                             if let sample = item as? HKCategorySample {
                                 let value = (sample.value == HKCategoryValueSleepAnalysis.inBed.rawValue) ? "InBed" : "Asleep"
-                                if (Calendar.current.compare(sample.endDate.addingTimeInterval(7200), to: date, toGranularity: .day) == .orderedSame &&
-                                    sample.sourceRevision.source.bundleIdentifier.contains("com.apple.health") &&
+                                if (sample.sourceRevision.source.bundleIdentifier.contains("com.apple.health") &&
                                     ((sample.sourceRevision.productType?.contains("Watch")) == true)) {
                                     print("Healthkit sleep: \(sample.startDate) \(sample.endDate) value: \(value)")
                                     let sleep = Sleep(value: sample.value, startDate: sample.startDate, endDate: sample.endDate, source: sample.sourceRevision.source.name)
@@ -165,23 +161,45 @@ struct ContentView: View {
                             }
                         }
                         newSleeps.sort(by: {$0.startDate < $1.startDate})
-                        sleeps = newSleeps
 
+                        sleeps = newSleeps
+                        calculateMinAndMaxSleepTime()
+//
+                        healthStore.startHeartRateQuery(startDate: startSleep, endDate: endSleep){ samples in
+                            if let samples = samples {
+                                for item in samples{
+                                    let heartRate = HeartRate(value: item.quantity.doubleValue(for: HKUnit(from: "count/min")), startDate: item.startDate)
+                                    heartRates.append(heartRate)
+                                }
+                                print("heartRates.count: \(heartRates.count)")
+
+                            }
+                        }
                     }
+                        
+
                 }
             }
 
         }
-
+        
     }
     
     func getSleptTime() -> DateComponents {
-        print(startSleep)
-        print(endSleep)
         let difference = Calendar.current.dateComponents([.hour, .minute], from: startSleep, to: endSleep)
-        print("differecnce")
-        print(difference)
         return difference
+    }
+    
+    private func calculateMinAndMaxSleepTime() {
+        if let earliest = sleeps.min(by: { $0.startDate < $1.startDate }) {
+            // use earliest reminder
+            startSleep = earliest.startDate
+        }
+        if let latest = sleeps.max(by: { $0.endDate < $1.endDate }) {
+            // use earliest reminder
+            endSleep = latest.endDate
+        }
+        timeDiff = endSleep.timeIntervalSinceReferenceDate - startSleep.timeIntervalSinceReferenceDate
     }
     
     var body: some View {
@@ -218,7 +236,7 @@ struct ContentView: View {
                 Text(getSleptTime(), formatter: timeFormatter).padding(.bottom)
                 
                 VStack{
-                    LineChartView(sleepPoints: getHistoricalStocks(), labels: getHourLabels(),
+                    LineChartView(sleepPoints: getSleepPoints(), labels: getHourLabels(),
                                   startSleep: startSleep, endSleep: endSleep)
                 }.padding()
                
@@ -227,8 +245,6 @@ struct ContentView: View {
 
                 List(sleeps, id: \.id) { sleep in
                     VStack(alignment: .leading){
-                        Text("sleeps.count: " + "\(sleeps.count)")
-
                         Text("\(sleep.value)")
                         Text(sleep.startDate,  formatter: formatter).opacity(0.5)
                         Text(sleep.endDate, formatter: formatter).opacity(0.5)
@@ -242,29 +258,17 @@ struct ContentView: View {
         }
             .navigationViewStyle(StackNavigationViewStyle())
             .onAppear(){
-                reloadSleeps()
+                loadSleeps()
             }
             .onChange(of: date, perform: { value in
-                reloadSleeps()
+                loadSleeps()
             })
-            .onChange(of: sleeps, perform: { value in
-                if let earliest = sleeps.min(by: { $0.startDate < $1.startDate }) {
-                    // use earliest reminder
-                    startSleep = earliest.startDate
-                }
-                if let latest = sleeps.max(by: { $0.endDate < $1.endDate }) {
-                    // use earliest reminder
-                    endSleep = latest.endDate
-                }
-                timeDiff = endSleep.timeIntervalSinceReferenceDate - startSleep.timeIntervalSinceReferenceDate
-                
-            })
-
     }
 }
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()
+            .previewInterfaceOrientation(.portrait)
     }
 }

@@ -7,7 +7,7 @@ struct LineChartView: View {
     let startSleep: Date
     let endSleep: Date
     
-    let screenWidth = UIScreen.main.bounds.width
+    let screenWidth = UIScreen.main.bounds.width - 10
     
     private var path: Path {
         
@@ -16,11 +16,10 @@ struct LineChartView: View {
         }
         
         var path = Path()
-        path.move(to: CGPoint(x: sleepPoints[0].offsetX, y: Double(sleepPoints[0].type)))
+        path.move(to: CGPoint(x: sleepPoints[0].offsetX, y: sleepPoints[0].type))
         
         for sleepPoint in sleepPoints {
-            path.addLine(to: CGPoint(x: sleepPoint.offsetX, y: Double(sleepPoint.type)))
-            print(sleepPoint.offsetX)
+            path.addLine(to: CGPoint(x: sleepPoint.offsetX, y: sleepPoint.type))
         }
         return path
         
@@ -46,8 +45,10 @@ struct LineChartView: View {
                                                         ]), startPoint: .top, endPoint: .bottom), lineWidth: 1.0)
                     .rotationEffect(.degrees(180), anchor: .center)
                     .rotation3DEffect(.degrees(180), axis: (x: 0, y: 1, z: 0))
-                    .frame(height: 150, alignment: .center)
-                    .frame(maxWidth: .infinity, maxHeight: 150)
+//                    .frame(height: 150, alignment: .center)
+                    .frame(maxWidth: .infinity, minHeight: 150, maxHeight: 150, alignment: .center)
+
+
             }
 
 
