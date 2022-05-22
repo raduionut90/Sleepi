@@ -40,13 +40,12 @@ class HealthStore {
     func startSleepQuery(date: Date, completion: @escaping ([HKSample]) -> Void) {
         let sleepType = HKObjectType.categoryType(forIdentifier: HKCategoryTypeIdentifier.sleepAnalysis)!
 
-//        let startDate = Calendar.current.date(byAdding: .day, value: -70, to: Date())
         var startDate = Calendar.current.startOfDay(for: date)
         startDate = Calendar.current.date(byAdding: .hour, value: -3, to: startDate)!
         
         let endDate = Calendar.current.date(byAdding: .day, value: 1, to: startDate)!
 
-        let sortDescriptor = NSSortDescriptor(key: HKSampleSortIdentifierEndDate, ascending: false)
+        let sortDescriptor = NSSortDescriptor(key: HKSampleSortIdentifierEndDate, ascending: true)
 
         let predicate = HKQuery.predicateForSamples(withStart: startDate, end: endDate, options: .strictStartDate)
 
