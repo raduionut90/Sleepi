@@ -56,12 +56,6 @@ struct ContentView: View {
 
         NavigationView{
             VStack {
-//                HStack {
-//                    Text("Day").underline()
-//                    Text("Week")
-//                    Text("Month")
-//                    Text("Year")
-//                }
                 HStack{
                     Spacer()
                     Button(action: {
@@ -99,6 +93,7 @@ struct ContentView: View {
                             Text(sleep.startDate,  formatter: formatter).opacity(0.5)
                             Text(sleep.endDate, formatter: formatter).opacity(0.5)
                             Text(sleep.source)
+                            Text("\(sleep.heartRates.count)")
                         }
                     }
             }

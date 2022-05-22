@@ -13,4 +13,5 @@ struct Sleep: Identifiable, Equatable {
     let startDate: Date
     let endDate: Date
     let source: String
+    var heartRates: [HeartRate] = []
 }

@@ -79,8 +79,8 @@ class HealthStore {
         endDate: Date,
         completion: @escaping (_ samples: [HKQuantitySample]?) -> Void) {
 
-            print("startDate: \(startDate)")
-            print("endDate: \(endDate)")
+//            print("startDate: \(startDate)")
+//            print("endDate: \(endDate)")
 
         /// Create sample type for the heart rate
         guard let sampleType = HKObjectType

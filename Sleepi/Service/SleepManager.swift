@@ -13,10 +13,13 @@ class SleepManager: ObservableObject {
     var currentDate: Date
     var startSleep: Date = Date.init(timeIntervalSince1970: 0)
     var endSleep: Date = Date.init(timeIntervalSince1970: 0)
-    var timeDiff: Double = 0
+    var sleepDuration: Double = 0
     let screenWidth: Double
+    var heartRates: [HeartRate] = []
 
     @Published var sleeps: [Sleep] = []
+    @Published var naps: [[Sleep]] = []
+
     @Published var sleepPoints: [SleepPoint] = []
 
     
@@ -51,7 +54,7 @@ class SleepManager: ObservableObject {
             // use earliest reminder
             endSleep = latest.endDate
         }
-        timeDiff = endSleep.timeIntervalSinceReferenceDate - startSleep.timeIntervalSinceReferenceDate
+        sleepDuration = endSleep.timeIntervalSinceReferenceDate - startSleep.timeIntervalSinceReferenceDate
     }
     
     func getHourLabels() -> [String] {
@@ -79,37 +82,24 @@ class SleepManager: ObservableObject {
         return hours.map { String($0) }
     }
 
-    func getSleepPoints(screenWidth: Double) -> [SleepPoint] {
+    func getSleepPoints() {
         var sleepPoints = [SleepPoint]()
         var lastEndTime: Date = Date.init(timeIntervalSince1970: 0)
 
-        print("Sleeps.count.getp: " + "\(sleeps.count)")
-
-        print("timeDiff: " + "\(timeDiff)")
-        print("Sleeps.count.getp: " + "\(sleeps.count)")
-
-//        if (sleeps.count == 0 || timeDiff == 0) {
-//            return []
-//        }
-
         var offsetX: Double = 0
         for sleep in sleeps {
-            print(sleep.startDate)
-            if (lastEndTime != Date.init(timeIntervalSince1970: 0) && lastEndTime < sleep.startDate && timeDiff != 0){
-                print("lastEndTime: " + "\(lastEndTime)")
+
+            if (lastEndTime != Date.init(timeIntervalSince1970: 0) && lastEndTime < sleep.startDate && sleepDuration != 0){
 
                 let sleepType = (sleep.startDate.timeIntervalSinceReferenceDate - lastEndTime.timeIntervalSinceReferenceDate) < 10 * 60 ?
                 SleepType.RemSleep.rawValue : SleepType.Awake.rawValue
-
-                print("type: \((sleep.startDate.timeIntervalSinceReferenceDate - lastEndTime.timeIntervalSinceReferenceDate) < 160)")
-                print("type: \((lastEndTime.timeIntervalSinceReferenceDate - sleep.startDate.timeIntervalSinceReferenceDate) )")
 
                 let startPoint = SleepPoint(
                     type: sleepType,
                     offsetX: offsetX)
                 sleepPoints.append(startPoint)
 
-                let sleepPercent: Double = ( (sleep.startDate.timeIntervalSinceReferenceDate - lastEndTime.timeIntervalSinceReferenceDate) / timeDiff )
+                let sleepPercent: Double = ( (sleep.startDate.timeIntervalSinceReferenceDate - lastEndTime.timeIntervalSinceReferenceDate) / sleepDuration )
                 let offset = (sleepPercent) * screenWidth
                 offsetX += offset
 
@@ -119,13 +109,16 @@ class SleepManager: ObservableObject {
                 sleepPoints.append(endPoint)
 
             }
-
+            
+//            for heartRate in heartRates {
+//                
+//            }
             let startPoint = SleepPoint(
                 type: SleepType.LightSleep.rawValue,
                 offsetX: offsetX)
             sleepPoints.append(startPoint)
 
-            let sleepPercent = ((sleep.endDate.timeIntervalSinceReferenceDate - sleep.startDate.timeIntervalSinceReferenceDate) / timeDiff )
+            let sleepPercent = ((sleep.endDate.timeIntervalSinceReferenceDate - sleep.startDate.timeIntervalSinceReferenceDate) / sleepDuration )
             let offset = (sleepPercent) * screenWidth
             offsetX += offset
 
@@ -137,7 +130,32 @@ class SleepManager: ObservableObject {
             lastEndTime = sleep.endDate
         }
 
-        return sleepPoints
+        self.sleepPoints = sleepPoints
+    }
+    
+    func loadHeartRates() {
+        for (index, sleep) in sleeps.enumerated() {
+            healthStore?.startHeartRateQuery(startDate: sleep.startDate, endDate: sleep.endDate) { samples in
+                var hrs: [HeartRate] = []
+                for sample in samples ?? [] {
+                    print(sample)
+                    let hr = HeartRate(value: sample.quantity.doubleValue(for: HKUnit(from: "count/min")), startDate: sample.startDate)
+                    hrs.append(hr)
+                }
+                DispatchQueue.main.async {
+                    self.sleeps[index].heartRates = hrs
+                }
+                
+            }
+        }
+//        healthStore?.startHeartRateQuery(startDate: self.startSleep, endDate: self.endSleep) { samples in
+//            for sample in samples ?? [] {
+//                print(sample)
+//                let hr = HeartRate(value: sample.quantity.doubleValue(for: HKUnit(from: "count/min")), startDate: sample.startDate)
+//                self.heartRates.append(hr)
+//            }
+//        }
+
     }
     
     func readSleeps(date: Date) async {
@@ -155,6 +173,7 @@ class SleepManager: ObservableObject {
                             if let sample = item as? HKCategorySample {
                                 if (sample.sourceRevision.source.bundleIdentifier.contains("com.apple.health") &&
                                     ((sample.sourceRevision.productType?.contains("Watch")) == true)) {
+                                    
                                     let sleep = Sleep(value: sample.value, startDate: sample.startDate, endDate: sample.endDate, source: sample.sourceRevision.source.name)
                                     
                                     DispatchQueue.main.async {
@@ -171,8 +190,10 @@ class SleepManager: ObservableObject {
                         }
                         DispatchQueue.main.async {
                             self.calculateMinAndMaxSleepTime()
-                            self.sleepPoints = self.getSleepPoints(screenWidth: self.screenWidth)
+                            self.loadHeartRates()
+                            self.getSleepPoints()
                         }
+                        
                     }
 
                 }
