@@ -1,13 +1,17 @@
 import SwiftUI
 
+
 struct LineChartView: View {
     
+    @State var speed: TimeInterval
+    @State private var isEditing = false
+    
     let sleepPoints: [SleepPoint]
-    let labels: [String]
+    let labels: [HourItem]
     let startSleep: Date
     let endSleep: Date
-    
     let screenWidth = UIScreen.main.bounds.width - 10
+    
     
     private var path: Path {
         
@@ -32,9 +36,10 @@ struct LineChartView: View {
     }()
     
     var body: some View {
+
         VStack {
 
-            ZStack {
+            VStack {
                 path.stroke(
                     LinearGradient(gradient: Gradient(colors:
                                                         [
@@ -48,15 +53,29 @@ struct LineChartView: View {
 //                    .frame(height: 150, alignment: .center)
                     .frame(maxWidth: .infinity, minHeight: 150, maxHeight: 150, alignment: .center)
 
-
+                Slider(
+                    value: $speed,
+                    in: startSleep.timeIntervalSince1970...endSleep.timeIntervalSince1970,
+                    onEditingChanged: { editing in
+                        isEditing = editing
+                    }
+                )
+                Text("\(Date.init(timeIntervalSince1970: speed))")
+                    .foregroundColor(isEditing ? .red : .blue)
+                Text(String(speed)).font(.caption)
             }
 
 
             HStack {
-                ForEach(labels, id: \.self) { label in
-                    Text(label)
-                        .font(.caption)
-//                        .frame(width: screenWidth/CGFloat(labels.count))
+                ForEach(labels, id: \.id) { label in
+                    if label.value == "x" {
+                        Circle()
+                            .fill(.gray)
+                            .frame(width: 5, height: 5)
+                    } else {
+                        Text(label.value)
+                            .font(.caption)
+                    }
                     if (label != labels.last){
                         Spacer()
                     }

@@ -7,7 +7,6 @@
 
 import SwiftUI
 import HealthKit
-import SwiftUICharts
 
 struct SleepPoint {
     let type: Double
@@ -17,13 +16,6 @@ struct SleepPoint {
 struct ContentView: View {
     @State private var currentDate: Date = Date()
     @StateObject var sleepManager: SleepManager = SleepManager(date: Date(), screenWidth: UIScreen.main.bounds.width - 30)
-    
-    init() {
-//        print("sleepManager.sleeps: \(sleepManager.sleeps?.count ?? 0)")
-//        sleepManager.readSleeps()
-
-//        print("sleepManager.count: \(sleepManager.sleeps?.count ?? 0)")
-    }
     
     func addingDays(nr: Int) -> Void {
         var dateComponent = DateComponents()
@@ -81,7 +73,7 @@ struct ContentView: View {
                 Text((sleepManager.getSleptTime()), formatter: timeFormatter).padding(.bottom)
                 
                 VStack{
-                    LineChartView(sleepPoints: sleepManager.sleepPoints, labels: sleepManager.getHourLabels(),
+                    LineChartView(speed: sleepManager.startSleep.timeIntervalSince1970, sleepPoints: sleepManager.sleepPoints, labels: sleepManager.getHourLabels(),
                                   startSleep: sleepManager.startSleep, endSleep: sleepManager.endSleep)
                 }.padding()
                                
@@ -101,12 +93,9 @@ struct ContentView: View {
         }
             .navigationViewStyle(StackNavigationViewStyle())
             .onAppear(){
-//                sleepManager.readSleeps()
-
+                sleepManager.refreshSleeps(date: currentDate)
             }
             .onChange(of: currentDate, perform: { value in
-//                refreshSleeps()
-//                await sleepManager.readSleeps(date: value)
                 sleepManager.refreshSleeps(date: value)
             })
     }
