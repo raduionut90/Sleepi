@@ -8,15 +8,10 @@
 import SwiftUI
 import HealthKit
 
-struct SleepPoint {
-    let type: Double
-    let offsetX: Double
-}
-
 struct ContentView: View {
     @State private var currentDate: Date = Date()
     @StateObject var sleepManager: SleepManager = SleepManager(date: Date(), screenWidth: UIScreen.main.bounds.width - 30)
-    
+
     func addingDays(nr: Int) -> Void {
         var dateComponent = DateComponents()
         dateComponent.day = nr
@@ -40,12 +35,13 @@ struct ContentView: View {
     
     private var timeFormatter: DateComponentsFormatter = {
         let formatter = DateComponentsFormatter()
+        formatter.zeroFormattingBehavior = .pad
         formatter.allowedUnits = [.hour, .minute]
         return formatter
     }()
     
     var body: some View {
-
+//        if sleepManager.sleepState != nil {
         NavigationView{
             VStack {
                 HStack{
@@ -70,35 +66,82 @@ struct ContentView: View {
                 }.padding()
                 Text("Night Sleep")
 
-                Text((sleepManager.getSleptTime()), formatter: timeFormatter).padding(.bottom)
+                if sleepManager.sleepState != nil {
+                    Text(timeFormatter.string(from: sleepManager.sleepState!.totalBedTime )! )
+                }
                 
+                if sleepManager.sleepState != nil {
+
                 VStack{
-                    LineChartView(speed: sleepManager.startSleep.timeIntervalSince1970, sleepPoints: sleepManager.sleepPoints, labels: sleepManager.getHourLabels(),
-                                  startSleep: sleepManager.startSleep, endSleep: sleepManager.endSleep)
+                    LineChartView(speed: (sleepManager.sleepState?.startSleep.timeIntervalSince1970)!,
+                                  sleepPoints: (sleepManager.sleepState?.sleepPoints)!,
+                                  labels: (sleepManager.sleepState?.hoursLabels)!,
+                                  startSleep: (sleepManager.sleepState?.startSleep)!,
+                                  endSleep: (sleepManager.sleepState?.endSleep)! )
                 }.padding()
-                               
+                }
+
+                VStack {
+                    Text("Scoring: 80")
+                    HStack {
+                        Text("Night sleep: ")
+                        Text(timeFormatter.string(from: sleepManager.sleepState?.sleepTime ?? 0)! )
+
+                    }
+                    HStack {
+                        Text("Deep sleep:")
+                        Text(timeFormatter.string(from: sleepManager.sleepState?.deepSleepTime ?? 0)! )
+                    }
+                    HStack {
+                        Text("Light sleep:")
+                        Text(timeFormatter.string(from: sleepManager.sleepState?.lightSleepTime ?? 0)! )
+                    }
+                    HStack {
+                        Text("REM sleep:")
+                        Text(timeFormatter.string(from: sleepManager.sleepState?.remSleepTime ?? 0)! )
+                    }
+                    Text("Deep Sleep continuity:")
+                    HStack {
+                        Text("Awake times:")
+                        let awake = sleepManager.sleepState?.sleeps.count ?? 0
+                        Text(String(awake > 0 ? awake - 1 : awake))
+                    }
+                    HStack{
+                        Text("Awake:")
+//                        let awakeTime = sleepManager.sleepState?.awakeTime ?? DateComponents()
+                        Text(timeFormatter.string(from: sleepManager.sleepState?.awakeTime ?? 0)! )
+                    }
+                    Text("Breathing quality:")
+                }
                 Spacer()
 
-                List(sleepManager.sleeps , id: \.id) { sleep in
-                        VStack(alignment: .leading){
-                            Text("\(sleep.value)")
-                            Text(sleep.startDate,  formatter: formatter).opacity(0.5)
-                            Text(sleep.endDate, formatter: formatter).opacity(0.5)
-                            Text(sleep.source)
-                            Text("\(sleep.heartRates.count)")
-                        }
-                    }
+//                if sleepManager.sleepState != nil {
+//                    List((sleepManager.sleepState?.sleeps)! , id: \.id) { sleep in
+//                        VStack(alignment: .leading){
+//                            Text("\(sleep.value)")
+//                            Text(sleep.startDate,  formatter: formatter).opacity(0.5)
+//                            Text(sleep.endDate, formatter: formatter).opacity(0.5)
+//                            Text(sleep.source)
+//                            Text("\(sleep.heartRates.count)")
+//                        }
+//                    }
+//                }
             }
             .navigationTitle("Sleepi")
         }
             .navigationViewStyle(StackNavigationViewStyle())
             .onAppear(){
+//                MotionService().startDeviceMotion()
+                MotionService().readMotionData()
                 sleepManager.refreshSleeps(date: currentDate)
             }
             .onChange(of: currentDate, perform: { value in
                 sleepManager.refreshSleeps(date: value)
+                MotionService().readMotionData()
             })
-    }
+        }
+
+    
 }
 
 struct ContentView_Previews: PreviewProvider {

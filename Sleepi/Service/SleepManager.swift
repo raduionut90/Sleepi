@@ -7,52 +7,107 @@
 
 import Foundation
 import HealthKit
-import SwiftUI
 
 @MainActor
 class SleepManager: ObservableObject {
     private var healthStore: HealthStore?
-    @Published var currentDate: Date
-    @Published var startSleep: Date = Date.init(timeIntervalSince1970: 0)
-    @Published var endSleep: Date = Date.init(timeIntervalSince1970: 0)
-    var sleepDuration: Double = 0
-    let screenWidth: Double
-    var heartRateAverage: Double = 0
-
-    @Published var sleeps: [Sleep] = []
-    @Published var naps: [[Sleep]] = []
-    @Published var sleepPoints: [SleepPoint] = []
-
+    var screenWidth: Double?
+    @Published var sleepState: SleepState?
+    var deepSleepTime: TimeInterval?
+    var lightSleepTime: TimeInterval?
+    var remSleepTime: TimeInterval?
     
-
-    init(date: Date, screenWidth: Double){
-        self.currentDate = date
+    convenience init(date: Date, screenWidth: Double){
+        self.init(date: date)
         self.screenWidth = screenWidth
+    }
+    
+    init(date: Date){
+        self.screenWidth = 0
         if HKHealthStore.isHealthDataAvailable() {
             self.healthStore = HealthStore()
         }
-        self.refreshSleeps(date: date)
-                
     }
     
-    func getSleptTime() -> DateComponents {
-        let difference = Calendar.current.dateComponents([.hour, .minute], from: startSleep, to: endSleep)
-        return difference
+    
+    func refreshSleeps(date: Date) {
+        deepSleepTime = TimeInterval()
+        lightSleepTime = TimeInterval()
+        remSleepTime = TimeInterval()
+        
+        Task.init {
+            if let healthStore = healthStore {
+                let authorized: Bool = try await healthStore.requestAuthorization()
+                if authorized {
+                    var tmpSleeps = await healthStore.startSleepQuery(date: date)
+                    for (index, sleep) in tmpSleeps.enumerated() {
+                        let heartRates = await healthStore.startHeartRateQuery(startDate: sleep.startDate, endDate: sleep.endDate)
+                        tmpSleeps[index].heartRates = heartRates
+                    }
+                    
+                    var sleepCalculation: (startSleep: Date, endSleep: Date, sleepDuration: TimeInterval, totalTime: TimeInterval) = (
+                        startSleep: Date.init(timeIntervalSince1970: 0),
+                        endSleep: Date.init(timeIntervalSince1970: 0),
+                        sleepDuration: 0,
+                        totalTime: 0
+                    )
+                    var heartRateAverage: Double = 0
+                    var sleepPoints: [SleepPoint] = []
+                    var hoursLabels: [HourItem] = []
+                    
+                    if tmpSleeps.count > 1 {
+                        sleepCalculation = self.calculateMinAndMaxSleepTime(sleeps: tmpSleeps)
+                        heartRateAverage = getHeartRateAverage(sleeps: tmpSleeps)
+                        sleepPoints = getSleepPoints(sleeps: tmpSleeps,
+                                                     sleepDuration: sleepCalculation.sleepDuration,
+                                                     heartRateAverage: heartRateAverage)
+                        hoursLabels = self.getHourLabels(startSleep: sleepCalculation.startSleep,
+                                                         endSleep: sleepCalculation.endSleep)
+                    }
+                    var state = SleepState(sleeps: tmpSleeps,
+                                           naps: [[Sleep]()],
+                                           sleepPoints: sleepPoints,
+                                           startSleep: sleepCalculation.startSleep,
+                                           endSleep: sleepCalculation.endSleep,
+                                           sleepDuration: sleepCalculation.sleepDuration,
+                                           screenWidth: self.screenWidth!,
+                                           heartRateAverage: heartRateAverage,
+                                           hoursLabels: hoursLabels,
+                                           totalBedTime: sleepCalculation.totalTime)
+                    state.sleepTime = self.getSleepTimeInterval(sleeps: tmpSleeps)
+                    state.awakeTime = self.getAwakeDuration(sleeps: tmpSleeps)
+                    state.deepSleepTime = self.deepSleepTime
+                    state.lightSleepTime = self.lightSleepTime
+                    state.remSleepTime = self.remSleepTime
+                    self.sleepState = state
+
+                }
+            }
+        }
     }
 
-    func calculateMinAndMaxSleepTime(_sleeps: [Sleep]) {
-        if let earliest = _sleeps.min(by: { $0.startDate < $1.startDate }) {
-            // use earliest reminder
-            startSleep = earliest.startDate
+    func getSleepTimeInterval(sleeps: [Sleep]) -> TimeInterval {
+        var result: TimeInterval = 0
+        
+        for sleep in sleeps {
+            result += sleep.endDate.timeIntervalSinceReferenceDate - sleep.startDate.timeIntervalSinceReferenceDate
+
         }
-        if let latest = _sleeps.max(by: { $0.endDate < $1.endDate }) {
-            // use earliest reminder
-            endSleep = latest.endDate
-        }
-        sleepDuration = endSleep.timeIntervalSinceReferenceDate - startSleep.timeIntervalSinceReferenceDate
+        return result
     }
     
-    func getHourLabels() -> [HourItem] {
+    func getAwakeDuration(sleeps: [Sleep]) -> TimeInterval {
+        var result: TimeInterval = 0
+        
+        for (index, sleep) in sleeps.enumerated() {
+            if index != 0 {
+                result += sleep.startDate.timeIntervalSinceReferenceDate - sleeps[index - 1].endDate.timeIntervalSinceReferenceDate
+            }
+        }
+        return result
+    }
+    
+    func getHourLabels(startSleep: Date, endSleep: Date) -> [HourItem] {
         var hours: [HourItem] = []
         let startHour = Calendar.current.component(.hour, from: startSleep)
         let endHour = Calendar.current.component(.hour, from: endSleep)
@@ -111,62 +166,96 @@ class SleepManager: ObservableObject {
         return result
     }
     
-
-
-    func getSleepPoints(sleeps: [Sleep]) {
-        
-        sleepPoints = []
-
+    func getSleepPoints(sleeps: [Sleep], sleepDuration: Double, heartRateAverage: Double) -> [SleepPoint] {
+        var sleepPoints: [SleepPoint] = []
         var lastEndTime: Date = Date.init(timeIntervalSince1970: 0)
-
         for sleep in sleeps {
-
             // when awake
             if (lastEndTime != Date.init(timeIntervalSince1970: 0) && lastEndTime < sleep.startDate && sleepDuration != 0){
-                setSleepPoint(startValue: lastEndTime.timeIntervalSinceReferenceDate, endValue: sleep.startDate.timeIntervalSinceReferenceDate, sleepType: SleepType.Awake)
-
+                sleepPoints = setSleepPoint(startValue: lastEndTime.timeIntervalSinceReferenceDate,
+                                            endValue: sleep.startDate.timeIntervalSinceReferenceDate,
+                                            sleepType: SleepType.Awake,
+                                            sleepPoints: sleepPoints,
+                                            sleepDuration: sleepDuration)
             }
-            var startValue = sleep.startDate.timeIntervalSinceReferenceDate
+            var startValue = sleep.startDate
             
             if sleep.heartRates.count > 2 {
                 for heartRate in sleep.heartRates {
-                    var sleepType: SleepType
-//                    print(((10/100) * heartRateAverage))
-                    if heartRate.value < heartRateAverage - ((10/100) * heartRateAverage) {
-                        
-                        sleepType = SleepType.DeepSleep
-                    } else if heartRate.value > heartRateAverage + ((10/100) * heartRateAverage) {
-                        sleepType = SleepType.RemSleep
-                    } else {
-                        sleepType = SleepType.LightSleep
-                    }
+                    let sleepType: SleepType = getSleepType(heartRate: heartRate, heartRateAverage: heartRateAverage)
+                    let endValue = heartRate.startDate
+                    setSleepTypeTime(sleepType: sleepType, start: startValue, end: endValue)
                     
-                    setSleepPoint(startValue: startValue, endValue: heartRate.startDate.timeIntervalSinceReferenceDate, sleepType: sleepType)
+                    sleepPoints = setSleepPoint(startValue: startValue.timeIntervalSinceReferenceDate,
+                                                endValue: endValue.timeIntervalSinceReferenceDate,
+                                                sleepType: sleepType,
+                                                sleepPoints: sleepPoints,
+                                                sleepDuration: sleepDuration)
                     
-                    startValue = heartRate.startDate.timeIntervalSinceReferenceDate
+                    startValue = heartRate.startDate
                 }
+                setSleepTypeTime(sleepType: SleepType.LightSleep, start: startValue, end: sleep.endDate)
+
+                sleepPoints = setSleepPoint(startValue: startValue.timeIntervalSinceReferenceDate,
+                                            endValue: sleep.endDate.timeIntervalSinceReferenceDate,
+                                            sleepType: SleepType.LightSleep,
+                                            sleepPoints: sleepPoints,
+                                            sleepDuration: sleepDuration)
             } else {
-                setSleepPoint(startValue: startValue, endValue: sleep.endDate.timeIntervalSinceReferenceDate, sleepType: SleepType.DeepSleep)
+                setSleepTypeTime(sleepType: SleepType.LightSleep, start: sleep.startDate, end: sleep.endDate)
+
+                sleepPoints = setSleepPoint(startValue: sleep.startDate.timeIntervalSinceReferenceDate,
+                                            endValue: sleep.endDate.timeIntervalSinceReferenceDate,
+                                            sleepType: SleepType.LightSleep,
+                                            sleepPoints: sleepPoints,
+                                            sleepDuration: sleepDuration)
             }
-            
             lastEndTime = sleep.endDate
         }
+        
+        return sleepPoints
     }
     
-    func getHeartRateAverage(sleeps: [Sleep]) -> Double {
-        var totalHr: [Int] = []
-
-        for sleep in sleeps {
-            let intHrs: [Int] = sleep.heartRates.map { Int($0.value) }
-
-            totalHr.append(contentsOf: intHrs )
+    func addTimeToInterval(_ sleeptime: inout TimeInterval, _ start: Date, _ end: Date) {
+        let duration = end.timeIntervalSinceReferenceDate - start.timeIntervalSinceReferenceDate
+        sleeptime += duration
+    }
+    
+    func setSleepTypeTime(sleepType: SleepType, start: Date, end: Date) {
+        switch sleepType {
+        case .DeepSleep:
+//            self.deepSleepTime!
+            addTimeToInterval(&self.deepSleepTime!, start, end)
+        case .LightSleep:
+            addTimeToInterval(&self.lightSleepTime!, start, end)
+        case .RemSleep:
+            addTimeToInterval(&self.remSleepTime!, start, end)
+        default:
+            break
         }
-        let result: Double = totalHr.count > 0 ? Double(totalHr.reduce(0, +) / totalHr.count) : 0
-
-        return result
+        
     }
     
-    func setSleepPoint(startValue: Double, endValue: Double, sleepType: SleepType) {
+    func getSleepType(heartRate: HeartRate, heartRateAverage: Double) -> SleepType {
+        var sleepType: SleepType
+        
+        if heartRate.value < heartRateAverage - ((3/100) * heartRateAverage) {
+            sleepType = SleepType.DeepSleep
+        } else if heartRate.value > heartRateAverage + ((8/100) * heartRateAverage) {
+            sleepType = SleepType.RemSleep
+        } else {
+            sleepType = SleepType.LightSleep
+        }
+
+        return sleepType
+    }
+    
+    func setSleepPoint(startValue: Double,
+                       endValue: Double,
+                       sleepType: SleepType,
+                       sleepPoints: [SleepPoint],
+                       sleepDuration: Double) -> [SleepPoint] {
+        var sleepPoints = sleepPoints
         var offsetX = sleepPoints.last?.offsetX ?? 0
                 
         let startPoint = SleepPoint(
@@ -175,36 +264,33 @@ class SleepManager: ObservableObject {
         sleepPoints.append(startPoint)
 
         let sleepPercent = ((endValue - startValue) / sleepDuration )
-        let offset = (sleepPercent) * screenWidth
+        let offset = (sleepPercent) * screenWidth!
         offsetX += offset
 
         let endPoint = SleepPoint(
             type: sleepType.rawValue,
             offsetX: offsetX)
         sleepPoints.append(endPoint)
+        return sleepPoints
     }
     
-    func refreshSleeps(date: Date) {
-        Task.init {
-            if let healthStore = healthStore {
-                let authorized: Bool = try await healthStore.requestAuthorization()
-                if authorized {
-                    var tmpSleeps = await healthStore.startSleepQuery(date: date)
-                    
-                    for (index, sleep) in tmpSleeps.enumerated() {
-                        let heartRates = await healthStore.startHeartRateQuery(startDate: sleep.startDate, endDate: sleep.endDate)
-                        tmpSleeps[index].heartRates = heartRates
-                    }
-                    calculateMinAndMaxSleepTime(_sleeps: tmpSleeps)
-                    self.heartRateAverage = getHeartRateAverage(sleeps: tmpSleeps)
-                    getSleepPoints(sleeps: tmpSleeps)
-                    self.sleeps = tmpSleeps
-                    
-                }
-
+    func getHeartRateAverage(sleeps: [Sleep]) -> Double {
+        var totalHr: [Int] = []
+            for sleep in sleeps {
+                let intHrs: [Int] = sleep.heartRates.map { Int($0.value) }
+                totalHr.append(contentsOf: intHrs )
             }
-            
-        }
+        return totalHr.count > 0 ? Double(totalHr.reduce(0, +) / totalHr.count) : 0
+    }
+    
+    func calculateMinAndMaxSleepTime(sleeps: [Sleep]) -> (startSleep: Date, endSleep: Date, sleepDuration: TimeInterval, totalTime: TimeInterval) {
+        print("calculateMinAndMaxSleepTime: ")
         
+        let endSleep: Date = sleeps.max(by: { $0.endDate < $1.endDate }).map( { $0.endDate} )!
+        let startSleep = sleeps.min(by: { $0.startDate < $1.startDate }).map( { $0.startDate } )!
+        let sleepDuration: TimeInterval = (endSleep.timeIntervalSinceReferenceDate ) - (startSleep.timeIntervalSinceReferenceDate )
+        let totalTime = endSleep.timeIntervalSinceReferenceDate - startSleep.timeIntervalSinceReferenceDate
+
+        return (startSleep, endSleep, sleepDuration, totalTime)
     }
 }

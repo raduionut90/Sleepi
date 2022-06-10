@@ -36,7 +36,6 @@ struct LineChartView: View {
     }()
     
     var body: some View {
-
         VStack {
 
             VStack {
@@ -60,9 +59,9 @@ struct LineChartView: View {
                         isEditing = editing
                     }
                 )
-                Text("\(Date.init(timeIntervalSince1970: speed))")
-                    .foregroundColor(isEditing ? .red : .blue)
-                Text(String(speed)).font(.caption)
+//                let _ = print(Date.init(timeIntervalSince1970: speed))
+                Text("\((Date.init(timeIntervalSince1970: speed)), formatter: timeFormatter)")
+                    .foregroundColor(isEditing ? .red : .blue).font(.caption)
             }
 
 
@@ -121,5 +120,8 @@ struct LineChartView: View {
             }
             
         }
+        .onChange(of: startSleep, perform: { value in
+            speed = value.timeIntervalSince1970
+        })
     }
 }

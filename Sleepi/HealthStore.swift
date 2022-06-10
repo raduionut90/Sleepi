@@ -32,7 +32,7 @@ class HealthStore {
         
         let res: ()? = try? await store.requestAuthorization(toShare: [], read: readTypes)
         guard res != nil else {
-            return false
+            throw HKError(.errorAuthorizationDenied)
         }
         return true
     }
@@ -57,10 +57,14 @@ class HealthStore {
                     return
                 }
                 var sleeps: [Sleep] = []
-                
+
                 if let result = tmpResult {
+
                     for item in result {
                         if let sample = item as? HKCategorySample {
+//                            print(sample.sourceRevision.source)
+//                            print(sample.sourceRevision.productType!)
+
                             if (sample.sourceRevision.source.bundleIdentifier.contains("com.apple.health") &&
                                 ((sample.sourceRevision.productType?.contains("Watch")) == true)) {
                                 let sleep = Sleep(value: sample.value, startDate: sample.startDate, endDate: sample.endDate, source: sample.sourceRevision.source.name, heartRates: [HeartRate]())
