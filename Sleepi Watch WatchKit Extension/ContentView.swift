@@ -12,8 +12,9 @@ struct ContentView: View {
     @State private var currentDate: Date = Date()
     @StateObject var sleepManager: SleepManager = SleepManager(date: Date())
     var swipeGestureRecognizer = WKSwipeGestureRecognizer()
-    
-    
+    let wmotionService = WMotionService()
+    @EnvironmentObject var service: WatchConnectivityService
+
     private var timeFormatter: DateComponentsFormatter = {
         let formatter = DateComponentsFormatter()
         formatter.zeroFormattingBehavior = .pad
@@ -39,26 +40,8 @@ struct ContentView: View {
         VStack{
             HStack{
                 Spacer()
-                if swipeGestureRecognizer.direction == WKSwipeGestureRecognizerDirection.left {
-//                    addingDays(nr: -1)
-                    Text("da")
-                }
-//                Button(action: {
-//                    addingDays(nr: -1)
-//                }) {
-//                    Text("<")
-//                        .font(.caption)
-//                }
                 Text(dateFormatter.string(from: currentDate))
                     .font(.headline)
-//                if (Calendar.current.compare(Date(), to: currentDate, toGranularity: .day) == .orderedDescending) {
-//                    Button(action: {
-//                        addingDays(nr: 1)
-//                    }) {
-//                        Text(">")
-//                            .font(.caption2)
-//                    }
-//                }
                 Spacer()
             }.padding()
             HStack {
@@ -69,9 +52,11 @@ struct ContentView: View {
         }
         .onAppear(){
             sleepManager.refreshSleeps(date: currentDate)
+//            wmotionService.readMotionData(service: service)
         }
         .onChange(of: currentDate, perform: { value in
             sleepManager.refreshSleeps(date: value)
+            wmotionService.readMotionData(service: service)
         })
         .gesture(DragGesture(minimumDistance: 0, coordinateSpace: .local)
                             .onEnded({ value in

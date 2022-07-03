@@ -9,59 +9,52 @@ import Foundation
 import CoreMotion
 import SwiftUI
 
+
 class MotionService {
     var timer: Timer?
-    let recorder = CMSensorRecorder()
-    let watchMotionService = WMotionService()
-    let motion = CMMotionManager()
+    var motion: CMMotionManager
+    var lastMotion = 0.0
 
     init() {
-        watchMotionService.startDeviceMotion()
+        self.motion = CMMotionManager()
     }
-    
-    func readMotionData() {
-        if motion.isDeviceMotionAvailable {
-            print("ios device motion available")
 
-            var xx = 0.0
-            var yy = 0.0
-            var zz = 0.0
-
-            // Configure a timer to fetch the motion data.
-            self.timer = Timer(fire: Date(), interval: (60), repeats: true,
-                               block: { (timer) in
-                                if let data = self.motion.deviceMotion {
-                                    print("data div motion")
-
-                                    // Get the attitude relative to the magnetic north reference frame.
-                                    let x = data.attitude.pitch
-                                    let y = data.attitude.roll
-                                    let z = data.attitude.yaw
-                                    
-                                    let xRange = (x - 0.1)..<(x + 0.1)
-                                    let yRange = (y - 0.1)..<(y + 0.1)
-                                    let zRange = (z - 0.1)..<(z + 0.1)
-
-                                    
-                                    if !xRange.contains(xx) || !yRange.contains(yy) || !zRange.contains(zz){
-                                        print(Date())
-                                        print("movement")
-
-                                    } else {
-                                        print(Date())
-                                        print("Not movement")
-                                    }
-                                    
-                                    xx = x
-                                    yy = y
-                                    zz = z
-
-                                }
-            })
-            
-            // Add the timer to the current run loop.
-            RunLoop.current.add(self.timer!, forMode: RunLoop.Mode.default)
-        }
-    }
+        
+    //live accelerometer
+//    func readMotionData() {
+//        if motion.isDeviceMotionAvailable {
+//            self.motion.deviceMotionUpdateInterval = 1
+//            self.motion.showsDeviceMovementDisplay = true
+//            self.motion.startDeviceMotionUpdates(using: .xMagneticNorthZVertical)
+//
+//            // Configure a timer to fetch the motion data.
+//            self.timer = Timer(fire: Date(), interval: (1), repeats: true,
+//                               block: { (timer) in
+//
+//                                if let data = self.motion.deviceMotion {
+//
+//                                    // Get the attitude relative to the magnetic north reference frame.
+//                                    let x = data.attitude.pitch
+//                                    let y = data.attitude.roll
+//                                    let z = data.attitude.yaw
+//
+//                                    let m = x + y + z
+//                                    let mRange = (self.lastMotion - 0.1)..<(self.lastMotion + 0.1)
+//
+//                                    if mRange.contains(m) {
+//                                        print("No motion")
+//                                    } else {
+//                                        print("MOTION")
+//                                    }
+//                                    print("")
+//                                    self.lastMotion = m
+//
+//                                }
+//            })
+//
+//            // Add the timer to the current run loop.
+//            RunLoop.current.add(self.timer!, forMode: RunLoop.Mode.default)
+//        }
+//    }
     
 }

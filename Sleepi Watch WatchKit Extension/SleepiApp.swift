@@ -9,10 +9,13 @@ import SwiftUI
 
 @main
 struct SleepiApp: App {
+    @StateObject var service = WatchConnectivityService()
+
     @SceneBuilder var body: some Scene {
         WindowGroup {
             NavigationView {
                 ContentView()
+                    .environmentObject(service)
             }
         }
 
