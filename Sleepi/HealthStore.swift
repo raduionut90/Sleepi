@@ -28,7 +28,9 @@ class HealthStore {
     func requestAuthorization() async throws -> Bool {
         let store = HKHealthStore()
 
-        let readTypes: Set = [HKObjectType.categoryType(forIdentifier: HKCategoryTypeIdentifier.sleepAnalysis)!, HKObjectType.quantityType(forIdentifier: HKQuantityTypeIdentifier.heartRate)!]
+        let readTypes: Set = [HKObjectType.categoryType(forIdentifier: HKCategoryTypeIdentifier.sleepAnalysis)!,
+                              HKObjectType.quantityType(forIdentifier: HKQuantityTypeIdentifier.heartRate)!,
+                              HKObjectType.quantityType(forIdentifier: HKQuantityTypeIdentifier.activeEnergyBurned)!]
         
         let res: ()? = try? await store.requestAuthorization(toShare: [], read: readTypes)
         guard res != nil else {
@@ -69,6 +71,7 @@ class HealthStore {
                                 ((sample.sourceRevision.productType?.contains("Watch")) == true)) {
                                 let sleep = Sleep(value: sample.value, startDate: sample.startDate, endDate: sample.endDate, source: sample.sourceRevision.source.name, heartRates: [HeartRate]())
                                 sleeps.append(sleep)
+                                print("\(sleep.startDate.formatted());\(sleep.endDate.formatted())")
                             }
                         }
                     }
@@ -138,4 +141,52 @@ class HealthStore {
         }
       }
     
+    
+    func activityQuery(
+        startDate: Date,
+        endDate: Date) async -> [HKQuantitySample] {
+
+//            print("startDate: \(startDate)")
+//            print("endDate: \(endDate)")
+
+        /// Create sample type for the heart rate
+        let sampleType = HKObjectType.quantityType(forIdentifier: .activeEnergyBurned)!
+
+        /// Predicate for specifiying start and end dates for the query
+        let predicate = HKQuery
+          .predicateForSamples(
+            withStart: startDate,
+            end: endDate,
+            options: .strictEndDate)
+
+        /// Set sorting by date.
+        let sortDescriptor = NSSortDescriptor(
+          key: HKSampleSortIdentifierStartDate,
+          ascending: true)
+
+        /// Create the query
+        return await withCheckedContinuation { continuation in
+
+            let query = HKSampleQuery(
+              sampleType: sampleType,
+              predicate: predicate,
+              limit: Int(HKObjectQueryNoLimit),
+              sortDescriptors: [sortDescriptor]) { (_, tmpResult, error) in
+
+                guard error == nil else {
+                    print("Error: \(error!.localizedDescription)")
+                    return
+                }
+
+              if let result = tmpResult as? [HKQuantitySample] {
+                  continuation.resume(returning: result)
+              }
+            }
+
+                /// Execute the query in the health store
+            if let healthStore = healthStore {
+                healthStore.execute(query)
+            }
+        }
+      }
 }

@@ -11,7 +11,6 @@ import HealthKit
 struct ContentView: View {
     @State private var currentDate: Date = Date()
     @StateObject var sleepManager: SleepManager = SleepManager(date: Date(), screenWidth: UIScreen.main.bounds.width - 30)
-    @EnvironmentObject var service: WatchConnectivityService
 
     func addingDays(nr: Int) -> Void {
         var dateComponent = DateComponents()
@@ -132,17 +131,12 @@ struct ContentView: View {
         }
             .navigationViewStyle(StackNavigationViewStyle())
             .onAppear(){
-//                MotionService().startDeviceMotion()
                 sleepManager.refreshSleeps(date: currentDate)
-                service.requestRecordingMotionDataToWatch()
-                service.requestMotionDataToWatch()
+                sleepManager.readActivityTime()
             }
             .onChange(of: currentDate, perform: { value in
                 sleepManager.refreshSleeps(date: value)
-//                MotionService().readMotionData()
-                service.requestRecordingMotionDataToWatch()
-                service.requestMotionDataToWatch()
-
+                sleepManager.readActivityTime()
             })
         }
 

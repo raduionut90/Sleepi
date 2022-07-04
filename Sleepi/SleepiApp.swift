@@ -9,12 +9,10 @@ import SwiftUI
 
 @main
 struct SleepiApp: App {
-    @StateObject var service = WatchConnectivityService()
 
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .environmentObject(service)
         }
     }
 }

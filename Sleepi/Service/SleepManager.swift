@@ -29,6 +29,49 @@ class SleepManager: ObservableObject {
         }
     }
     
+    private var formatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "E, dd MMM yyyy, HH:mm"
+        return formatter
+    }()
+    
+    func readActivityTime(){
+        Task.init {
+            if let healthStore = healthStore {
+                let authorized: Bool = try await healthStore.requestAuthorization()
+                if authorized {
+                    let start: Date = Calendar.current.date(byAdding: .day, value: -4, to: Date())!
+                    let end: Date = Calendar.current.date(byAdding: .day, value: 0, to: Date())!
+                    let result = await healthStore.activityQuery(startDate: start, endDate: end)
+                    print(Date())
+                    for (index,item) in result.enumerated() {
+//                        if item.quantity.doubleValue(for: HKUnit(from: "kcal")) < 0.300 {
+//                        var sumkcal = 0.0
+//                        for k in index...index+10 {
+//                            if k < result.count {
+//                                sumkcal += result[k].quantity.doubleValue(for: .kilocalorie())
+//                            }
+//
+//                        }
+//                        print("sumkcal: \(item.startDate) : \(sumkcal)")
+//
+//                        if sumkcal < 5 {
+//                            print(item.quantity)
+//                            print(item.startDate)
+//                            print(item.endDate)
+//                            print("")
+//
+//                        }
+//                        sumkcal = 0
+//                        print("\(item.quantity);\(item.startDate);\(item.endDate)")
+
+//                        }
+
+                    }
+                }
+            }
+        }
+    }
     
     func refreshSleeps(date: Date) {
         deepSleepTime = TimeInterval()
@@ -44,6 +87,37 @@ class SleepManager: ObservableObject {
                         let heartRates = await healthStore.startHeartRateQuery(startDate: sleep.startDate, endDate: sleep.endDate)
                         tmpSleeps[index].heartRates = heartRates
                     }
+                    
+                    let start: Date = Calendar.current.date(byAdding: .day, value: -1, to: Date())!
+                    let end: Date = Calendar.current.date(byAdding: .day, value: 0, to: Date())!
+                    let hrates = await healthStore.startHeartRateQuery(startDate: start, endDate: end)
+                    let actEnergy = await healthStore.activityQuery(startDate: start, endDate: end)
+
+                    var activity: [Activity] = []
+                    
+                    for actEnergy in actEnergy {
+                        let act = Activity(date: actEnergy.startDate, actEng: actEnergy.quantity.doubleValue(for: .kilocalorie()))
+                        activity.append(act)
+                    }
+                    
+                    for hrs in hrates {
+                        if let existingAct = activity.first(where: {formatter.string(from: $0.date) == formatter.string(from: hrs.startDate)} ) {
+                            existingAct.hr = hrs.value
+                        } else {
+                            let act = Activity(date: hrs.startDate, hr: hrs.value)
+                            activity.append(act)
+                        }
+
+                    }
+                    activity = activity.sorted { a,b in
+                        a.date < b.date
+                    }
+                    
+                    for act in activity {
+                        print("\(act.date.formatted());\(act.hr ?? 999);\(act.actEng ?? 999)")
+                    }
+                    
+                    performCalculation(activities: activity)
                     
                     var sleepCalculation: (startSleep: Date, endSleep: Date, sleepDuration: TimeInterval, totalTime: TimeInterval) = (
                         startSleep: Date.init(timeIntervalSince1970: 0),
@@ -83,6 +157,74 @@ class SleepManager: ObservableObject {
 
                 }
             }
+        }
+    }
+    
+    func performCalculation(activities: [Activity]){
+        var lowActivities: [Activity] = []
+        var highActivities: [Activity] = []
+        var counter: Int = 0
+        let avgHr = getAverage(array: activities, by: "hr")
+        
+        print("AvrrHR: \(avgHr)")
+        for activity in activities {
+            if (activity.actEng ?? 999) < 0.150  || avgHr > activity.hr ?? 999 {
+                let avgResultActEng = getAverage(array: highActivities, by: "ae")
+                let avgResultHr = getAverage(array: lowActivities, by: "hr")
+                
+                if counter > 4 || (avgResultHr.isNaN ? false : avgResultHr > avgHr) {
+                    let firstEntryTimeInterval = lowActivities.last?.date.timeIntervalSinceReferenceDate ?? 0
+                    let lastEntryTimeInterval = lowActivities.first?.date.timeIntervalSinceReferenceDate ?? 0
+//                    print("avgResultHr: \(avgResultHr) \(avgResultHr.isNaN ? false : avgResultHr > avgHr)")
+                    print("avgResultActEng: \(avgResultActEng), start: \(highActivities.first?.date), end: \(highActivities.last?.date)")
+                    
+                    if (firstEntryTimeInterval - lastEntryTimeInterval) > 1200 {
+                        if let start = lowActivities.first?.date.formatted() {
+                            print(start)
+                            if start == "04.07.2022, 5:53"{
+                                print("jer")
+                            }
+                        }
+                        if let end = lowActivities.last?.date.formatted() {
+                            print(end)
+                        }
+                    }
+                    lowActivities = []
+                    highActivities = []
+                    print("")
+                }
+                counter = 0
+                lowActivities.append(activity)
+            } else {
+                counter += 1
+                if counter <= 4 {
+                    highActivities.append(activity)
+                }
+            }
+        }
+    }
+    
+    func checkNextActivitiesAreLow(activities: [Activity], fromIndex: Int, averageHr: Double) -> Bool {
+        var result = true
+        var tempArray: [Activity] = []
+        for index in fromIndex...fromIndex + 4 {
+            tempArray.append(activities[index])
+        }
+        for activity in tempArray {
+            if (activity.actEng ?? 0) > 0.150  || averageHr < activity.hr ?? 0 {
+                result = false
+            }
+        }
+        return result
+    }
+    
+    func getAverage(array: [Activity], by: String) -> Double {
+        if by == "hr" {
+            let sumResultHr = array.compactMap(\.hr).reduce(0.0, +)
+            return (sumResultHr / Double(array.compactMap(\.hr).count))
+        } else {
+            let sumResultHr = array.compactMap(\.actEng).reduce(0.0, +)
+            return (sumResultHr / Double(array.compactMap(\.actEng).count))
         }
     }
 
