@@ -28,6 +28,8 @@
 		170A4B7128470EEA009FB756 /* HourItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17D07D28283E822A002575B6 /* HourItem.swift */; };
 		170F2D862834252F00D00A7C /* HeartRate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 170F2D852834252F00D00A7C /* HeartRate.swift */; };
 		170F2D8828342AA800D00A7C /* SleepType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 170F2D8728342AA800D00A7C /* SleepType.swift */; };
+		17111E5D28744427004169C9 /* SleepDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17111E5C28744427004169C9 /* SleepDetector.swift */; };
+		17111E602874461A004169C9 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17111E5F2874461A004169C9 /* Utils.swift */; };
 		171535212815C02F00B1A499 /* SleepiApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 171535202815C02F00B1A499 /* SleepiApp.swift */; };
 		171535232815C02F00B1A499 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 171535222815C02F00B1A499 /* ContentView.swift */; };
 		171535252815C02F00B1A499 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 171535242815C02F00B1A499 /* Assets.xcassets */; };
@@ -38,10 +40,8 @@
 		174E5F2B28720D6F00D423A0 /* Activity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 174E5F2A28720D6F00D423A0 /* Activity.swift */; };
 		174E5F2C2872106000D423A0 /* SleepManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17A4C3C6283511F5005D92F7 /* SleepManager.swift */; };
 		174E5F2D2872106400D423A0 /* Activity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 174E5F2A28720D6F00D423A0 /* Activity.swift */; };
-		176D2039286393F1004D0211 /* WatchConnectivityService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 176D2038286393F1004D0211 /* WatchConnectivityService.swift */; };
 		17A4C3C7283511F5005D92F7 /* SleepManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17A4C3C6283511F5005D92F7 /* SleepManager.swift */; };
 		17C85170284A86B500E93C26 /* HealthKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 17C8516F284A86B500E93C26 /* HealthKit.framework */; };
-		17CC5F16284BCEF6000A84BF /* WMotionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17CC5F15284BCEF6000A84BF /* WMotionService.swift */; };
 		17D07D29283E822A002575B6 /* HourItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17D07D28283E822A002575B6 /* HourItem.swift */; };
 		17EA8C8C28282B6800545BDD /* LineChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17EA8C8B28282B6800545BDD /* LineChartView.swift */; };
 /* End PBXBuildFile section */
@@ -106,6 +106,8 @@
 		170A4B6028470EC6009FB756 /* PushNotificationPayload.apns */ = {isa = PBXFileReference; lastKnownFileType = text; path = PushNotificationPayload.apns; sourceTree = "<group>"; };
 		170F2D852834252F00D00A7C /* HeartRate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeartRate.swift; sourceTree = "<group>"; };
 		170F2D8728342AA800D00A7C /* SleepType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepType.swift; sourceTree = "<group>"; };
+		17111E5C28744427004169C9 /* SleepDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepDetector.swift; sourceTree = "<group>"; };
+		17111E5F2874461A004169C9 /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
 		1715351D2815C02F00B1A499 /* Sleepi.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Sleepi.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		171535202815C02F00B1A499 /* SleepiApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepiApp.swift; sourceTree = "<group>"; };
 		171535222815C02F00B1A499 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -117,11 +119,9 @@
 		171535352815D7F200B1A499 /* Sleep.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sleep.swift; sourceTree = "<group>"; };
 		172D18272853302900A0FD42 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		174E5F2A28720D6F00D423A0 /* Activity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Activity.swift; sourceTree = "<group>"; };
-		176D2038286393F1004D0211 /* WatchConnectivityService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchConnectivityService.swift; sourceTree = "<group>"; };
 		17A4C3C6283511F5005D92F7 /* SleepManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepManager.swift; sourceTree = "<group>"; };
 		17C8516F284A86B500E93C26 /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = Platforms/WatchOS.platform/Developer/SDKs/WatchOS8.5.sdk/System/Library/Frameworks/HealthKit.framework; sourceTree = DEVELOPER_DIR; };
 		17CC5F12284BC9B3000A84BF /* Sleepi Watch WatchKit ExtensionRelease.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = "Sleepi Watch WatchKit ExtensionRelease.entitlements"; sourceTree = "<group>"; };
-		17CC5F15284BCEF6000A84BF /* WMotionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WMotionService.swift; sourceTree = "<group>"; };
 		17D07D28283E822A002575B6 /* HourItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HourItem.swift; sourceTree = "<group>"; };
 		17EA8C8B28282B6800545BDD /* LineChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LineChartView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -159,7 +159,6 @@
 			children = (
 				17CC5F12284BC9B3000A84BF /* Sleepi Watch WatchKit ExtensionRelease.entitlements */,
 				170039D3284A8CE800227F80 /* Sleepi Watch WatchKit Extension.entitlements */,
-				17C8516D284A804100E93C26 /* Service */,
 				170A4B5028470EC5009FB756 /* SleepiApp.swift */,
 				170A4B5228470EC5009FB756 /* ContentView.swift */,
 				170A4B5428470EC5009FB756 /* NotificationController.swift */,
@@ -254,15 +253,8 @@
 			isa = PBXGroup;
 			children = (
 				17A4C3C6283511F5005D92F7 /* SleepManager.swift */,
-			);
-			path = Service;
-			sourceTree = "<group>";
-		};
-		17C8516D284A804100E93C26 /* Service */ = {
-			isa = PBXGroup;
-			children = (
-				17CC5F15284BCEF6000A84BF /* WMotionService.swift */,
-				176D2038286393F1004D0211 /* WatchConnectivityService.swift */,
+				17111E5C28744427004169C9 /* SleepDetector.swift */,
+				17111E5F2874461A004169C9 /* Utils.swift */,
 			);
 			path = Service;
 			sourceTree = "<group>";
@@ -422,8 +414,6 @@
 				170A4B6F28470EEA009FB756 /* SleepState.swift in Sources */,
 				170A4B5728470EC5009FB756 /* NotificationView.swift in Sources */,
 				170A4B6D28470EEA009FB756 /* SleepPoint.swift in Sources */,
-				176D2039286393F1004D0211 /* WatchConnectivityService.swift in Sources */,
-				17CC5F16284BCEF6000A84BF /* WMotionService.swift in Sources */,
 				170A4B6E28470EEA009FB756 /* HealthStore.swift in Sources */,
 				170A4B6B28470EEA009FB756 /* SleepType.swift in Sources */,
 			);
@@ -436,6 +426,7 @@
 				171535232815C02F00B1A499 /* ContentView.swift in Sources */,
 				17A4C3C7283511F5005D92F7 /* SleepManager.swift in Sources */,
 				17D07D29283E822A002575B6 /* HourItem.swift in Sources */,
+				17111E602874461A004169C9 /* Utils.swift in Sources */,
 				170A4ADC283FBF87009FB756 /* SleepPoint.swift in Sources */,
 				171535362815D7F200B1A499 /* Sleep.swift in Sources */,
 				171535332815C1EA00B1A499 /* HealthStore.swift in Sources */,
@@ -445,6 +436,7 @@
 				170F2D862834252F00D00A7C /* HeartRate.swift in Sources */,
 				170F2D8828342AA800D00A7C /* SleepType.swift in Sources */,
 				171535212815C02F00B1A499 /* SleepiApp.swift in Sources */,
+				17111E5D28744427004169C9 /* SleepDetector.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
