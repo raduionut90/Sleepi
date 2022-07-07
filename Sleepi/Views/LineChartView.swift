@@ -12,6 +12,21 @@ struct LineChartView: View {
     let endSleep: Date
     let screenWidth = UIScreen.main.bounds.width - 10
     
+//    private func getPath() -> [Path] {
+//        if sleepPoints.isEmpty {
+//            return [Path()]
+//        }
+//        
+//        var paths: [Path] = []
+//        var x = sleepPoints[0].offsetX
+//        var y = sleepPoints[0].type
+//        
+//        for sleepPoint in sleepPoints {
+//            var path = Path()
+//            path.move(to: CGPoint(x: x, y: y))
+//            path.addLine(to: CGPoint(x: sleepPoint.offsetX, y: sleepPoint.type))
+//        }
+//    }
     
     private var path: Path {
         

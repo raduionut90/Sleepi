@@ -481,7 +481,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = kantaraweb.Sleepi.watchkitapp.watchkitextension;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kantaraweb.Sleepi.watchkitapp.watchkitextension;
 				PRODUCT_NAME = "${TARGET_NAME}";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = watchos;
@@ -518,7 +518,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = kantaraweb.Sleepi.watchkitapp.watchkitextension;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kantaraweb.Sleepi.watchkitapp.watchkitextension;
 				PRODUCT_NAME = "${TARGET_NAME}";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = watchos;
@@ -544,9 +544,9 @@
 				IBSC_MODULE = Sleepi_Watch_WatchKit_Extension;
 				INFOPLIST_KEY_CFBundleDisplayName = "Sleepi Watch";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = kantaraweb.Sleepi;
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.kantaraweb.Sleepi;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = kantaraweb.Sleepi.watchkitapp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kantaraweb.Sleepi.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
@@ -571,9 +571,9 @@
 				IBSC_MODULE = Sleepi_Watch_WatchKit_Extension;
 				INFOPLIST_KEY_CFBundleDisplayName = "Sleepi Watch";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = kantaraweb.Sleepi;
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.kantaraweb.Sleepi;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = kantaraweb.Sleepi.watchkitapp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kantaraweb.Sleepi.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
@@ -726,7 +726,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = kantaraweb.Sleepi;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kantaraweb.Sleepi;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -763,7 +763,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = kantaraweb.Sleepi;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kantaraweb.Sleepi;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;

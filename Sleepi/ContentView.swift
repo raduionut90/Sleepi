@@ -132,12 +132,11 @@ struct ContentView: View {
         }
             .navigationViewStyle(StackNavigationViewStyle())
             .onAppear(){
+                sleepDetector.performSleepDetection()
                 sleepManager.refreshSleeps(date: currentDate)
-                sleepDetector.performSleepDetection(date: currentDate)
             }
             .onChange(of: currentDate, perform: { value in
                 sleepManager.refreshSleeps(date: value)
-                sleepDetector.performSleepDetection(date: value)
             })
         }
 

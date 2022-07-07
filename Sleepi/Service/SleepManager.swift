@@ -283,7 +283,6 @@ class SleepManager: ObservableObject {
     }
     
     func calculateMinAndMaxSleepTime(sleeps: [Sleep]) -> (startSleep: Date, endSleep: Date, sleepDuration: TimeInterval, totalTime: TimeInterval) {
-        print("calculateMinAndMaxSleepTime: ")
         
         let endSleep: Date = sleeps.max(by: { $0.endDate < $1.endDate }).map( { $0.endDate} )!
         let startSleep = sleeps.min(by: { $0.startDate < $1.startDate }).map( { $0.startDate } )!
