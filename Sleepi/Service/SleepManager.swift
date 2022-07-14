@@ -54,7 +54,7 @@ class SleepManager: ObservableObject {
                     var sleepPoints: [SleepPoint] = []
                     var hoursLabels: [HourItem] = []
                     
-                    if tmpSleeps.count > 1 {
+                    if tmpSleeps.count > 0 {
                         sleepCalculation = self.calculateMinAndMaxSleepTime(sleeps: tmpSleeps)
                         heartRateAverage = getHeartRateAverage(sleeps: tmpSleeps)
                         sleepPoints = getSleepPoints(sleeps: tmpSleeps,
@@ -180,18 +180,24 @@ class SleepManager: ObservableObject {
             var startValue = sleep.startDate
             
             if sleep.heartRates.count > 2 {
+                var sleepType: SleepType = getSleepType(heartRate: sleep.heartRates[0], heartRateAverage: heartRateAverage)
                 for heartRate in sleep.heartRates {
-                    let sleepType: SleepType = getSleepType(heartRate: heartRate, heartRateAverage: heartRateAverage)
-                    let endValue = heartRate.startDate
-                    setSleepTypeTime(sleepType: sleepType, start: startValue, end: endValue)
+                    let currentSleepType = getSleepType(heartRate: heartRate, heartRateAverage: heartRateAverage)
                     
-                    sleepPoints = setSleepPoint(startValue: startValue.timeIntervalSinceReferenceDate,
-                                                endValue: endValue.timeIntervalSinceReferenceDate,
-                                                sleepType: sleepType,
-                                                sleepPoints: sleepPoints,
-                                                sleepDuration: sleepDuration)
-                    
-                    startValue = heartRate.startDate
+                    if currentSleepType != sleepType {
+                        let endValue = heartRate.startDate
+                        setSleepTypeTime(sleepType: sleepType, start: startValue, end: endValue)
+                        
+                        sleepPoints = setSleepPoint(startValue: startValue.timeIntervalSinceReferenceDate,
+                                                    endValue: endValue.timeIntervalSinceReferenceDate,
+                                                    sleepType: sleepType,
+                                                    sleepPoints: sleepPoints,
+                                                    sleepDuration: sleepDuration)
+                        
+                        startValue = heartRate.startDate
+                        sleepType = currentSleepType
+                    }
+
                 }
                 setSleepTypeTime(sleepType: SleepType.LightSleep, start: startValue, end: sleep.endDate)
 
@@ -254,22 +260,24 @@ class SleepManager: ObservableObject {
                        sleepType: SleepType,
                        sleepPoints: [SleepPoint],
                        sleepDuration: Double) -> [SleepPoint] {
+        
         var sleepPoints = sleepPoints
         var offsetX = sleepPoints.last?.offsetX ?? 0
-                
-        let startPoint = SleepPoint(
-            type: sleepType.rawValue,
-            offsetX: offsetX)
-        sleepPoints.append(startPoint)
 
         let sleepPercent = ((endValue - startValue) / sleepDuration )
         let offset = (sleepPercent) * screenWidth!
-        offsetX += offset
+        
+        if offset != 0 {
+                print("offset: \(offset)")
+            offsetX += offset
 
-        let endPoint = SleepPoint(
-            type: sleepType.rawValue,
-            offsetX: offsetX)
-        sleepPoints.append(endPoint)
+            let endPoint = SleepPoint(
+                type: sleepType.rawValue,
+                offsetX: offsetX)
+            sleepPoints.append(endPoint)
+            print("endPoint: \(endPoint)")
+        }
+
         return sleepPoints
     }
     

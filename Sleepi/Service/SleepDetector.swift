@@ -8,8 +8,9 @@
 import Foundation
 import HealthKit
 
-class SleepDetector {
+class SleepDetector: ObservableObject {
     private var healthStore: HealthStore?
+    @Published var loading: Bool = true
 
     init(){
         if HKHealthStore.isHealthDataAvailable() {
@@ -33,7 +34,7 @@ class SleepDetector {
 //                    processRawData(debugHeartRates, debugActiveEnergy)
                     // stop debugging
                     
-                    print("startDate: \(startDate.formatted()) , endDate: \(endDate.formatted())")
+//                    print("startDate: \(startDate.formatted()) , endDate: \(endDate.formatted())")
 
                     let heartRates = await healthStore.startHeartRateQuery(startDate: startDate, endDate: endDate)
                     let activeEnergy = await healthStore.activityQuery(startDate: startDate, endDate: endDate)
@@ -41,9 +42,11 @@ class SleepDetector {
                     let activities: [Activity] = processRawData(heartRates, activeEnergy)
                     
                     performCalculation(activities: activities)
+                    
                 }
             }
         }
+        loading = false
     }
     
     private func performCalculation(activities: [Activity]) {
@@ -139,9 +142,9 @@ class SleepDetector {
         }
         
 //      used for debug
-        for record in activities {
-            print("\(record.date.formatted());\(record.hr ?? 999);\(record.actEng ?? 999)")
-        }
+//        for record in activities {
+//            print("\(record.date.formatted());\(record.hr ?? 999);\(record.actEng ?? 999)")
+//        }
         
         return activities
     }

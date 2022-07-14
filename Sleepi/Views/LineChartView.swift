@@ -35,10 +35,17 @@ struct LineChartView: View {
         }
         
         var path = Path()
-        path.move(to: CGPoint(x: sleepPoints[0].offsetX, y: sleepPoints[0].type))
-        
-        for sleepPoint in sleepPoints {
+        var offsetX = 0.0
+        var offsetY = sleepPoints[0].type
+        path.move(to: CGPoint(x: offsetX, y: offsetY))
+
+        print("sleeppoint.count: \(sleepPoints.count)")
+        for sleepPoint in sleepPoints {            
+            path.addRoundedRect(in: CGRect(x: offsetX, y: offsetY - 10, width: sleepPoint.offsetX - offsetX, height: 20), cornerSize: CGSize(width: 5, height: 5), style: .circular)
             path.addLine(to: CGPoint(x: sleepPoint.offsetX, y: sleepPoint.type))
+                
+            offsetX = sleepPoint.offsetX
+            offsetY = sleepPoint.type
         }
         return path
         

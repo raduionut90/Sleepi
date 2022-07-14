@@ -11,7 +11,7 @@ import HealthKit
 struct ContentView: View {
     @State private var currentDate: Date = Date()
     @StateObject var sleepManager: SleepManager = SleepManager(date: Date(), screenWidth: UIScreen.main.bounds.width - 30)
-    let sleepDetector = SleepDetector()
+    @StateObject var sleepDetector = SleepDetector()
 
     func addingDays(nr: Int) -> Void {
         var dateComponent = DateComponents()
@@ -137,6 +137,9 @@ struct ContentView: View {
             }
             .onChange(of: currentDate, perform: { value in
                 sleepManager.refreshSleeps(date: value)
+            })
+            .onChange(of: sleepDetector.loading, perform: { _ in
+                sleepManager.refreshSleeps(date: currentDate)
             })
         }
 
