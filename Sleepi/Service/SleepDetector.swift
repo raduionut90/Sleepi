@@ -37,9 +37,9 @@ class SleepDetector: ObservableObject {
 //                    print("startDate: \(startDate.formatted()) , endDate: \(endDate.formatted())")
 
                     let heartRates = await healthStore.startHeartRateQuery(startDate: startDate, endDate: endDate)
-                    let activeEnergy = await healthStore.activityQuery(startDate: startDate, endDate: endDate)
+                    let activeEnergy = await healthStore.activeEnergyQuery(startDate: startDate, endDate: endDate)
 
-                    let activities: [Activity] = processRawData(heartRates, activeEnergy)
+                    let activities: [Activity] = Utils.getActivitiesFromRawData(heartRates, activeEnergy)
                     
                     performCalculation(activities: activities)
                     
@@ -87,7 +87,7 @@ class SleepDetector: ObservableObject {
                 }
 
             }
-            if !isDataContinuity(activities[index].date, activities[nextIndex].date) {endingSleep(lowActivities: &lowActivities, highActivities: &highActivities)}
+            if !isDataContinuity(activities[index].startDate, activities[nextIndex].startDate) {endingSleep(lowActivities: &lowActivities, highActivities: &highActivities)}
 
         }
     }
@@ -119,36 +119,6 @@ class SleepDetector: ObservableObject {
         return appSleeps.last?.endDate ?? result
     }
     
-    private func processRawData(_ heartRates: [HeartRate], _ activeEnergy: [HKQuantitySample]) -> [Activity] {
-        var activities: [Activity] = []
-
-        for actEnergy in activeEnergy {
-            let record = Activity(date: actEnergy.startDate, actEng: actEnergy.quantity.doubleValue(for: .kilocalorie()))
-            activities.append(record)
-        }
-        
-        for heartRate in heartRates {
-            if let existingRecord = activities.first(where: {Utils.dateTimeformatter.string(from: $0.date) ==
-                                                Utils.dateTimeformatter.string(from: heartRate.startDate)} ) {
-                existingRecord.hr = heartRate.value
-            } else {
-                let record = Activity(date: heartRate.startDate, hr: heartRate.value)
-                activities.append(record)
-            }
-
-        }
-        activities = activities.sorted { a,b in
-            a.date < b.date
-        }
-        
-//      used for debug
-//        for record in activities {
-//            print("\(record.date.formatted());\(record.hr ?? 999);\(record.actEng ?? 999)")
-//        }
-        
-        return activities
-    }
-    
     private func isDataContinuity(_ currentDate: Date, _ nextDate: Date) -> Bool {
         if nextDate.timeIntervalSinceReferenceDate - currentDate.timeIntervalSinceReferenceDate < 600 {
 //            print("isDataContinuity")
@@ -159,14 +129,14 @@ class SleepDetector: ObservableObject {
         return false
     }
     private func endingSleep(lowActivities: inout [Activity], highActivities: inout [Activity]) {
-        let firstEntryTimeInterval = lowActivities.last?.date.timeIntervalSinceReferenceDate ?? 0
-        let lastEntryTimeInterval = lowActivities.first?.date.timeIntervalSinceReferenceDate ?? 0
+        let firstEntryTimeInterval = lowActivities.last?.startDate.timeIntervalSinceReferenceDate ?? 0
+        let lastEntryTimeInterval = lowActivities.first?.startDate.timeIntervalSinceReferenceDate ?? 0
         //                    print("avgResultHr: \(avgResultHr) \(avgResultHr.isNaN ? false : avgResultHr > avgHr)")
         //                    print("avgResultActEng: \(avgResultActEng), start: \(highActivities.first?.date), end: \(highActivities.last?.date)")
         
         if (firstEntryTimeInterval - lastEntryTimeInterval) > 1200 {
 
-            if let start = lowActivities.first?.date, let end = lowActivities.last?.date {
+            if let start = lowActivities.first?.startDate, let end = lowActivities.last?.startDate {
                 print("\(start.formatted()) \(end.formatted())")
                 healthStore?.saveSleepAnalysis(startTime: start, endTime: end)
 

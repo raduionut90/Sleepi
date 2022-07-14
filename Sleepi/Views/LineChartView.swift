@@ -3,61 +3,64 @@ import SwiftUI
 
 struct LineChartView: View {
     
-    @State var speed: TimeInterval
-    @State private var isEditing = false
-    
-    let sleepPoints: [SleepPoint]
-    let labels: [HourItem]
-    let startSleep: Date
-    let endSleep: Date
-    let screenWidth = UIScreen.main.bounds.width - 10
-    
-//    private func getPath() -> [Path] {
-//        if sleepPoints.isEmpty {
-//            return [Path()]
-//        }
-//        
-//        var paths: [Path] = []
-//        var x = sleepPoints[0].offsetX
-//        var y = sleepPoints[0].type
-//        
-//        for sleepPoint in sleepPoints {
-//            var path = Path()
-//            path.move(to: CGPoint(x: x, y: y))
-//            path.addLine(to: CGPoint(x: sleepPoint.offsetX, y: sleepPoint.type))
-//        }
-//    }
+    let sleeps: [Sleep]
+    let timeInBed: Double
+    let screenWidth: CGFloat
     
     private var path: Path {
+        print("linechart sleeps.count: \(sleeps.count)")
+//        print("Screenwidth: \(screenWidth)")
         
-        if sleepPoints.isEmpty {
+        if sleeps.isEmpty {
             return Path()
         }
         
         var path = Path()
         var offsetX = 0.0
-        var offsetY = sleepPoints[0].type
+        var offsetY: Double = SleepType.LightSleep.rawValue
+
         path.move(to: CGPoint(x: offsetX, y: offsetY))
 
-        print("sleeppoint.count: \(sleepPoints.count)")
-        for sleepPoint in sleepPoints {            
-            path.addRoundedRect(in: CGRect(x: offsetX, y: offsetY - 10, width: sleepPoint.offsetX - offsetX, height: 20), cornerSize: CGSize(width: 5, height: 5), style: .circular)
-            path.addLine(to: CGPoint(x: sleepPoint.offsetX, y: sleepPoint.type))
+        for (index, sleep) in sleeps.enumerated() {
+            if index != 0 {
+                path.addLine(to: CGPoint(x: offsetX, y: SleepType.LightSleep.rawValue))
+            }
+            
+            let offset = getOffset(timeInterval: sleep.getDuration())
+//            print("offset: \(offset)")
+            offsetX += offset
+            path.addLine(to: CGPoint(x: offsetX, y: offsetY))
+            
+            
+            // awake time
+            if index < sleeps.count - 1 {
+                // make a vertical line
+                path.addLine(to: CGPoint(x: offsetX, y: SleepType.Awake.rawValue))
+
                 
-            offsetX = sleepPoint.offsetX
-            offsetY = sleepPoint.type
+                let nextAwakeTime = sleeps[index + 1].rawSleep.startDate.timeIntervalSinceReferenceDate - sleep.rawSleep.endDate.timeIntervalSinceReferenceDate
+                let awakeOffset = getOffset(timeInterval: nextAwakeTime)
+                offsetX += awakeOffset
+                path.addLine(to: CGPoint(x: offsetX, y: SleepType.Awake.rawValue))
+            }
         }
+//        for sleepPoint in sleepPoints {
+//            path.addRoundedRect(in: CGRect(x: offsetX, y: offsetY - 10, width: sleepPoint.offsetX - offsetX, height: 20), cornerSize: CGSize(width: 5, height: 5), style: .circular)
+//            path.addLine(to: CGPoint(x: sleepPoint.offsetX, y: sleepPoint.type))
+//
+//            offsetX = sleepPoint.offsetX
+//            offsetY = sleepPoint.type
+//        }
         return path
         
     }
     
-    let timeFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "HH:mm"
-        return formatter
-    }()
+    func getOffset(timeInterval: Double) -> Double {
+        return timeInterval / timeInBed * screenWidth
+    }
     
     var body: some View {
+        if !sleeps.isEmpty {
         VStack {
 
             VStack {
@@ -74,33 +77,6 @@ struct LineChartView: View {
 //                    .frame(height: 150, alignment: .center)
                     .frame(maxWidth: .infinity, minHeight: 150, maxHeight: 150, alignment: .center)
 
-                Slider(
-                    value: $speed,
-                    in: startSleep.timeIntervalSince1970...endSleep.timeIntervalSince1970,
-                    onEditingChanged: { editing in
-                        isEditing = editing
-                    }
-                )
-//                let _ = print(Date.init(timeIntervalSince1970: speed))
-                Text("\((Date.init(timeIntervalSince1970: speed)), formatter: timeFormatter)")
-                    .foregroundColor(isEditing ? .red : .blue).font(.caption)
-            }
-
-
-            HStack {
-                ForEach(labels, id: \.id) { label in
-                    if label.value == "x" {
-                        Circle()
-                            .fill(.gray)
-                            .frame(width: 5, height: 5)
-                    } else {
-                        Text(label.value)
-                            .font(.caption)
-                    }
-                    if (label != labels.last){
-                        Spacer()
-                    }
-                }
             }
 
             HStack {
@@ -109,9 +85,10 @@ struct LineChartView: View {
                 Text("Rise time").font(.caption)
             }
             HStack {
-                Text(startSleep, formatter: timeFormatter).font(.caption)
+                
+                Text((sleeps.first?.rawSleep.startDate)!, formatter: Utils.hhmmtimeFormatter).font(.caption)
                 Spacer()
-                Text(endSleep, formatter: timeFormatter).font(.caption)
+                Text((sleeps.last?.rawSleep.endDate)!, formatter: Utils.hhmmtimeFormatter).font(.caption)
             }
 
             HStack {
@@ -142,8 +119,7 @@ struct LineChartView: View {
             }
             
         }
-        .onChange(of: startSleep, perform: { value in
-            speed = value.timeIntervalSince1970
-        })
+    }
+        
     }
 }

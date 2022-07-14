@@ -8,6 +8,6 @@
 import Foundation
 
 struct SleepPoint: Equatable {
-    let type: Double
+    let offsetY: Double
     let offsetX: Double
 }

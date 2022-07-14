@@ -8,17 +8,20 @@
 import Foundation
 
 class Activity {
-    let date: Date
+    let startDate: Date
+    let endDate: Date
     var hr: Double?
     var actEng: Double?
     
-    init(date: Date, hr: Double){
-        self.date = date
+    init(startDate: Date, endDate: Date, hr: Double){
+        self.startDate = startDate
+        self.endDate = endDate
         self.hr = hr
     }
     
-    init(date: Date, actEng: Double){
-        self.date = date
+    init(startDate: Date, endDate: Date, actEng: Double){
+        self.startDate = startDate
+        self.endDate = endDate
         self.actEng = actEng
     }
 }

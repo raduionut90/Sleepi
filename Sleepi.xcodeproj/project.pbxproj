@@ -8,25 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		170A4ADC283FBF87009FB756 /* SleepPoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 170A4ADB283FBF87009FB756 /* SleepPoint.swift */; };
-		170A4ADE2840080C009FB756 /* SleepState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 170A4ADD2840080C009FB756 /* SleepState.swift */; };
-		170A4B4628470EC5009FB756 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 170A4B4528470EC5009FB756 /* Assets.xcassets */; };
-		170A4B4C28470EC5009FB756 /* Sleepi Watch WatchKit Extension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 170A4B4B28470EC5009FB756 /* Sleepi Watch WatchKit Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		170A4B5128470EC5009FB756 /* SleepiApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 170A4B5028470EC5009FB756 /* SleepiApp.swift */; };
-		170A4B5328470EC5009FB756 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 170A4B5228470EC5009FB756 /* ContentView.swift */; };
-		170A4B5528470EC5009FB756 /* NotificationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 170A4B5428470EC5009FB756 /* NotificationController.swift */; };
-		170A4B5728470EC5009FB756 /* NotificationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 170A4B5628470EC5009FB756 /* NotificationView.swift */; };
-		170A4B5928470EC5009FB756 /* ComplicationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 170A4B5828470EC5009FB756 /* ComplicationController.swift */; };
-		170A4B5B28470EC6009FB756 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 170A4B5A28470EC6009FB756 /* Assets.xcassets */; };
-		170A4B5E28470EC6009FB756 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 170A4B5D28470EC6009FB756 /* Preview Assets.xcassets */; };
-		170A4B6328470EC6009FB756 /* Sleepi Watch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 170A4B4328470EC4009FB756 /* Sleepi Watch.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		170A4B6B28470EEA009FB756 /* SleepType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 170F2D8728342AA800D00A7C /* SleepType.swift */; };
-		170A4B6C28470EEA009FB756 /* HeartRate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 170F2D852834252F00D00A7C /* HeartRate.swift */; };
-		170A4B6D28470EEA009FB756 /* SleepPoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 170A4ADB283FBF87009FB756 /* SleepPoint.swift */; };
-		170A4B6E28470EEA009FB756 /* HealthStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 171535322815C1EA00B1A499 /* HealthStore.swift */; };
-		170A4B6F28470EEA009FB756 /* SleepState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 170A4ADD2840080C009FB756 /* SleepState.swift */; };
-		170A4B7028470EEA009FB756 /* Sleep.swift in Sources */ = {isa = PBXBuildFile; fileRef = 171535352815D7F200B1A499 /* Sleep.swift */; };
-		170A4B7128470EEA009FB756 /* HourItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17D07D28283E822A002575B6 /* HourItem.swift */; };
-		170F2D862834252F00D00A7C /* HeartRate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 170F2D852834252F00D00A7C /* HeartRate.swift */; };
 		170F2D8828342AA800D00A7C /* SleepType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 170F2D8728342AA800D00A7C /* SleepType.swift */; };
 		17111E5D28744427004169C9 /* SleepDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17111E5C28744427004169C9 /* SleepDetector.swift */; };
 		17111E602874461A004169C9 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17111E5F2874461A004169C9 /* Utils.swift */; };
@@ -38,30 +19,9 @@
 		171535332815C1EA00B1A499 /* HealthStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 171535322815C1EA00B1A499 /* HealthStore.swift */; };
 		171535362815D7F200B1A499 /* Sleep.swift in Sources */ = {isa = PBXBuildFile; fileRef = 171535352815D7F200B1A499 /* Sleep.swift */; };
 		174E5F2B28720D6F00D423A0 /* Activity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 174E5F2A28720D6F00D423A0 /* Activity.swift */; };
-		174E5F2C2872106000D423A0 /* SleepManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17A4C3C6283511F5005D92F7 /* SleepManager.swift */; };
-		174E5F2D2872106400D423A0 /* Activity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 174E5F2A28720D6F00D423A0 /* Activity.swift */; };
 		17A4C3C7283511F5005D92F7 /* SleepManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17A4C3C6283511F5005D92F7 /* SleepManager.swift */; };
-		17C85170284A86B500E93C26 /* HealthKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 17C8516F284A86B500E93C26 /* HealthKit.framework */; };
-		17D07D29283E822A002575B6 /* HourItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17D07D28283E822A002575B6 /* HourItem.swift */; };
 		17EA8C8C28282B6800545BDD /* LineChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17EA8C8B28282B6800545BDD /* LineChartView.swift */; };
 /* End PBXBuildFile section */
-
-/* Begin PBXContainerItemProxy section */
-		170A4B4D28470EC5009FB756 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 171535152815C02F00B1A499 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 170A4B4A28470EC5009FB756;
-			remoteInfo = "Sleepi Watch WatchKit Extension";
-		};
-		170A4B6128470EC6009FB756 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 171535152815C02F00B1A499 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 170A4B4228470EC4009FB756;
-			remoteInfo = "Sleepi Watch";
-		};
-/* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		170A4B0B28470A51009FB756 /* Embed Watch Content */ = {
@@ -70,47 +30,20 @@
 			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
 			dstSubfolderSpec = 16;
 			files = (
-				170A4B6328470EC6009FB756 /* Sleepi Watch.app in Embed Watch Content */,
 			);
 			name = "Embed Watch Content";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		170A4B6728470EC6009FB756 /* Embed App Extensions */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 13;
-			files = (
-				170A4B4C28470EC5009FB756 /* Sleepi Watch WatchKit Extension.appex in Embed App Extensions */,
-			);
-			name = "Embed App Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		170039D3284A8CE800227F80 /* Sleepi Watch WatchKit Extension.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = "Sleepi Watch WatchKit Extension.entitlements"; sourceTree = "<group>"; };
 		170A4ADB283FBF87009FB756 /* SleepPoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepPoint.swift; sourceTree = "<group>"; };
-		170A4ADD2840080C009FB756 /* SleepState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepState.swift; sourceTree = "<group>"; };
-		170A4B4328470EC4009FB756 /* Sleepi Watch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Sleepi Watch.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		170A4B4528470EC5009FB756 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		170A4B4B28470EC5009FB756 /* Sleepi Watch WatchKit Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Sleepi Watch WatchKit Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
-		170A4B5028470EC5009FB756 /* SleepiApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepiApp.swift; sourceTree = "<group>"; };
-		170A4B5228470EC5009FB756 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		170A4B5428470EC5009FB756 /* NotificationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationController.swift; sourceTree = "<group>"; };
-		170A4B5628470EC5009FB756 /* NotificationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationView.swift; sourceTree = "<group>"; };
-		170A4B5828470EC5009FB756 /* ComplicationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComplicationController.swift; sourceTree = "<group>"; };
-		170A4B5A28470EC6009FB756 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		170A4B5D28470EC6009FB756 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-		170A4B5F28470EC6009FB756 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		170A4B6028470EC6009FB756 /* PushNotificationPayload.apns */ = {isa = PBXFileReference; lastKnownFileType = text; path = PushNotificationPayload.apns; sourceTree = "<group>"; };
-		170F2D852834252F00D00A7C /* HeartRate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeartRate.swift; sourceTree = "<group>"; };
 		170F2D8728342AA800D00A7C /* SleepType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepType.swift; sourceTree = "<group>"; };
 		17111E5C28744427004169C9 /* SleepDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepDetector.swift; sourceTree = "<group>"; };
 		17111E5F2874461A004169C9 /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
 		1715351D2815C02F00B1A499 /* Sleepi.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Sleepi.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		171535202815C02F00B1A499 /* SleepiApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepiApp.swift; sourceTree = "<group>"; };
-		171535222815C02F00B1A499 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		171535222815C02F00B1A499 /* ContentView.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
 		171535242815C02F00B1A499 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		171535272815C02F00B1A499 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		1715352E2815C04200B1A499 /* Sleepi.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Sleepi.entitlements; sourceTree = "<group>"; };
@@ -121,20 +54,10 @@
 		174E5F2A28720D6F00D423A0 /* Activity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Activity.swift; sourceTree = "<group>"; };
 		17A4C3C6283511F5005D92F7 /* SleepManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepManager.swift; sourceTree = "<group>"; };
 		17C8516F284A86B500E93C26 /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = Platforms/WatchOS.platform/Developer/SDKs/WatchOS8.5.sdk/System/Library/Frameworks/HealthKit.framework; sourceTree = DEVELOPER_DIR; };
-		17CC5F12284BC9B3000A84BF /* Sleepi Watch WatchKit ExtensionRelease.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = "Sleepi Watch WatchKit ExtensionRelease.entitlements"; sourceTree = "<group>"; };
-		17D07D28283E822A002575B6 /* HourItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HourItem.swift; sourceTree = "<group>"; };
 		17EA8C8B28282B6800545BDD /* LineChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LineChartView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		170A4B4828470EC5009FB756 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				17C85170284A86B500E93C26 /* HealthKit.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		1715351A2815C02F00B1A499 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -146,46 +69,10 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		170A4B4428470EC4009FB756 /* Sleepi Watch */ = {
-			isa = PBXGroup;
-			children = (
-				170A4B4528470EC5009FB756 /* Assets.xcassets */,
-			);
-			path = "Sleepi Watch";
-			sourceTree = "<group>";
-		};
-		170A4B4F28470EC5009FB756 /* Sleepi Watch WatchKit Extension */ = {
-			isa = PBXGroup;
-			children = (
-				17CC5F12284BC9B3000A84BF /* Sleepi Watch WatchKit ExtensionRelease.entitlements */,
-				170039D3284A8CE800227F80 /* Sleepi Watch WatchKit Extension.entitlements */,
-				170A4B5028470EC5009FB756 /* SleepiApp.swift */,
-				170A4B5228470EC5009FB756 /* ContentView.swift */,
-				170A4B5428470EC5009FB756 /* NotificationController.swift */,
-				170A4B5628470EC5009FB756 /* NotificationView.swift */,
-				170A4B5828470EC5009FB756 /* ComplicationController.swift */,
-				170A4B5A28470EC6009FB756 /* Assets.xcassets */,
-				170A4B5F28470EC6009FB756 /* Info.plist */,
-				170A4B6028470EC6009FB756 /* PushNotificationPayload.apns */,
-				170A4B5C28470EC6009FB756 /* Preview Content */,
-			);
-			path = "Sleepi Watch WatchKit Extension";
-			sourceTree = "<group>";
-		};
-		170A4B5C28470EC6009FB756 /* Preview Content */ = {
-			isa = PBXGroup;
-			children = (
-				170A4B5D28470EC6009FB756 /* Preview Assets.xcassets */,
-			);
-			path = "Preview Content";
-			sourceTree = "<group>";
-		};
 		171535142815C02F00B1A499 = {
 			isa = PBXGroup;
 			children = (
 				1715351F2815C02F00B1A499 /* Sleepi */,
-				170A4B4428470EC4009FB756 /* Sleepi Watch */,
-				170A4B4F28470EC5009FB756 /* Sleepi Watch WatchKit Extension */,
 				1715351E2815C02F00B1A499 /* Products */,
 				1715352F2815C04200B1A499 /* Frameworks */,
 			);
@@ -195,8 +82,6 @@
 			isa = PBXGroup;
 			children = (
 				1715351D2815C02F00B1A499 /* Sleepi.app */,
-				170A4B4328470EC4009FB756 /* Sleepi Watch.app */,
-				170A4B4B28470EC5009FB756 /* Sleepi Watch WatchKit Extension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -239,11 +124,8 @@
 			isa = PBXGroup;
 			children = (
 				171535352815D7F200B1A499 /* Sleep.swift */,
-				170F2D852834252F00D00A7C /* HeartRate.swift */,
 				170F2D8728342AA800D00A7C /* SleepType.swift */,
-				17D07D28283E822A002575B6 /* HourItem.swift */,
 				170A4ADB283FBF87009FB756 /* SleepPoint.swift */,
-				170A4ADD2840080C009FB756 /* SleepState.swift */,
 				174E5F2A28720D6F00D423A0 /* Activity.swift */,
 			);
 			path = Models;
@@ -270,40 +152,6 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		170A4B4228470EC4009FB756 /* Sleepi Watch */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 170A4B6828470EC6009FB756 /* Build configuration list for PBXNativeTarget "Sleepi Watch" */;
-			buildPhases = (
-				170A4B4128470EC4009FB756 /* Resources */,
-				170A4B6728470EC6009FB756 /* Embed App Extensions */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				170A4B4E28470EC5009FB756 /* PBXTargetDependency */,
-			);
-			name = "Sleepi Watch";
-			productName = "Sleepi Watch";
-			productReference = 170A4B4328470EC4009FB756 /* Sleepi Watch.app */;
-			productType = "com.apple.product-type.application.watchapp2";
-		};
-		170A4B4A28470EC5009FB756 /* Sleepi Watch WatchKit Extension */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 170A4B6428470EC6009FB756 /* Build configuration list for PBXNativeTarget "Sleepi Watch WatchKit Extension" */;
-			buildPhases = (
-				170A4B4728470EC5009FB756 /* Sources */,
-				170A4B4828470EC5009FB756 /* Frameworks */,
-				170A4B4928470EC5009FB756 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = "Sleepi Watch WatchKit Extension";
-			productName = "Sleepi Watch WatchKit Extension";
-			productReference = 170A4B4B28470EC5009FB756 /* Sleepi Watch WatchKit Extension.appex */;
-			productType = "com.apple.product-type.watchkit2-extension";
-		};
 		1715351C2815C02F00B1A499 /* Sleepi */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 1715352B2815C02F00B1A499 /* Build configuration list for PBXNativeTarget "Sleepi" */;
@@ -316,7 +164,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				170A4B6228470EC6009FB756 /* PBXTargetDependency */,
 			);
 			name = Sleepi;
 			packageProductDependencies = (
@@ -335,12 +182,6 @@
 				LastSwiftUpdateCheck = 1340;
 				LastUpgradeCheck = 1330;
 				TargetAttributes = {
-					170A4B4228470EC4009FB756 = {
-						CreatedOnToolsVersion = 13.4;
-					};
-					170A4B4A28470EC5009FB756 = {
-						CreatedOnToolsVersion = 13.4;
-					};
 					1715351C2815C02F00B1A499 = {
 						CreatedOnToolsVersion = 13.3.1;
 					};
@@ -362,30 +203,11 @@
 			projectRoot = "";
 			targets = (
 				1715351C2815C02F00B1A499 /* Sleepi */,
-				170A4B4228470EC4009FB756 /* Sleepi Watch */,
-				170A4B4A28470EC5009FB756 /* Sleepi Watch WatchKit Extension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		170A4B4128470EC4009FB756 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				170A4B4628470EC5009FB756 /* Assets.xcassets in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		170A4B4928470EC5009FB756 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				170A4B5E28470EC6009FB756 /* Preview Assets.xcassets in Resources */,
-				170A4B5B28470EC6009FB756 /* Assets.xcassets in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		1715351B2815C02F00B1A499 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -398,42 +220,18 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		170A4B4728470EC5009FB756 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				170A4B7028470EEA009FB756 /* Sleep.swift in Sources */,
-				170A4B5528470EC5009FB756 /* NotificationController.swift in Sources */,
-				170A4B5328470EC5009FB756 /* ContentView.swift in Sources */,
-				170A4B5928470EC5009FB756 /* ComplicationController.swift in Sources */,
-				174E5F2C2872106000D423A0 /* SleepManager.swift in Sources */,
-				170A4B5128470EC5009FB756 /* SleepiApp.swift in Sources */,
-				174E5F2D2872106400D423A0 /* Activity.swift in Sources */,
-				170A4B6C28470EEA009FB756 /* HeartRate.swift in Sources */,
-				170A4B7128470EEA009FB756 /* HourItem.swift in Sources */,
-				170A4B6F28470EEA009FB756 /* SleepState.swift in Sources */,
-				170A4B5728470EC5009FB756 /* NotificationView.swift in Sources */,
-				170A4B6D28470EEA009FB756 /* SleepPoint.swift in Sources */,
-				170A4B6E28470EEA009FB756 /* HealthStore.swift in Sources */,
-				170A4B6B28470EEA009FB756 /* SleepType.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		171535192815C02F00B1A499 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				171535232815C02F00B1A499 /* ContentView.swift in Sources */,
 				17A4C3C7283511F5005D92F7 /* SleepManager.swift in Sources */,
-				17D07D29283E822A002575B6 /* HourItem.swift in Sources */,
 				17111E602874461A004169C9 /* Utils.swift in Sources */,
 				170A4ADC283FBF87009FB756 /* SleepPoint.swift in Sources */,
 				171535362815D7F200B1A499 /* Sleep.swift in Sources */,
 				171535332815C1EA00B1A499 /* HealthStore.swift in Sources */,
 				174E5F2B28720D6F00D423A0 /* Activity.swift in Sources */,
-				170A4ADE2840080C009FB756 /* SleepState.swift in Sources */,
 				17EA8C8C28282B6800545BDD /* LineChartView.swift in Sources */,
-				170F2D862834252F00D00A7C /* HeartRate.swift in Sources */,
 				170F2D8828342AA800D00A7C /* SleepType.swift in Sources */,
 				171535212815C02F00B1A499 /* SleepiApp.swift in Sources */,
 				17111E5D28744427004169C9 /* SleepDetector.swift in Sources */,
@@ -442,148 +240,7 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
-/* Begin PBXTargetDependency section */
-		170A4B4E28470EC5009FB756 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 170A4B4A28470EC5009FB756 /* Sleepi Watch WatchKit Extension */;
-			targetProxy = 170A4B4D28470EC5009FB756 /* PBXContainerItemProxy */;
-		};
-		170A4B6228470EC6009FB756 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 170A4B4228470EC4009FB756 /* Sleepi Watch */;
-			targetProxy = 170A4B6128470EC6009FB756 /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
-
 /* Begin XCBuildConfiguration section */
-		170A4B6528470EC6009FB756 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_COMPLICATION_NAME = Complication;
-				CODE_SIGN_ENTITLEMENTS = "Sleepi Watch WatchKit Extension/Sleepi Watch WatchKit Extension.entitlements";
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"Sleepi Watch WatchKit Extension/Preview Content\"";
-				DEVELOPMENT_TEAM = X78UPLLN5Z;
-				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "Sleepi Watch WatchKit Extension/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "Sleepi Watch WatchKit Extension";
-				INFOPLIST_KEY_CLKComplicationPrincipalClass = Sleepi_Watch_WatchKit_Extension.ComplicationController;
-				INFOPLIST_KEY_NSHealthClinicalHealthRecordsShareUsageDescription = "This app requires to access your health data";
-				INFOPLIST_KEY_NSHealthShareUsageDescription = "This app requires to access your health data";
-				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "This app requires to access your health data";
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.kantaraweb.Sleepi.watchkitapp.watchkitextension;
-				PRODUCT_NAME = "${TARGET_NAME}";
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				SDKROOT = watchos;
-				SKIP_INSTALL = YES;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 4;
-				WATCHOS_DEPLOYMENT_TARGET = 8.5;
-			};
-			name = Debug;
-		};
-		170A4B6628470EC6009FB756 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_COMPLICATION_NAME = Complication;
-				CODE_SIGN_ENTITLEMENTS = "Sleepi Watch WatchKit Extension/Sleepi Watch WatchKit ExtensionRelease.entitlements";
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"Sleepi Watch WatchKit Extension/Preview Content\"";
-				DEVELOPMENT_TEAM = X78UPLLN5Z;
-				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "Sleepi Watch WatchKit Extension/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "Sleepi Watch WatchKit Extension";
-				INFOPLIST_KEY_CLKComplicationPrincipalClass = Sleepi_Watch_WatchKit_Extension.ComplicationController;
-				INFOPLIST_KEY_NSHealthClinicalHealthRecordsShareUsageDescription = "This app requires to access your health data";
-				INFOPLIST_KEY_NSHealthShareUsageDescription = "This app requires to access your health data";
-				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "This app requires to access your health data";
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.kantaraweb.Sleepi.watchkitapp.watchkitextension;
-				PRODUCT_NAME = "${TARGET_NAME}";
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				SDKROOT = watchos;
-				SKIP_INSTALL = YES;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 4;
-				WATCHOS_DEPLOYMENT_TARGET = 8.5;
-			};
-			name = Release;
-		};
-		170A4B6928470EC6009FB756 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = X78UPLLN5Z;
-				GENERATE_INFOPLIST_FILE = YES;
-				IBSC_MODULE = Sleepi_Watch_WatchKit_Extension;
-				INFOPLIST_KEY_CFBundleDisplayName = "Sleepi Watch";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.kantaraweb.Sleepi;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.kantaraweb.Sleepi.watchkitapp;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = watchos;
-				SKIP_INSTALL = YES;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 4;
-				WATCHOS_DEPLOYMENT_TARGET = 8.5;
-			};
-			name = Debug;
-		};
-		170A4B6A28470EC6009FB756 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = X78UPLLN5Z;
-				GENERATE_INFOPLIST_FILE = YES;
-				IBSC_MODULE = Sleepi_Watch_WatchKit_Extension;
-				INFOPLIST_KEY_CFBundleDisplayName = "Sleepi Watch";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.kantaraweb.Sleepi;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.kantaraweb.Sleepi.watchkitapp;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = watchos;
-				SKIP_INSTALL = YES;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 4;
-				WATCHOS_DEPLOYMENT_TARGET = 8.5;
-			};
-			name = Release;
-		};
 		171535292815C02F00B1A499 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -775,24 +432,6 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		170A4B6428470EC6009FB756 /* Build configuration list for PBXNativeTarget "Sleepi Watch WatchKit Extension" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				170A4B6528470EC6009FB756 /* Debug */,
-				170A4B6628470EC6009FB756 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		170A4B6828470EC6009FB756 /* Build configuration list for PBXNativeTarget "Sleepi Watch" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				170A4B6928470EC6009FB756 /* Debug */,
-				170A4B6A28470EC6009FB756 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		171535182815C02F00B1A499 /* Build configuration list for PBXProject "Sleepi" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

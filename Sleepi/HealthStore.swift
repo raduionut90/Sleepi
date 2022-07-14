@@ -39,11 +39,11 @@ class HealthStore {
         return true
     }
     
-    func startSleepQuery(date: Date) async -> [Sleep] {
+    func sleepQuery(date: Date) async -> [HKCategorySample] {
         let sleepType = HKObjectType.categoryType(forIdentifier: HKCategoryTypeIdentifier.sleepAnalysis)!
         
         var startDate = Calendar.current.startOfDay(for: date)
-        startDate = Calendar.current.date(byAdding: .hour, value: -3, to: startDate)!
+        startDate = Calendar.current.date(byAdding: .hour, value: -5, to: startDate)!
         
         let endDate = Calendar.current.date(byAdding: .day, value: 1, to: startDate)!
         
@@ -58,9 +58,9 @@ class HealthStore {
                     print("Something went wrong getting sleep analysis: \(String(describing: error))")
                     return
                 }
-                var sleeps: [Sleep] = []
 
                 if let result = tmpResult {
+                    var sleeps: [HKCategorySample] = []
 
                     for item in result {
                         if let sample = item as? HKCategorySample {
@@ -68,8 +68,7 @@ class HealthStore {
 //                            print(sample.sourceRevision.productType!)
 
                             if sample.sourceRevision.source.bundleIdentifier == Bundle.main.bundleIdentifier {
-                                let sleep = Sleep(value: sample.value, startDate: sample.startDate, endDate: sample.endDate, source: sample.sourceRevision.source.name, heartRates: [HeartRate]())
-                                sleeps.append(sleep)
+                                sleeps.append(sample)
 //                                print("\(sleep.startDate.formatted());\(sleep.endDate.formatted())")
                             }
                         }
@@ -88,7 +87,7 @@ class HealthStore {
     
     func startHeartRateQuery(
         startDate: Date,
-        endDate: Date) async -> [HeartRate] {
+        endDate: Date) async -> [HKQuantitySample] {
 
 //            print("startDate: \(startDate)")
 //            print("endDate: \(endDate)")
@@ -122,14 +121,8 @@ class HealthStore {
                         return
                     }
 
-                  var heartRates: [HeartRate] = []
                   if let result = tmpResult as? [HKQuantitySample] {
-                      for item in result {
-                          let hr = HeartRate(value: item.quantity.doubleValue(for: HKUnit(from: "count/min")), startDate: item.startDate)
-                          heartRates.append(hr)
-                      }
-                      
-                      continuation.resume(returning: heartRates)
+                      continuation.resume(returning: result)
                   }
             }
 
@@ -141,7 +134,7 @@ class HealthStore {
       }
     
     
-    func activityQuery(
+    func activeEnergyQuery(
         startDate: Date,
         endDate: Date) async -> [HKQuantitySample] {
 
