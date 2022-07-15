@@ -7,46 +7,57 @@ struct LineChartView: View {
     let timeInBed: Double
     let sleepsHrAverage: Double
     
-    fileprivate func checkAwakeTime(_ index: Int, _ path: inout Path, _ offsetX: inout Double, _ sleep: Sleep, _ screenWidth: CGFloat) {
+    fileprivate func checkAwakeTime(_ index: Int, _ path: inout Path, _ offsetX: inout Double, _ offsetY: inout Double, _ sleep: Sleep, _ screenWidth: CGFloat) {
         // awake time
         if index < sleeps.count - 1 {
             // make a vertical line
             path.addLine(to: CGPoint(x: offsetX, y: SleepType.Awake.rawValue))
             
-            
             let nextAwakeTime = sleeps[index + 1].rawSleep.startDate.timeIntervalSinceReferenceDate - sleep.rawSleep.endDate.timeIntervalSinceReferenceDate
             let awakeOffset = getOffset(timeInterval: nextAwakeTime, screenWidth: screenWidth)
+
             offsetX += awakeOffset
+            
+
             path.addLine(to: CGPoint(x: offsetX, y: SleepType.Awake.rawValue))
+
+            offsetY = SleepType.Awake.rawValue
+            
+
         }
     }
     
-    fileprivate func processEachActivity(_ sleep: Sleep, _ path: inout Path, _ offsetX: inout Double, _ screenWidth: CGFloat) {
+    fileprivate func processEachActivity(_ sleep: Sleep, _ path: inout Path, _ offsetX: inout Double,_ offsetY: inout Double, _ screenWidth: CGFloat) {
         let activities = sleep.getActivities()
+        var rectWidth = 0.0
         
         for (index, activity) in activities.enumerated() {
             let interval: Double = activity.endDate.timeIntervalSinceReferenceDate -
             (index == 0 ? sleep.rawSleep.startDate.timeIntervalSinceReferenceDate : activities[index - 1].endDate.timeIntervalSinceReferenceDate)
             
-            let offsetY = activity.getSleepType(sleepsHrAverage).rawValue
-            
-            path.addLine(to: CGPoint(x: offsetX, y: offsetY)) // vertical line
-            
+            let newOffsetY = activity.getSleepType(sleepsHrAverage).rawValue
             let offset = getOffset(timeInterval: interval, screenWidth: screenWidth)
-//            path.addRoundedRect(in: CGRect(x: offsetX, y: offsetY, width: offset, height: 20), cornerSize: CGSize(width: 5, height: 5), style: .circular)
-            offsetX += offset
             
-            path.addLine(to: CGPoint(x: offsetX, y: offsetY)) //horizontal line
+            offsetX += offset
+            rectWidth += offset
 
-//            path.move(to: CGPoint(x: offsetX, y: offsetY))
-
+            if offsetY != newOffsetY{
+                path.addLine(to: CGPoint(x: offsetX, y: offsetY)) //horizontal line
+//                path.addRoundedRect(in: CGRect(x: offsetX - offset, y: offsetY, width: rectWidth, height: 20), cornerSize: CGSize(width: 5, height: 5), style: .circular)
+//                path.move(to: CGPoint(x: offsetX, y: offsetY))
+                
+                path.addLine(to: CGPoint(x: offsetX, y: newOffsetY)) // vertical line
+                
+                rectWidth = 0.0
+            }
             
             //last activity to end sleep
             if index == activities.count - 1{
                 let lastInterval: Double = sleep.rawSleep.endDate.timeIntervalSinceReferenceDate - activity.endDate.timeIntervalSinceReferenceDate
                 offsetX += getOffset(timeInterval: lastInterval, screenWidth: screenWidth)
-                path.addLine(to: CGPoint(x: offsetX, y: offsetY))
+                path.addLine(to: CGPoint(x: offsetX, y: newOffsetY))
             }
+            offsetY = newOffsetY
         }
     }
     
@@ -66,9 +77,9 @@ struct LineChartView: View {
 
         for (index, sleep) in sleeps.enumerated() {
             
-            processEachActivity(sleep, &path, &offsetX, screenWidth)
+            processEachActivity(sleep, &path, &offsetX, &offsetY, screenWidth)
             
-            checkAwakeTime(index, &path, &offsetX, sleep, screenWidth)
+            checkAwakeTime(index, &path, &offsetX, &offsetY, sleep, screenWidth)
         }
 //        for sleepPoint in sleepPoints {
 //            path.addRoundedRect(in: CGRect(x: offsetX, y: offsetY - 10, width: sleepPoint.offsetX - offsetX, height: 20), cornerSize: CGSize(width: 5, height: 5), style: .circular)
