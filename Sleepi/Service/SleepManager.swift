@@ -39,21 +39,18 @@ class SleepManager: ObservableObject {
             }
         }
         
-        print("sleeps refreshSleeps: \(sleeps.count)")
-        print("naps refreshSleeps: \(naps.count)")
+//        print("sleeps refreshSleeps: \(sleeps.count)")
+//        print("naps refreshSleeps: \(naps.count)")
 
     }
     
     private func napCheck(_ date: Date) {
         self.naps = []
         var counter = 0
+        var referenceHour = Calendar.current.startOfDay(for: date)
+        referenceHour = Calendar.current.date(byAdding: .hour, value: 12, to: referenceHour)!
         
         for (index, sleep) in sleeps.enumerated() {
-            var referenceHour = Calendar.current.startOfDay(for: date)
-            referenceHour = Calendar.current.date(byAdding: .hour, value: 12, to: referenceHour)!
-            print("referenceHour: \(referenceHour.formatted())")
-            print("sleep.startDate: \(sleep.rawSleep.startDate.formatted())")
-
             if sleeps.count >= 2 && index > 0 {
                 let timeUntilNextSleep = sleep.rawSleep.startDate.timeIntervalSinceReferenceDate - sleeps[index - 1].rawSleep.endDate.timeIntervalSinceReferenceDate
 

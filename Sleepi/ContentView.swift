@@ -52,55 +52,41 @@ struct ContentView: View {
                 }.padding()
                 ScrollView(.vertical){
 
-                HStack() {
-                    VStack {
-                        Text("In Bed")
-                            .font(.title2)
-                            .fontWeight(.light)
+                    HStack() {
+                        VStack {
+                            Text("In Bed")
+                                .font(.title2)
+                                .fontWeight(.light)
 
-                        Text(Utils.timeFormatter.string(from: sleepManager.getInBedTime() )! )
-                            .font(.title)
-                            .fontWeight(.bold)
-                    }
-                    .padding(/*@START_MENU_TOKEN@*/.all/*@END_MENU_TOKEN@*/)
-                    Spacer()
-                    VStack {
-                        Text("Asleep")
-                            .font(.title2)
-                            .fontWeight(.light)
-                            
-                        Text(Utils.timeFormatter.string(from: sleepManager.getAsleepTime() )! )
-                            .font(.title)
-                            .fontWeight(.bold)
-                    }
-                    .padding(/*@START_MENU_TOKEN@*/.all/*@END_MENU_TOKEN@*/)
-                }.padding()
+                            Text(Utils.timeFormatter.string(from: sleepManager.getInBedTime() )! )
+                                .font(.title)
+                                .fontWeight(.bold)
+                        }
 
-                
-                GeometryReader { geo in
-    
+                        Spacer()
+                        VStack {
+                            Text("Asleep")
+                                .font(.title2)
+                                .fontWeight(.light)
+                                
+                            Text(Utils.timeFormatter.string(from: sleepManager.getAsleepTime() )! )
+                                .font(.title)
+                                .fontWeight(.bold)
+                        }
+                    }.padding()
+        
                     VStack {
-                        LineChartView(sleeps: sleepManager.sleeps, timeInBed: sleepManager.getInBedTime(), screenWidth: geo.size.width)
-                    }
-
-                    // FOR NAPS
-
-                        
-                    VStack {
+                        LineChartView(sleeps: sleepManager.sleeps, timeInBed: sleepManager.getInBedTime())
+     
+                        // FOR NAPS
                         ForEach(sleepManager.naps, id: \.self) { nap in
-                                VStack {
-                                    Spacer()
-
-                                    Text("NAPS")
-
-                                    LineChartView(sleeps: [nap], timeInBed: (nap.rawSleep.endDate.timeIntervalSinceReferenceDate - nap.rawSleep.startDate.timeIntervalSinceReferenceDate), screenWidth: geo.size.width)
-                                }
-
+                            Text("NAPS")
+                            LineChartView(sleeps: [nap], timeInBed: (nap.rawSleep.endDate.timeIntervalSinceReferenceDate - nap.rawSleep.startDate.timeIntervalSinceReferenceDate))
                         }
                     }
+                    .padding(.all, 15)
+                    
 
-                }
- 
                 }
 
             }
@@ -114,7 +100,8 @@ struct ContentView: View {
             .onChange(of: currentDate, perform: { value in
                 sleepManager.refreshSleeps(date: value)
             })
-            .onChange(of: sleepDetector.loading, perform: { _ in
+            .onChange(of: sleepDetector.loading, perform: { value in
+                print("loading changed: \(value)")
                 sleepManager.refreshSleeps(date: currentDate)
             })
         }

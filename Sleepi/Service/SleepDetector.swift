@@ -8,11 +8,13 @@
 import Foundation
 import HealthKit
 
+@MainActor
 class SleepDetector: ObservableObject {
     private var healthStore: HealthStore?
     @Published var loading: Bool = true
 
     init(){
+        print("init loading = \(loading)")
         if HKHealthStore.isHealthDataAvailable() {
             self.healthStore = HealthStore()
         }
@@ -46,7 +48,6 @@ class SleepDetector: ObservableObject {
                 }
             }
         }
-        loading = false
     }
     
     private func performCalculation(activities: [Activity]) {
@@ -124,7 +125,7 @@ class SleepDetector: ObservableObject {
 //            print("isDataContinuity")
             return true
         }
-        print("NoDataContinuity")
+//        print("NoDataContinuity")
 
         return false
     }
@@ -139,7 +140,7 @@ class SleepDetector: ObservableObject {
             if let start = lowActivities.first?.startDate, let end = lowActivities.last?.startDate {
                 print("\(start.formatted()) \(end.formatted())")
                 healthStore?.saveSleepAnalysis(startTime: start, endTime: end)
-
+                loading = false
             }
             print("")
         }

@@ -59,7 +59,7 @@ class Utils {
         
 //      used for debug
 //        for record in activities {
-//            print("\(record.date.formatted());\(record.hr ?? 999);\(record.actEng ?? 999)")
+//            print("\(record.startDate.formatted());\(record.hr ?? 999);\(record.actEng ?? 999)")
 //        }
         
         return activities
