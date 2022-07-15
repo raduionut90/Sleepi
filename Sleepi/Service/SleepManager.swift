@@ -89,4 +89,11 @@ class SleepManager: ObservableObject {
         return result
     }
 
+    func getSleepsHeartRateAverage() -> Double {
+        var average: Double = 0.0
+        for sleep in sleeps {
+            average += sleep.getHeartRateAverage()
+        }
+        return average / Double(sleeps.count)
+    }
 }

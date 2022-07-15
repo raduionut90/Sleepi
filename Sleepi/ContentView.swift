@@ -76,12 +76,12 @@ struct ContentView: View {
                     }.padding()
         
                     VStack {
-                        LineChartView(sleeps: sleepManager.sleeps, timeInBed: sleepManager.getInBedTime())
+                        LineChartView(sleeps: sleepManager.sleeps, timeInBed: sleepManager.getInBedTime(), sleepsHrAverage: sleepManager.getSleepsHeartRateAverage())
      
                         // FOR NAPS
                         ForEach(sleepManager.naps, id: \.self) { nap in
                             Text("NAPS")
-                            LineChartView(sleeps: [nap], timeInBed: (nap.rawSleep.endDate.timeIntervalSinceReferenceDate - nap.rawSleep.startDate.timeIntervalSinceReferenceDate))
+                            LineChartView(sleeps: [nap], timeInBed: (nap.rawSleep.endDate.timeIntervalSinceReferenceDate - nap.rawSleep.startDate.timeIntervalSinceReferenceDate), sleepsHrAverage: sleepManager.getSleepsHeartRateAverage())
                         }
                     }
                     .padding(.all, 15)

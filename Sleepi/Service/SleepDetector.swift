@@ -53,7 +53,7 @@ class SleepDetector: ObservableObject {
     private func performCalculation(activities: [Activity]) {
         var lowActivities: [Activity] = []
         var highActivities: [Activity] = []
-        let averageHr = getAverage(array: activities, by: .heartRate)
+        let averageHr = Utils.getAverage(array: activities, by: .heartRate)
         
         print("AvrrHR: \(averageHr)")
         
@@ -173,14 +173,5 @@ class SleepDetector: ObservableObject {
         return false
     }
     
-    private func getAverage(array: [Activity], by: HKQuantityTypeIdentifier) -> Double {
-        if by == .heartRate {
-            let sumResultHr = array.compactMap(\.hr).reduce(0.0, +)
-            return (sumResultHr / Double(array.compactMap(\.hr).count))
-        } else if by == .activeEnergyBurned {
-            let sumResultHr = array.compactMap(\.actEng).reduce(0.0, +)
-            return (sumResultHr / Double(array.compactMap(\.actEng).count))
-        }
-        return 0.0;
-    }
+
 }

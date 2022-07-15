@@ -18,6 +18,10 @@ struct Sleep: Identifiable, Equatable, Hashable {
         Utils.getActivitiesFromRawData(heartRates, activeEnergy)
     }
     
+    func getHeartRateAverage() -> Double {
+        Utils.getAverage(array: getActivities(), by: .heartRate)
+    }
+    
     func getDuration() -> Double {
         return rawSleep.endDate.timeIntervalSinceReferenceDate - rawSleep.startDate.timeIntervalSinceReferenceDate
     }

@@ -5,6 +5,7 @@ struct LineChartView: View {
     
     let sleeps: [Sleep]
     let timeInBed: Double
+    let sleepsHrAverage: Double
     
     fileprivate func checkAwakeTime(_ index: Int, _ path: inout Path, _ offsetX: inout Double, _ sleep: Sleep, _ screenWidth: CGFloat) {
         // awake time
@@ -21,8 +22,8 @@ struct LineChartView: View {
     }
     
     private func getPath(screenWidth: CGFloat) -> Path {
-        print("linechart sleeps.count: \(sleeps.count)")
-//        print("Screenwidth: \(screenWidth)")
+//        print("linechart sleeps.count: \(sleeps.count)")
+        print("Screenwidth: \(screenWidth)")
         
         if sleeps.isEmpty {
             return Path()
@@ -35,26 +36,32 @@ struct LineChartView: View {
         path.move(to: CGPoint(x: offsetX, y: offsetY))
 
         for (index, sleep) in sleeps.enumerated() {
+            
             if index != 0 {
                 path.addLine(to: CGPoint(x: offsetX, y: SleepType.LightSleep.rawValue))
             }
-//            let activities = sleep.getActivities()
-//
-//            for (index, activity) in activities.enumerated() {
-//                let interval: Double = activity.endDate.timeIntervalSinceReferenceDate -
-//                (index == 0 ? sleep.rawSleep.startDate.timeIntervalSinceReferenceDate : activity.endDate.timeIntervalSinceReferenceDate)
-//                offsetX += getOffset(timeInterval: interval, screenWidth: screenWidth)
-//                path.addLine(to: CGPoint(x: offsetX, y: offsetY))
-//            }
-//            //last activity to end sleep
-//            let interval: Double = sleep.rawSleep.endDate.timeIntervalSinceReferenceDate - (activities.last?.endDate.timeIntervalSinceReferenceDate ?? sleep.rawSleep.startDate.timeIntervalSinceReferenceDate)
-//            offsetX += getOffset(timeInterval: interval, screenWidth: screenWidth)
-//            path.addLine(to: CGPoint(x: offsetX, y: offsetY))
+            let activities = sleep.getActivities()
+            print("activities: \(activities.count)")
 
-            let offset = getOffset(timeInterval: sleep.getDuration(), screenWidth: screenWidth)
-//            print("offset: \(offset)")
-            offsetX += offset
+            for (index, activity) in activities.enumerated() {
+                let interval: Double = activity.endDate.timeIntervalSinceReferenceDate -
+                (index == 0 ? sleep.rawSleep.startDate.timeIntervalSinceReferenceDate : activities[index - 1].endDate.timeIntervalSinceReferenceDate)
+
+                let offsetY = getOffsetY(activity)
+                path.addLine(to: CGPoint(x: offsetX, y: offsetY))
+
+                offsetX += getOffset(timeInterval: interval, screenWidth: screenWidth)
+
+                path.addLine(to: CGPoint(x: offsetX, y: offsetY))
+            }
+            //last activity to end sleep
+            let lastInterval: Double = sleep.rawSleep.endDate.timeIntervalSinceReferenceDate - (activities.last?.endDate.timeIntervalSinceReferenceDate ?? sleep.rawSleep.startDate.timeIntervalSinceReferenceDate)
+            offsetX += getOffset(timeInterval: lastInterval, screenWidth: screenWidth)
             path.addLine(to: CGPoint(x: offsetX, y: offsetY))
+
+//            let offset = getOffset(timeInterval: sleep.getDuration(), screenWidth: screenWidth)
+//            offsetX += offset
+//            path.addLine(to: CGPoint(x: offsetX, y: offsetY))
             
             
             checkAwakeTime(index, &path, &offsetX, sleep, screenWidth)
@@ -66,12 +73,44 @@ struct LineChartView: View {
 //            offsetX = sleepPoint.offsetX
 //            offsetY = sleepPoint.type
 //        }
+        print(offsetX)
         return path
         
     }
     
-    func getOffset(timeInterval: Double, screenWidth: CGFloat) -> Double {
-        print("screW: \(screenWidth)")
+    private func getOffsetY(_ activity: Activity) -> Double {
+        var result: Double = SleepType.LightSleep.rawValue
+        
+        if let hr = activity.hr {
+            if hr <= sleepsHrAverage - 10 {
+                result = SleepType.DeepSleep.rawValue
+            } else if hr > sleepsHrAverage + 15 {
+                result = SleepType.RemSleep.rawValue
+            } else {
+                result = SleepType.LightSleep.rawValue
+            }
+        }
+
+//        if let activeEnergy = activity.actEng {
+//            if result == SleepType.LightSleep.rawValue {
+//
+//                if activeEnergy < 0.10 {
+//                    result = SleepType.DeepSleep.rawValue
+//                } else if activeEnergy > 0.3 {
+//                    result = SleepType.RemSleep.rawValue
+//                } else {
+//                    result = SleepType.LightSleep.rawValue
+//                }
+//
+//            } else {
+//                print("offsetYYYYYYY")
+//            }
+//        }
+
+        return result
+    }
+    
+    private func getOffset(timeInterval: Double, screenWidth: CGFloat) -> Double {
         return timeInterval / timeInBed * screenWidth
     }
     
