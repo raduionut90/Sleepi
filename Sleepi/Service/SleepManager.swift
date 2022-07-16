@@ -34,7 +34,9 @@ class SleepManager: ObservableObject {
                         tmpSleeps.append(sleep)
                     }
                     self.sleeps = tmpSleeps
-                    self.napCheck(date)
+                    if self.sleeps.count > 0 {
+                        self.napCheck(date)
+                    }
                 }
             }
         }
@@ -46,27 +48,19 @@ class SleepManager: ObservableObject {
     
     private func napCheck(_ date: Date) {
         self.naps = []
-        var counter = 0
-        var referenceHour = Calendar.current.startOfDay(for: date)
-        referenceHour = Calendar.current.date(byAdding: .hour, value: 12, to: referenceHour)!
         
+        var referenceHour = Calendar.current.startOfDay(for: date)
+        referenceHour = Calendar.current.date(byAdding: .hour, value: 10, to: referenceHour)!
+        
+        var counter = 0
         for (index, sleep) in sleeps.enumerated() {
-            if sleeps.count >= 2 && index > 0 {
-                let timeUntilNextSleep = sleep.rawSleep.startDate.timeIntervalSinceReferenceDate - sleeps[index - 1].rawSleep.endDate.timeIntervalSinceReferenceDate
 
-                if timeUntilNextSleep > 10800 {  // 4h 60 * 60 * 4
-                    self.naps.append(sleep)
-                    self.sleeps.remove(at: index - counter)
-                    counter += 1
-                }
-            } else if sleep.rawSleep.startDate > referenceHour {
+            if sleep.rawSleep.startDate > referenceHour {
                 self.naps.append(sleep)
                 self.sleeps.remove(at: index - counter)
                 counter += 1
-
             }
         }
-
     }
     
     func getInBedTime() -> Double {

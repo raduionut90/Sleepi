@@ -43,7 +43,7 @@ class HealthStore {
         let sleepType = HKObjectType.categoryType(forIdentifier: HKCategoryTypeIdentifier.sleepAnalysis)!
         
         var startDate = Calendar.current.startOfDay(for: date)
-        startDate = Calendar.current.date(byAdding: .hour, value: -5, to: startDate)!
+        startDate = Calendar.current.date(byAdding: .hour, value: -4, to: startDate)!
         
         let endDate = Calendar.current.date(byAdding: .day, value: 1, to: startDate)!
         

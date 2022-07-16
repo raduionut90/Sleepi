@@ -28,15 +28,15 @@ class Activity {
     func getSleepType(_ heartRateAverage: Double) -> SleepType {
         var result: SleepType = SleepType.LightSleep
         
-        if let hr = self.hr {
-            if hr <= heartRateAverage - 5 {
-                result = SleepType.DeepSleep
-            } else if hr > heartRateAverage + 8 {
-                result = SleepType.RemSleep
-            } else {
-                result = SleepType.LightSleep
-            }
-        }
+//        if let hr = self.hr {
+//            if hr <= heartRateAverage - 5 {
+//                result = SleepType.DeepSleep
+//            } else if hr > heartRateAverage + 8 {
+//                result = SleepType.RemSleep
+//            } else {
+//                result = SleepType.LightSleep
+//            }
+//        }
 
         if let activeEnergy = self.actEng {
             if activeEnergy < 0.06 {

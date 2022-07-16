@@ -132,17 +132,15 @@ class SleepDetector: ObservableObject {
     private func endingSleep(lowActivities: inout [Activity], highActivities: inout [Activity]) {
         let firstEntryTimeInterval = lowActivities.last?.startDate.timeIntervalSinceReferenceDate ?? 0
         let lastEntryTimeInterval = lowActivities.first?.startDate.timeIntervalSinceReferenceDate ?? 0
-        //                    print("avgResultHr: \(avgResultHr) \(avgResultHr.isNaN ? false : avgResultHr > avgHr)")
-        //                    print("avgResultActEng: \(avgResultActEng), start: \(highActivities.first?.date), end: \(highActivities.last?.date)")
         
         if (firstEntryTimeInterval - lastEntryTimeInterval) > 1200 {
 
             if let start = lowActivities.first?.startDate, let end = lowActivities.last?.startDate {
-                print("\(start.formatted()) \(end.formatted())")
+//                print("\(start.formatted()) \(end.formatted())")
                 healthStore?.saveSleepAnalysis(startTime: start, endTime: end)
                 loading = false
             }
-            print("")
+//            print("")
         }
         lowActivities = []
         highActivities = []

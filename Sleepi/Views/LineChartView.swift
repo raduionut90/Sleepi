@@ -2,10 +2,27 @@ import SwiftUI
 
 
 struct LineChartView: View {
+    @State var chartLineOffsetX: Double = 0.0
+    @State var chartLineIsVisible: Bool = false
+    @State var chartWidth: Double = 0.0
+    @State var chartLineDate: Date = Date()
     
     let sleeps: [Sleep]
     let timeInBed: Double
     let sleepsHrAverage: Double
+    
+    private func setChartLineDate(){
+        let startDate = (sleeps.first?.rawSleep.startDate.timeIntervalSinceReferenceDate)!
+        let endDate = (sleeps.last?.rawSleep.endDate.timeIntervalSinceReferenceDate)!
+        
+        let xPercent =  chartLineOffsetX / chartWidth * 100
+        let result = (endDate - startDate) * xPercent / 100
+        
+        let date = Date(timeIntervalSinceReferenceDate: startDate + result)
+        chartLineDate = date
+        print("chartLineDate: \(chartLineDate)")
+        
+    }
     
     fileprivate func checkAwakeTime(_ index: Int, _ path: inout Path, _ offsetX: inout Double, _ offsetY: inout Double, _ sleep: Sleep, _ screenWidth: CGFloat) {
         // awake time
@@ -43,7 +60,7 @@ struct LineChartView: View {
 
             if offsetY != newOffsetY{
                 path.addLine(to: CGPoint(x: offsetX, y: offsetY)) //horizontal line
-//                path.addRoundedRect(in: CGRect(x: offsetX - offset, y: offsetY, width: rectWidth, height: 20), cornerSize: CGSize(width: 5, height: 5), style: .circular)
+//                path.addRoundedRect(in: CGRect(x: offsetX - rectWidth, y: offsetY - 10, width: rectWidth, height: 20), cornerSize: CGSize(width: 5, height: 5), style: .circular)
 //                path.move(to: CGPoint(x: offsetX, y: offsetY))
                 
                 path.addLine(to: CGPoint(x: offsetX, y: newOffsetY)) // vertical line
@@ -61,7 +78,7 @@ struct LineChartView: View {
         }
     }
     
-    private func getPath(screenWidth: CGFloat) -> Path {
+    private var path: Path {
 //        print("linechart sleeps.count: \(sleeps.count)")
 //        print("Screenwidth: \(screenWidth)")
         
@@ -77,22 +94,24 @@ struct LineChartView: View {
 
         for (index, sleep) in sleeps.enumerated() {
             
-            processEachActivity(sleep, &path, &offsetX, &offsetY, screenWidth)
+            processEachActivity(sleep, &path, &offsetX, &offsetY, chartWidth)
             
-            checkAwakeTime(index, &path, &offsetX, &offsetY, sleep, screenWidth)
+            checkAwakeTime(index, &path, &offsetX, &offsetY, sleep, chartWidth)
         }
-//        for sleepPoint in sleepPoints {
-//            path.addRoundedRect(in: CGRect(x: offsetX, y: offsetY - 10, width: sleepPoint.offsetX - offsetX, height: 20), cornerSize: CGSize(width: 5, height: 5), style: .circular)
-//            path.addLine(to: CGPoint(x: sleepPoint.offsetX, y: sleepPoint.type))
-//
-//            offsetX = sleepPoint.offsetX
-//            offsetY = sleepPoint.type
-//        }
         return path
     }
     
     private func getOffset(timeInterval: Double, screenWidth: CGFloat) -> Double {
         return timeInterval / timeInBed * screenWidth
+    }
+    
+    private func setChartWidth(_ geometry: GeometryProxy) -> some View {
+
+        DispatchQueue.main.async {
+            self.chartWidth = geometry.size.width
+        }
+
+        return EmptyView()
     }
     
     var body: some View {
@@ -125,30 +144,62 @@ struct LineChartView: View {
 //                .background(.red)
 
                 
-                VStack {
-                    GeometryReader { geo in
-//                        let _ = print(geo.size.width)
-                  
-
-                        getPath(screenWidth: geo.size.width).stroke(
-                            LinearGradient(gradient: Gradient(colors:
-                                                                [
-                                                                    Color(UIColor(named: "AppDeepSleep")!),
-                                                                    Color(UIColor(named: "AppLightSleep")!),
-                                                                    Color(UIColor(named: "AppRemSleep")!),
-                                                                    Color(UIColor(named: "AppAwakeSleep")!)
-                                                                ]), startPoint: .top, endPoint: .bottom), lineWidth: 1.0)
-                            .rotationEffect(.degrees(180), anchor: .center)
-                            .rotation3DEffect(.degrees(180), axis: (x: 0, y: 1, z: 0))
-        //                    .frame(height: 150, alignment: .center)
-                        
+                ZStack {
+                    if chartLineIsVisible {
+                        VStack {
+                            Text(chartLineDate, formatter: Utils.hhmmtimeFormatter)
+                            Spacer()
+                        }
                     }
+                    VStack {
+                        GeometryReader { geo in
+                            setChartWidth(geo)
+                            path.stroke(
+                                LinearGradient(gradient: Gradient(colors:
+                                                                    [
+                                                                        Color(UIColor(named: "AppDeepSleep")!),
+                                                                        Color(UIColor(named: "AppLightSleep")!),
+                                                                        Color(UIColor(named: "AppRemSleep")!),
+                                                                        Color(UIColor(named: "AppAwakeSleep")!)
+                                                                    ]), startPoint: .top, endPoint: .bottom), lineWidth: 1.0)
+                                .rotationEffect(.degrees(180), anchor: .center)
+                                .rotation3DEffect(.degrees(180), axis: (x: 0, y: 1, z: 0))
+            //                    .frame(height: 150, alignment: .center)
+                            
+                        }
                         .frame(maxWidth: .infinity, minHeight: 150, maxHeight: 150, alignment: .center)
+                    }
+                    VStack {
+                        if chartLineIsVisible {
+                            Path { path in
+                                  path.move(to: CGPoint(x: chartLineOffsetX, y: 0))
+                                  path.addLine(to: CGPoint(x: chartLineOffsetX, y: 300))
+                            }.stroke(.gray)
+                        }
+
+                    }
 
                 }
                 .cornerRadius(1)
                 .padding(.vertical)
+                .gesture(DragGesture(minimumDistance: .leastNormalMagnitude, coordinateSpace: .local)
+                    .onChanged { value in
+                        chartLineIsVisible = true
+                        chartLineOffsetX = value.startLocation.x
 
+                        if chartLineOffsetX + value.translation.width < 0 {
+                            chartLineOffsetX = 0
+                        } else if chartLineOffsetX + value.translation.width > chartWidth {
+                            chartLineOffsetX = chartWidth
+                        } else {
+                            chartLineOffsetX += value.translation.width
+                        }
+                        setChartLineDate()
+                    }
+                    .onEnded { _ in
+                        chartLineIsVisible = false
+                    }
+                )
             }
             .padding(.vertical)
             .padding(.horizontal, 5.0)

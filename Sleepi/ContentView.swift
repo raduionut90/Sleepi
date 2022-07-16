@@ -45,9 +45,7 @@ struct ContentView: View {
                             Text(">")
                                 .font(.headline)
                                 .foregroundColor(.gray)
-
                         }
-                        
                     }
                 }.padding()
                 ScrollView(.vertical){
@@ -101,9 +99,21 @@ struct ContentView: View {
                 sleepManager.refreshSleeps(date: value)
             })
             .onChange(of: sleepDetector.loading, perform: { value in
-                print("loading changed: \(value)")
                 sleepManager.refreshSleeps(date: currentDate)
             })
+//            .gesture(DragGesture(minimumDistance: 3.0, coordinateSpace: .local)
+//                .onEnded { value in
+//                    print(value.translation)
+//                    switch(value.translation.width, value.translation.height) {
+//                        case (...0, -50...50):
+//                            if (Calendar.current.compare(Date(), to: currentDate, toGranularity: .day) == .orderedDescending) {
+//                                    addingDays(nr: 1)
+//                            }
+//                        case (0..., -50...50): addingDays(nr: -1)
+//                        default: print("no clue")
+//                    }
+//                }
+//            )
         }
 
     
