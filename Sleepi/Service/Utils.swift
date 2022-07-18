@@ -35,36 +35,6 @@ class Utils {
         return formatter
     }()
     
-    static func getActivitiesFromRawData(_ heartRates: [HKQuantitySample], _ activeEnergy: [HKQuantitySample]) -> [Activity] {
-        var activities: [Activity] = []
-
-        for actEnergy in activeEnergy {
-            let record = Activity(startDate: actEnergy.startDate, endDate: actEnergy.endDate, actEng: actEnergy.quantity.doubleValue(for: .kilocalorie()))
-            activities.append(record)
-        }
-        
-        for heartRate in heartRates {
-            if let existingRecord = activities.first(where: {Utils.dateTimeformatter.string(from: $0.startDate) ==
-                                                Utils.dateTimeformatter.string(from: heartRate.startDate)} ) {
-                existingRecord.hr = heartRate.quantity.doubleValue(for: HKUnit(from: "count/min"))
-            } else {
-                let record = Activity(startDate: heartRate.startDate, endDate: heartRate.endDate, hr: heartRate.quantity.doubleValue(for: HKUnit(from: "count/min")))
-                activities.append(record)
-            }
-
-        }
-        activities = activities.sorted { a,b in
-            a.startDate < b.startDate
-        }
-        
-//      used for debug
-//        for record in activities {
-//            print("\(record.startDate.formatted());\(record.hr ?? 999);\(record.actEng ?? 999)")
-//        }
-        
-        return activities
-    }
-    
     static func getAverage(array: [Activity], by: HKQuantityTypeIdentifier) -> Double {
         if by == .heartRate {
             let sumResultHr = array.compactMap(\.hr).reduce(0.0, +)

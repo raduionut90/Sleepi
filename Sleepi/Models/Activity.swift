@@ -7,15 +7,20 @@
 
 import Foundation
 
-class Activity {
+class Activity: Equatable {
+    static func == (lhs: Activity, rhs: Activity) -> Bool {
+        lhs.id == rhs.id
+    }
+    
+    let id = UUID()
     let startDate: Date
-    let endDate: Date
+    var endDate: Date?
     var hr: Double?
     var actEng: Double?
+    var stage: SleepType?
     
-    init(startDate: Date, endDate: Date, hr: Double){
+    init(startDate: Date, hr: Double){
         self.startDate = startDate
-        self.endDate = endDate
         self.hr = hr
     }
     
@@ -25,29 +30,17 @@ class Activity {
         self.actEng = actEng
     }
     
-    func getSleepType(_ heartRateAverage: Double) -> SleepType {
+    func setStage(_ heartRateNightSleepsAverage: Double) {
         var result: SleepType = SleepType.LightSleep
-        
-//        if let hr = self.hr {
-//            if hr <= heartRateAverage - 5 {
-//                result = SleepType.DeepSleep
-//            } else if hr > heartRateAverage + 8 {
-//                result = SleepType.RemSleep
-//            } else {
-//                result = SleepType.LightSleep
-//            }
-//        }
-
-        if let activeEnergy = self.actEng {
-            if activeEnergy < 0.06 {
+//        print("\(startDate.formatted());\(hr!)")
+                
+        if let hr = self.hr {
+            if hr <= heartRateNightSleepsAverage - 2 {
                 result = SleepType.DeepSleep
-            } else if activeEnergy > 0.4 {
+            } else if hr > heartRateNightSleepsAverage + 8 {
                 result = SleepType.RemSleep
-            } else {
-                result = SleepType.LightSleep
             }
         }
-
-        return result
+        self.stage = result
     }
 }
