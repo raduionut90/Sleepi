@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum SleepType: Double {
+enum SleepStage: Double {
     case DeepSleep = 0
     case LightSleep = 50
     case RemSleep = 100

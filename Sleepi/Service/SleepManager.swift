@@ -11,8 +11,8 @@ import HealthKit
 @MainActor
 class SleepManager: ObservableObject {
     private var healthStore: HealthStore?
-    @Published var heartRateAverage: Double = 0.0
-    @Published var sleeps: [Sleep] = []
+    @Published var nsHeartRateAverage: Double = 0.0
+    @Published var nightSleeps: [Sleep] = []
     @Published var naps: [Sleep] = []
     
     init(date: Date){
@@ -22,9 +22,6 @@ class SleepManager: ObservableObject {
     }
     
     func refreshSleeps(date: Date) {
-        self.naps = []
-        self.sleeps = []
-        self.heartRateAverage = 0.0
         Task.init {
             if let healthStore = healthStore {
                 let authorized: Bool = try await healthStore.requestAuthorization()
@@ -32,6 +29,7 @@ class SleepManager: ObservableObject {
                     var tmpSleeps: [Sleep] = []
                     let rawSleeps: [HKCategorySample] = await healthStore.sleepQuery(date: date)
                     for rawSleep in rawSleeps {
+                        print(rawSleep.startDate.formatted())
                         let heartRates = await healthStore.startHeartRateQuery(startDate: rawSleep.startDate, endDate: rawSleep.endDate)
 //                        let activeEnergy = await healthStore.activeEnergyQuery(startDate: rawSleep.startDate, endDate: rawSleep.endDate)
 //                        let sleep: Sleep = Sleep(rawSleep: rawSleep, heartRates: heartRates, activeEnergy: activeEnergy)
@@ -40,12 +38,12 @@ class SleepManager: ObservableObject {
                         updateActivityEndDate(sleep)
                         tmpSleeps.append(sleep)
                     }
-                    self.sleeps = tmpSleeps
-                    self.heartRateAverage = getSleepsHeartRateAverage()
-                    if self.sleeps.count > 0 {
-                        self.napCheck(date)
-                        self.updateActivityStage()
-                    }
+                    let sleeps = self.sleepFilter(sleeps: tmpSleeps, date: date)
+                    self.nsHeartRateAverage = getNightSleepsHeartRateAverage(sleeps: sleeps.nightSleep)
+                    self.updateActivityStage(sleeps.nightSleep)
+                    self.updateActivityStage(sleeps.naps)
+                    self.nightSleeps = sleeps.nightSleep
+                    self.naps = sleeps.naps
                 }
             }
         }
@@ -55,10 +53,10 @@ class SleepManager: ObservableObject {
 
     }
     
-    private func updateActivityStage() {
+    private func updateActivityStage(_ sleeps: [Sleep]) {
         for sleep in sleeps {
             for activity in sleep.activities {
-                activity.setStage(heartRateAverage)
+                activity.setStage(nsHeartRateAverage)
             }
         }
     }
@@ -69,47 +67,72 @@ class SleepManager: ObservableObject {
         }
     }
     
-    private func napCheck(_ date: Date) {
+    private func sleepFilter(sleeps: [Sleep], date: Date) -> (nightSleep: [Sleep], naps: [Sleep]) {
+        var nightSleep: [Sleep] = []
+        var naps: [Sleep] = []
         var referenceHour = Calendar.current.startOfDay(for: date)
         referenceHour = Calendar.current.date(byAdding: .hour, value: 10, to: referenceHour)!
         
-        var counter = 0
-        for (index, sleep) in sleeps.enumerated() {
-
+        for sleep in sleeps {
             if sleep.startDate > referenceHour {
-                self.naps.append(sleep)
-                self.sleeps.remove(at: index - counter)
-                counter += 1
+                naps.append(sleep)
+            } else {
+                nightSleep.append(sleep)
             }
         }
+        return (nightSleep, naps)
     }
     
     func getInBedTime() -> Double {
-        if sleeps.isEmpty {
+        if nightSleeps.isEmpty {
             return 0.0
         }
-        let startDate: Date = (self.sleeps.first?.startDate)!
-        let endDate: Date = (self.sleeps.last?.endDate)!
+        let startDate: Date = (self.nightSleeps.first?.startDate)!
+        let endDate: Date = (self.nightSleeps.last?.endDate)!
         return endDate.timeIntervalSinceReferenceDate - startDate.timeIntervalSinceReferenceDate
     }
     
-    func getAsleepTime() -> Double {
+    func getSleepStageDuration(stage: SleepStage) -> TimeInterval {
+        if stage == .Awake {
+            return zip(nightSleeps, nightSleeps.dropFirst())
+                .map({
+                    $1.startDate.timeIntervalSinceReferenceDate - $0.endDate.timeIntervalSinceReferenceDate
+                }).reduce(0, +)
+        }
+        return self.nightSleeps.map({
+            $0.getStageSleepDuration(allSleepsHrAverage: self.nsHeartRateAverage, stage: stage)
+        }).reduce(0, +)
+    }
+    
+    func getSleepDuration(type: SleepType) -> Double {
         var result: Double = 0.0
-        if sleeps.isEmpty {
-            return result
+        switch type {
+        case .NightSleep:
+            for sleep in self.nightSleeps {
+                result += sleep.endDate.timeIntervalSinceReferenceDate - sleep.startDate.timeIntervalSinceReferenceDate
+            }
+        case .Nap:
+            for sleep in self.naps {
+                result += sleep.endDate.timeIntervalSinceReferenceDate - sleep.startDate.timeIntervalSinceReferenceDate
+            }
+        case .All:
+            for sleep in self.nightSleeps {
+                result += sleep.endDate.timeIntervalSinceReferenceDate - sleep.startDate.timeIntervalSinceReferenceDate
+            }
+            for sleep in self.naps {
+                result += sleep.endDate.timeIntervalSinceReferenceDate - sleep.startDate.timeIntervalSinceReferenceDate
+            }
         }
-        for sleep in sleeps {
-            result += sleep.endDate.timeIntervalSinceReferenceDate - sleep.startDate.timeIntervalSinceReferenceDate
-        }
+
         return result
     }
 
-    private func getSleepsHeartRateAverage() -> Double {
-        var average: Double = 0.0
-        for sleep in self.sleeps {
-            average += sleep.heartRateAverage
+    private func getNightSleepsHeartRateAverage(sleeps: [Sleep]) -> Double {
+        var sum: Double = 0.0
+        for sleep in sleeps {
+            sum += sleep.heartRateAverage
         }
-        return average / Double(self.sleeps.count)
+        return sum / Double(sleeps.count)
     }
     
     private func getActivitiesFromRawData(heartRates: [HKQuantitySample]) -> [Activity] {
@@ -131,4 +154,10 @@ class SleepManager: ObservableObject {
         
         return activities
     }
+}
+
+enum SleepType: Double {
+    case NightSleep
+    case Nap
+    case All
 }

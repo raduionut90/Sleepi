@@ -17,7 +17,7 @@ class Activity: Equatable {
     var endDate: Date?
     var hr: Double?
     var actEng: Double?
-    var stage: SleepType?
+    var stage: SleepStage?
     
     init(startDate: Date, hr: Double){
         self.startDate = startDate
@@ -30,15 +30,14 @@ class Activity: Equatable {
         self.actEng = actEng
     }
     
-    func setStage(_ heartRateNightSleepsAverage: Double) {
-        var result: SleepType = SleepType.LightSleep
-//        print("\(startDate.formatted());\(hr!)")
+    func setStage(_ nsHeartRateAverage: Double) {
+        var result: SleepStage = SleepStage.LightSleep
                 
         if let hr = self.hr {
-            if hr <= heartRateNightSleepsAverage - 2 {
-                result = SleepType.DeepSleep
-            } else if hr > heartRateNightSleepsAverage + 8 {
-                result = SleepType.RemSleep
+            if hr <= nsHeartRateAverage - 2 {
+                result = SleepStage.DeepSleep
+            } else if hr > nsHeartRateAverage + 8 {
+                result = SleepStage.RemSleep
             }
         }
         self.stage = result

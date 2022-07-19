@@ -8,7 +8,7 @@
 import Foundation
 import HealthKit
 
-struct Sleep: Hashable {
+struct Sleep: Hashable, Identifiable, Equatable {
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
     }
@@ -34,53 +34,31 @@ struct Sleep: Hashable {
         return self.endDate.timeIntervalSinceReferenceDate - self.startDate.timeIntervalSinceReferenceDate
     }
     
-    func getStageSleepDuration(allSleepsHrAverage: Double, stage: SleepType) -> Double {
-        var dateArr: [Date] = []
-//        print(rawSleep.startDate.formatted())
-        let heartRates = activities.filter({ $0.hr != nil })
+    func getStageSleepDuration(allSleepsHrAverage: Double, stage: SleepStage) -> Double {
+        var result: [TimeInterval] = []
         
-        //start sleep -> first activity
-//        dateArr.append(self.startDate)
-//        dateArr.append(activities.first!.startDate)
+        if stage == .LightSleep {
+            result.append(self.activities.first!.startDate.timeIntervalSinceReferenceDate - self.startDate.timeIntervalSinceReferenceDate)
+        }
         
-        for (index, activity) in heartRates.enumerated() {
-//            print("\(hr.startDate.formatted());\(hr.quantity.doubleValue(for: HKUnit(from: "count/min")))")
-//            print("\(activity.startDate.formatted()), \(activity.endDate!.formatted()), \(activity.hr!), \(activity.stage!) ")
-            
+        for activity in activities {
             switch stage {
             case .DeepSleep:
-                if activity.hr! <= allSleepsHrAverage - 2 {
-                    dateArr.append(activity.startDate)
-                    dateArr.append(activity == heartRates.last ? self.endDate : heartRates[index + 1].startDate)
+                if activity.stage == .DeepSleep {
+                    result.append(activity.endDate!.timeIntervalSinceReferenceDate - activity.startDate.timeIntervalSinceReferenceDate)
                 }
             case .LightSleep:
-                if activity.hr! <= allSleepsHrAverage + 8 &&
-                    activity.hr! > allSleepsHrAverage - 2 {
-                    dateArr.append(activity.startDate)
-                    dateArr.append(activity == heartRates.last ? self.endDate : heartRates[index + 1].startDate)
+                if activity.stage == .LightSleep {
+                    result.append(activity.endDate!.timeIntervalSinceReferenceDate - activity.startDate.timeIntervalSinceReferenceDate)
                 }
             case .RemSleep:
-                if activity.hr! > allSleepsHrAverage + 8 {
-                    dateArr.append(activity.startDate)
-                    dateArr.append(activity == heartRates.last ? self.endDate : heartRates[index + 1].startDate)
+                if activity.stage == .RemSleep {
+                    result.append(activity.endDate!.timeIntervalSinceReferenceDate - activity.startDate.timeIntervalSinceReferenceDate)
                 }
             case .Awake:
                 ()
             }
-
-
         }
-        var result = 0.0
-        for (index, t) in dateArr.enumerated() {
-            if index % 2 == 0 {
-                result += dateArr[index + 1].timeIntervalSinceReferenceDate - t.timeIntervalSinceReferenceDate
-            }
-        }
-        
-//        for date in dateArr {
-//            print(date.formatted())
-//        }
-        return result;
+        return result.reduce(0, +);
     }
-    
 }

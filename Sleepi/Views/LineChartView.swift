@@ -26,7 +26,7 @@ struct LineChartView: View {
         // awake time
         if index < sleeps.count - 1 {
             // make a vertical line
-            path.addLine(to: CGPoint(x: offsetX, y: SleepType.Awake.rawValue))
+            path.addLine(to: CGPoint(x: offsetX, y: SleepStage.Awake.rawValue))
             
             let nextAwakeTime = sleeps[index + 1].startDate.timeIntervalSinceReferenceDate - sleep.endDate.timeIntervalSinceReferenceDate
             let awakeOffset = getOffset(timeInterval: nextAwakeTime, screenWidth: screenWidth)
@@ -34,9 +34,9 @@ struct LineChartView: View {
             offsetX += awakeOffset
             
 
-            path.addLine(to: CGPoint(x: offsetX, y: SleepType.Awake.rawValue))
+            path.addLine(to: CGPoint(x: offsetX, y: SleepStage.Awake.rawValue))
 
-            offsetY = SleepType.Awake.rawValue
+            offsetY = SleepStage.Awake.rawValue
             
 
         }
@@ -49,7 +49,7 @@ struct LineChartView: View {
             let interval: Double = activity.endDate!.timeIntervalSinceReferenceDate -
             (index == 0 ? sleep.startDate.timeIntervalSinceReferenceDate : sleep.activities[index - 1].endDate!.timeIntervalSinceReferenceDate)
             
-            let newOffsetY = activity.stage == nil ? SleepType.LightSleep.rawValue : activity.stage!.rawValue 
+            let newOffsetY = activity.stage == nil ? SleepStage.LightSleep.rawValue : activity.stage!.rawValue 
             let offset = getOffset(timeInterval: interval, screenWidth: screenWidth)
             
 //            print("\(activity.startDate.formatted()); \(activity.hr!); \(activity)")
@@ -88,9 +88,9 @@ struct LineChartView: View {
         
         var path = Path()
         var offsetX = 0.0
-        var offsetY = SleepType.LightSleep.rawValue
+        var offsetY = SleepStage.LightSleep.rawValue
 
-        path.move(to: CGPoint(x: offsetX, y: SleepType.LightSleep.rawValue))
+        path.move(to: CGPoint(x: offsetX, y: SleepStage.LightSleep.rawValue))
 
         for (index, sleep) in sleeps.enumerated() {
             
@@ -115,7 +115,6 @@ struct LineChartView: View {
     }
     
     var body: some View {
-        if !sleeps.isEmpty {
         VStack {
             ZStack {
                 if chartLineIsVisible {
@@ -154,39 +153,41 @@ struct LineChartView: View {
 
                     
                     ZStack {
-                        VStack {
-                            GeometryReader { geo in
-                                setChartWidth(geo)
-                                path.stroke(
-                                    LinearGradient(gradient: Gradient(colors:
-                                                                        [
-                                                                            Color(UIColor(named: "AppDeepSleep")!),
-                                                                            Color(UIColor(named: "AppLightSleep")!),
-                                                                            Color(UIColor(named: "AppRemSleep")!),
-                                                                            Color(UIColor(named: "AppAwakeSleep")!)
-                                                                        ]), startPoint: .top, endPoint: .bottom), lineWidth: 1.0)
-                                    .rotationEffect(.degrees(180), anchor: .center)
-                                    .rotation3DEffect(.degrees(180), axis: (x: 0, y: 1, z: 0))
-                //                    .frame(height: 150, alignment: .center)
-                                
+                        if !sleeps.isEmpty {
+                            VStack {
+                                GeometryReader { geo in
+                                    setChartWidth(geo)
+                                    path.stroke(
+                                        LinearGradient(gradient: Gradient(colors:
+                                                                            [
+                                                                                Color(UIColor(named: "AppDeepSleep")!),
+                                                                                Color(UIColor(named: "AppLightSleep")!),
+                                                                                Color(UIColor(named: "AppRemSleep")!),
+                                                                                Color(UIColor(named: "AppAwakeSleep")!)
+                                                                            ]), startPoint: .top, endPoint: .bottom), lineWidth: 1.0)
+                                        .rotationEffect(.degrees(180), anchor: .center)
+                                        .rotation3DEffect(.degrees(180), axis: (x: 0, y: 1, z: 0))
+//                                        .frame(width: 300, height: 150, alignment: .center)
+                                    
+                                }
+                                .frame(maxWidth: .infinity, minHeight: 150, maxHeight: 150, alignment: .center)
                             }
-                            .frame(maxWidth: .infinity, minHeight: 150, maxHeight: 150, alignment: .center)
-                        }
-                        VStack {
-                            if chartLineIsVisible {
-                                Path { path in
-                                      path.move(to: CGPoint(x: chartLineOffsetX, y: 0))
-                                      path.addLine(to: CGPoint(x: chartLineOffsetX, y: 300))
-                                }.stroke(.gray)
+                            VStack {
+                                if chartLineIsVisible {
+                                    Path { path in
+                                          path.move(to: CGPoint(x: chartLineOffsetX, y: 0))
+                                          path.addLine(to: CGPoint(x: chartLineOffsetX, y: 150))
+                                    }.stroke(.gray)
+                                }
                             }
-
+                        } else {
+                            Spacer()
                         }
-
                     }
-                    .cornerRadius(1)
-                    .padding(.vertical)
+                    .frame(minWidth: 300, minHeight: 150)
                     .gesture(DragGesture(minimumDistance: 0, coordinateSpace: .local)
                         .onChanged { value in
+                            print(value.translation)
                             chartLineIsVisible = true
                             chartLineOffsetX = value.startLocation.x
 
@@ -213,47 +214,25 @@ struct LineChartView: View {
             )
             }
 
-            HStack {
-                Text("Bed time").font(.caption)
-                Spacer()
-                Text("Rise time").font(.caption)
+            VStack {
+                HStack {
+                    Text("Bed time").font(.caption)
+                    Spacer()
+                    Text("Rise time").font(.caption)
+                }
+                if !sleeps.isEmpty {
+                    HStack {
+                            Text((sleeps.first?.startDate)!, formatter: Utils.hhmmtimeFormatter).font(.caption)
+                            Spacer()
+                            Text((sleeps.last?.endDate)!, formatter: Utils.hhmmtimeFormatter).font(.caption)
+                    }
+                } else {
+                    Spacer()
+                }
             }
-            HStack {
-                
-                Text((sleeps.first?.startDate)!, formatter: Utils.hhmmtimeFormatter).font(.caption)
-                Spacer()
-                Text((sleeps.last?.endDate)!, formatter: Utils.hhmmtimeFormatter).font(.caption)
-            }
-
-            HStack {
-                Circle()
-                    .fill(Color(UIColor(named: "AppDeepSleep")!))
-                    .frame(width: 10, height: 10)
-                Text("Deep Sleep")
-                    .font(.caption)
-                
-                Circle()
-                    .fill(Color(UIColor(named: "AppLightSleep")!))
-                    .frame(width: 10, height: 10)
-                Text("Light Sleep")
-                    .font(.caption)
-
-                Circle()
-                    .fill(Color(UIColor(named: "AppRemSleep")!))
-                    .frame(width: 10, height: 10)
-                Text("Rem Sleep")
-                    .font(.caption)
-
-                Circle()
-                    .fill(Color(UIColor(named: "AppAwakeSleep")!))
-                    .frame(width: 10, height: 10)
-                Text("Awake")
-                    .font(.caption)
-
-            }
+            .frame(minHeight: 30)
             
         }
-    }
         
     }
 }

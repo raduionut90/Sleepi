@@ -85,7 +85,9 @@ class SleepDetector: ObservableObject {
                 }
 
             }
-            if !isDataContinuity(activities[index].startDate, activities[nextIndex].startDate) {endingSleep(lowActivities: &lowActivities, highActivities: &highActivities)}
+            if !isDataContinuity(activities[index].startDate, activities[nextIndex].startDate) {
+                endingSleep(lowActivities: &lowActivities, highActivities: &highActivities)
+            }
 
         }
     }
