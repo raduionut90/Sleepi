@@ -54,47 +54,39 @@ struct ContentView: View {
                             
                             HStack() {
                                 VStack {
-                                    Text("In Bed")
-                                        .font(.subheadline)
-                                        .fontWeight(.light)
-                                        
-                                    Text(Utils.timeFormatter.string(from: sleepManager.getInBedTime() )! )
-                                        .font(.title2)
-                                        .fontWeight(.medium)
-                                }
-                                Spacer()
-                                VStack {
                                     Text("Night Sleep")
                                         .font(.subheadline)
                                         .fontWeight(.light)
                                         
-                                    Text(Utils.timeFormatter.string(from: sleepManager.getSleepDuration(type: .NightSleep) )! )
+                                    Text(Utils.timeForrmatedAbr.string(from: sleepManager.getInBedTime() )! )
                                         .font(.title2)
                                         .fontWeight(.medium)
                                 }
                                 Spacer()
+//                                VStack {
+//                                    Text("Night Sleep")
+//                                        .font(.subheadline)
+//                                        .fontWeight(.light)
+//
+//                                    Text(Utils.timeForrmatedAbr.string(from: sleepManager.getSleepDuration(type: .NightSleep) )! )
+//                                        .font(.title2)
+//                                        .fontWeight(.medium)
+//                                }
+//                                Spacer()
                                 VStack {
                                     Text("Nap")
                                         .font(.subheadline)
                                         .fontWeight(.light)
                                         
-                                    Text(Utils.timeFormatter.string(from: sleepManager.getSleepDuration(type: .Nap) )! )
-                                        .font(.title2)
-                                        .fontWeight(.medium)
-                                }
-                                Spacer()
-                                VStack {
-                                    Text("Total")
-                                        .font(.subheadline)
-                                        .fontWeight(.light)
-                                        
-                                    Text(Utils.timeFormatter.string(from: sleepManager.getSleepDuration(type: .All) )! )
+                                    Text(Utils.timeForrmatedAbr.string(from: sleepManager.getSleepDuration(type: .Nap) )! )
                                         .font(.title2)
                                         .fontWeight(.medium)
                                 }
                             }
                             .padding()
                         }
+                        .background(Color("BackgroundSec"))
+                        .foregroundColor(Color("TextColorPrim"))
                         .gesture(DragGesture(minimumDistance: 70.0, coordinateSpace: .local)
                             .onEnded { value in
             
@@ -111,74 +103,101 @@ struct ContentView: View {
             
                         VStack {
                             LineChartView(sleeps: sleepManager.nightSleeps, timeInBed: sleepManager.getInBedTime(), sleepsHrAverage: sleepManager.nsHeartRateAverage)
-         
-                            // FOR NAPS
-    //                        ForEach(sleepManager.naps) { nap in
-    //                            Text("NAPS")
-    //                            LineChartView(sleeps: [nap], timeInBed: (nap.endDate.timeIntervalSinceReferenceDate - nap.startDate.timeIntervalSinceReferenceDate), sleepsHrAverage: sleepManager.nsHeartRateAverage)
-    //                        }
                         }
                         .padding(.all, 15)
                     }
-                    .background(.white)
+                    .background(Color("BackgroundSec"))
                     
                     ScrollView(.vertical){
-
+                        
                         VStack {
                             Group {
                                 HStack {
+                                    let percent = sleepManager.getSleepStageDuration(stage: .Awake) / sleepManager.getInBedTime() * 100
                                     Circle()
                                         .fill(Color(UIColor(named: "AppAwakeSleep")!))
                                         .frame(width: 10, height: 10)
-                                    Text("Awake")
+                                    VStack(alignment: .leading) {
+                                        Text("Awake \(String(format: "%.0f", percent)) %")
+                                        Text("Reference: 1 time")
+                                            .font(.caption2)
+                                            .foregroundColor(Color("TextColorSec"))
+                                    }
                                     Spacer()
-                                    Text(Utils.timeFormatter.string(from: sleepManager.getSleepStageDuration(stage: .Awake))!)
-                                    
+                                    Text(Utils.timeForrmatedAbr.string(from: sleepManager.getSleepStageDuration(stage: .Awake))!)
                                 }
                                 HStack {
+                                    let percent = sleepManager.getSleepStageDuration(stage: .RemSleep) / sleepManager.getInBedTime() * 100
                                     Circle()
                                         .fill(Color(UIColor(named: "AppRemSleep")!))
                                         .frame(width: 10, height: 10)
-                                    Text("Rem")
+                                    VStack(alignment: .leading) {
+                                        Text("Rem \(String(format: "%.0f", percent)) %")
+                                        Text("Reference: 10-30%")
+                                            .font(.caption2)
+                                            .foregroundColor(Color("TextColorSec"))
+                                    }
                                     Spacer()
-                                    Text(Utils.timeFormatter.string(from: sleepManager.getSleepStageDuration(stage: .RemSleep))!)
+                                    Text(Utils.timeForrmatedAbr.string(from: sleepManager.getSleepStageDuration(stage: .RemSleep))!)
                                 }
                                 HStack {
+                                    let percent = sleepManager.getSleepStageDuration(stage: .LightSleep) / sleepManager.getInBedTime() * 100
                                     Circle()
                                         .fill(Color(UIColor(named: "AppLightSleep")!))
                                         .frame(width: 10, height: 10)
-                                    Text("Light")
+                                    VStack(alignment: .leading) {
+                               
+                                        Text("Light \(String(format: "%.0f", percent)) %")
+                                        Text("Reference: 40-60%")
+                                            .font(.caption2)
+                                            .foregroundColor(Color("TextColorSec"))
+                                    }
                                     Spacer()
-                                    Text(Utils.timeFormatter.string(from: sleepManager.getSleepStageDuration(stage: .LightSleep))!)
+                                    Text(Utils.timeForrmatedAbr.string(from: sleepManager.getSleepStageDuration(stage: .LightSleep))!)
                                     
                                 }
                                 HStack {
+                                    let percent = sleepManager.getSleepStageDuration(stage: .DeepSleep) / sleepManager.getInBedTime() * 100
                                     Circle()
                                         .fill(Color(UIColor(named: "AppDeepSleep")!))
                                         .frame(width: 10, height: 10)
-                                    Text("Deep")
+                                    VStack(alignment: .leading) {
+                                        Text("Deep \(String(format: "%.0f", percent)) %")
+                                        Text("Reference: 20-60%")
+                                            .font(.caption2)
+                                            .foregroundColor(Color("TextColorSec"))
+                                    }
                                     Spacer()
-                                    Text(Utils.timeFormatter.string(from: sleepManager.getSleepStageDuration(stage: .DeepSleep))!)
+                                    Text(Utils.timeForrmatedAbr.string(from: sleepManager.getSleepStageDuration(stage: .DeepSleep))!)
                                 }
                                 ForEach(sleepManager.naps) { nap in
                                     HStack {
-                                        Text("Nap")
+                                        Circle()
+                                            .fill(Color(UIColor(named: "BackgroundSec")!))
+                                            .frame(width: 10, height: 10)
+                                        VStack(alignment: .leading) {
+                                            Text("Nap")
+                                            Text(Utils.hhmmtimeFormatter.string(from: nap.startDate) + " - " +  Utils.hhmmtimeFormatter.string(from: nap.endDate))
+                                                .font(.caption2)
+                                                .foregroundColor(Color("TextColorSec"))
+                                        }
                                         Spacer()
-                                        Text(Utils.timeFormatter.string(from: nap.getDuration() )!)
+                                        Text(Utils.timeForrmatedAbr.string(from: nap.getDuration() )!)
                                     }
                                 }
                             }
                             .padding()
-                            .background(/*@START_MENU_TOKEN@*//*@PLACEHOLDER=View@*/Color.white/*@END_MENU_TOKEN@*/)
+                            .background(Color("BackgroundSec"))
+                            .foregroundColor(Color("TextColorPrim"))
                             .cornerRadius(10)
                         }
-                        .padding(/*@START_MENU_TOKEN@*/.all/*@END_MENU_TOKEN@*/)
+                        .padding(.all)
                         .gesture(DragGesture(minimumDistance: 70.0, coordinateSpace: .local)
                             .onEnded { value in
-            
+                                
                                 if value.translation.width < 0 {
                                     if (Calendar.current.compare(Date(), to: currentDate, toGranularity: .day) == .orderedDescending) {
-                                            addingDays(nr: 1)
+                                        addingDays(nr: 1)
                                     }
                                 } else {
                                     addingDays(nr: -1)
@@ -190,7 +209,7 @@ struct ContentView: View {
                 }
                 .navigationTitle("Sleepi")
                 .navigationBarTitleDisplayMode(.inline)
-                .background(Color("Background"))
+                .background(Color("BackgroundPrim"))
 
         }
             .navigationViewStyle(StackNavigationViewStyle())
@@ -204,16 +223,16 @@ struct ContentView: View {
             .onChange(of: sleepDetector.loading, perform: { _ in
                 sleepManager.refreshSleeps(date: currentDate)
             })
-            .onChange(of: sleepManager.nightSleeps, perform: { value in
-                let deep = sleepManager.getSleepStageDuration(stage: .DeepSleep)
-                print("deep: \(Utils.timeFormatter.string(from: deep)!)")
-                let rem = sleepManager.getSleepStageDuration(stage: .RemSleep)
-                print("rem: \(Utils.timeFormatter.string(from: rem)!)")
-                let light = sleepManager.getSleepStageDuration(stage: .LightSleep)
-                print("light: \(Utils.timeFormatter.string(from: light)!)")
-                print("total: \(Utils.timeFormatter.string(from: deep + rem + light)!)")
-
-            })
+//            .onChange(of: sleepManager.nightSleeps, perform: { value in
+//                let deep = sleepManager.getSleepStageDuration(stage: .DeepSleep)
+//                print("deep: \(Utils.timeFormatter.string(from: deep)!)")
+//                let rem = sleepManager.getSleepStageDuration(stage: .RemSleep)
+//                print("rem: \(Utils.timeFormatter.string(from: rem)!)")
+//                let light = sleepManager.getSleepStageDuration(stage: .LightSleep)
+//                print("light: \(Utils.timeFormatter.string(from: light)!)")
+//                print("total: \(Utils.timeFormatter.string(from: deep + rem + light)!)")
+//
+//            })
 //            .gesture(DragGesture(minimumDistance: 70.0, coordinateSpace: .local)
 //                .onEnded { value in
 //
@@ -233,7 +252,17 @@ struct ContentView: View {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView()
-            .previewInterfaceOrientation(.portraitUpsideDown)
+        Group {
+            ContentView()
+                .previewInterfaceOrientation(.portraitUpsideDown)
+            ContentView()
+                .previewInterfaceOrientation(.landscapeLeft)
+            ContentView()
+                .previewInterfaceOrientation(.portraitUpsideDown)
+                .preferredColorScheme(.dark)
+            ContentView()
+                .previewInterfaceOrientation(.landscapeLeft)
+                .preferredColorScheme(.dark)
+        }
     }
 }

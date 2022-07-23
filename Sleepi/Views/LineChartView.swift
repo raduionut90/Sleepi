@@ -126,32 +126,6 @@ struct LineChartView: View {
                     }
                 }
                 HStack {
-                    VStack {
-                        Text("awake")
-                            .font(.caption)
-                            .foregroundColor(Color.gray)
-                            .frame(maxHeight: .infinity)
-
-                        Text("rem")
-                            .font(.caption)
-                            .foregroundColor(Color.gray)
-                            .frame(maxHeight: .infinity)
-
-
-                        Text("light")
-                            .font(.caption)
-                            .foregroundColor(Color.gray)
-                            .frame(maxHeight: .infinity)
-
-                        Text("deep")
-                            .font(.caption)
-                            .foregroundColor(Color.gray)
-                            .frame(maxHeight: .infinity)
-
-                    }
-    //                .background(.red)
-
-                    
                     ZStack {
                         if !sleeps.isEmpty {
                             VStack {
@@ -184,10 +158,11 @@ struct LineChartView: View {
                             Spacer()
                         }
                     }
-                    .frame(minWidth: 300, minHeight: 150)
-                    .gesture(DragGesture(minimumDistance: 0, coordinateSpace: .local)
+                    .background(Color("BackgroundSec"))
+//                    .foregroundColor(.green)
+                    .highPriorityGesture(DragGesture(minimumDistance: 0, coordinateSpace: .local)
                         .onChanged { value in
-                            print(value.translation)
+//                            print(value.translation)
                             chartLineIsVisible = true
                             chartLineOffsetX = value.startLocation.x
 
@@ -204,14 +179,18 @@ struct LineChartView: View {
                             chartLineIsVisible = false
                         }
                     )
+                    .frame(minWidth: 300, minHeight: 150)
+                    
                 }
                 .padding(.vertical)
                 .padding(.horizontal, 5.0)
                 .frame(maxWidth: .infinity, maxHeight: 300)
                 .overlay(
-                        RoundedRectangle(cornerRadius: 16)
-                            .stroke(.gray, lineWidth: 1)
-            )
+                    RoundedRectangle(cornerRadius: 16)
+                            .stroke(.gray, lineWidth: 1))
+//                VStack{
+//
+//                }
             }
 
             VStack {

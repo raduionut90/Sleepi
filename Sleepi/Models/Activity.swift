@@ -8,6 +8,17 @@
 import Foundation
 
 class Activity: Equatable {
+    internal init(startDate: Date, endDate: Date? = nil, hr: Double? = nil, actEng: Double? = nil, hrv: Double? = nil, rhr: Double? = nil, respRate: Double? = nil, stage: SleepStage? = nil) {
+        self.startDate = startDate
+        self.endDate = endDate
+        self.hr = hr
+        self.actEng = actEng
+        self.hrv = hrv
+        self.rhr = rhr
+        self.respRate = respRate
+        self.stage = stage
+    }
+    
     static func == (lhs: Activity, rhs: Activity) -> Bool {
         lhs.id == rhs.id
     }
@@ -17,18 +28,21 @@ class Activity: Equatable {
     var endDate: Date?
     var hr: Double?
     var actEng: Double?
+    var hrv: Double?
+    var rhr: Double?
+    var respRate: Double?
     var stage: SleepStage?
     
-    init(startDate: Date, hr: Double){
-        self.startDate = startDate
-        self.hr = hr
-    }
-    
-    init(startDate: Date, endDate: Date, actEng: Double){
-        self.startDate = startDate
-        self.endDate = endDate
-        self.actEng = actEng
-    }
+//    init(startDate: Date, hr: Double){
+//        self.startDate = startDate
+//        self.hr = hr
+//    }
+//
+//    init(startDate: Date, endDate: Date, actEng: Double){
+//        self.startDate = startDate
+//        self.endDate = endDate
+//        self.actEng = actEng
+//    }
     
     func setStage(_ nsHeartRateAverage: Double) {
         var result: SleepStage = SleepStage.LightSleep
@@ -36,7 +50,7 @@ class Activity: Equatable {
         if let hr = self.hr {
             if hr <= nsHeartRateAverage - 2 {
                 result = SleepStage.DeepSleep
-            } else if hr > nsHeartRateAverage + 8 {
+            } else if hr > nsHeartRateAverage + 2 {
                 result = SleepStage.RemSleep
             }
         }

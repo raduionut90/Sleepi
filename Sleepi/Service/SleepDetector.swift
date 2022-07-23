@@ -19,6 +19,17 @@ class SleepDetector: ObservableObject {
         }
     }
     
+    fileprivate func getActivities(_ healthStore: HealthStore, _ startDate: Date, _ endDate: Date) async -> [Activity] {
+        let heartRates = await healthStore.startHeartRateQuery(startDate: startDate, endDate: endDate)
+        let activeEnergy = await healthStore.activeEnergyQuery(startDate: startDate, endDate: endDate)
+        //                    let hrv = await healthStore.startHeartRateVariabilityQuery(startDate: startDate, endDate: endDate)
+        //                    let rhr = await healthStore.startRestingHeartRateQuery(startDate: startDate, endDate: endDate)
+        //                    let resp = await healthStore.startRespiratoryRateQuery(startDate: startDate, endDate: endDate)
+        
+        let activities: [Activity] = self.getActivitiesFromRawData(heartRates: heartRates, activeEnergy: activeEnergy, hrvs: [], rhrs: [], respRates: [])
+        return activities
+    }
+    
     func performSleepDetection() {
         Task.init {
             if let healthStore = healthStore {
@@ -27,23 +38,45 @@ class SleepDetector: ObservableObject {
 
                     let endDate = Date()
                     
-                    let startDate = await getStartDate(healthStore, endDate)
+                    var startDate = await getStartDate(healthStore, endDate)
+                    
+
                     // for debugging
-//                    let debugStartDate = Calendar.current.date(byAdding: .day, value: -1, to: endDate)!
-//                    let debugHeartRates = await healthStore.startHeartRateQuery(startDate: debugStartDate, endDate: endDate)
-//                    let debugActiveEnergy = await healthStore.activityQuery(startDate: debugStartDate, endDate: endDate)
-//                    processRawData(debugHeartRates, debugActiveEnergy)
-                    // stop debugging
+//                    let debugStartDate = Calendar.current.date(byAdding: .day, value: -56, to: Date())!
+//                    let debugEndDate = Calendar.current.date(byAdding: .day, value: +5, to: debugStartDate)!
+//                    let debugsleeps = await healthStore.sleepQuery(date: debugStartDate)
+//                    let debugsleeps2 = await healthStore.sleepQuery(date: Calendar.current.date(byAdding: .day, value: 1, to: debugStartDate)!)
+//                    let debugsleeps3 = await healthStore.sleepQuery(date: Calendar.current.date(byAdding: .day, value: 2, to: debugStartDate)!)
+//                    let debugsleeps4 = await healthStore.sleepQuery(date: Calendar.current.date(byAdding: .day, value: 3, to: debugStartDate)!)
+//                    let debugsleeps5 = await healthStore.sleepQuery(date: Calendar.current.date(byAdding: .day, value: 4, to: debugStartDate)!)
+//
+//
+//                    let debugHeartRates = await healthStore.startHeartRateQuery(startDate: debugStartDate, endDate: debugEndDate)
+//                    let debugActiveEnergy = await healthStore.activeEnergyQuery(startDate: debugStartDate, endDate: debugEndDate)
+//                    let debughrv = await healthStore.startHeartRateVariabilityQuery(startDate: debugStartDate, endDate: debugEndDate)
+//                    let debugrhr = await healthStore.startRestingHeartRateQuery(startDate: debugStartDate, endDate: debugEndDate)
+//                    let debugresp = await healthStore.startRespiratoryRateQuery(startDate: debugStartDate, endDate: debugEndDate)
+//
+//                    self.getActivitiesFromRawData(heartRates: debugHeartRates, activeEnergy: debugActiveEnergy, hrvs: debughrv, rhrs: debugrhr, respRates: debugresp)
+//                     stop debugging
                     
-//                    print("startDate: \(startDate.formatted()) , endDate: \(endDate.formatted())")
-
-                    let heartRates = await healthStore.startHeartRateQuery(startDate: startDate, endDate: endDate)
-                    let activeEnergy = await healthStore.activeEnergyQuery(startDate: startDate, endDate: endDate)
-
-                    let activities: [Activity] = self.getActivitiesFromRawData(heartRates, activeEnergy)
                     
+                    print("before while: startDate: \(startDate.formatted()) , endDate: \(endDate.formatted())")
+                    while endDate.timeIntervalSinceReferenceDate - startDate.timeIntervalSinceReferenceDate > 84600 {
+                        let next24h = Calendar.current.date(byAdding: .day, value: 1, to: startDate)!
+                        let startOfNextDay = Calendar.current.startOfDay(for: next24h)
+                        let nextDay12am = Calendar.current.date(byAdding: .hour, value: 12, to: startOfNextDay)!
+                        
+//                        print("sleepDetector: startDate: \(startDate.formatted()) , endDate: \(nextDay12am.formatted())")
+
+                        let activities: [Activity] = await getActivities(healthStore, startDate, nextDay12am)
+                        self.performCalculation(activities: activities)
+                        startDate = nextDay12am
+                    }
+
+                    let activities: [Activity] = await getActivities(healthStore, startDate, endDate)
                     performCalculation(activities: activities)
-                    
+                    self.loading = false
                 }
             }
         }
@@ -137,7 +170,6 @@ class SleepDetector: ObservableObject {
             if let start = lowActivities.first?.startDate, let end = lowActivities.last?.startDate {
 //                print("\(start.formatted()) \(end.formatted())")
                 healthStore?.saveSleepAnalysis(startTime: start, endTime: end)
-                loading = false
             }
 //            print("")
         }
@@ -170,7 +202,13 @@ class SleepDetector: ObservableObject {
         return false
     }
     
-    private func getActivitiesFromRawData(_ heartRates: [HKQuantitySample], _ activeEnergy: [HKQuantitySample]) -> [Activity] {
+    private func getActivitiesFromRawData(
+            heartRates: [HKQuantitySample],
+            activeEnergy: [HKQuantitySample],
+            hrvs: [HKQuantitySample],
+            rhrs: [HKQuantitySample],
+            respRates: [HKQuantitySample]
+    ) -> [Activity] {
         var activities: [Activity] = []
 
         for actEnergy in activeEnergy {
@@ -186,15 +224,50 @@ class SleepDetector: ObservableObject {
                 let record = Activity(startDate: heartRate.startDate, hr: heartRate.quantity.doubleValue(for: HKUnit(from: "count/min")))
                 activities.append(record)
             }
-
         }
+        
+//        for hrv in hrvs {
+//            if let existingRecord = activities.first(where: {Utils.dateTimeformatter.string(from: $0.startDate) ==
+//                                                Utils.dateTimeformatter.string(from: hrv.startDate)} ) {
+//                existingRecord.hrv = hrv.quantity.doubleValue(for: HKUnit(from: "ms"))
+//            } else {
+//                let record = Activity(startDate: hrv.startDate, hrv: hrv.quantity.doubleValue(for: HKUnit(from: "ms")))
+//                activities.append(record)
+//            }
+//        }
+//
+//        for rhr in rhrs {
+//            if let existingRecord = activities.first(where: {Utils.dateTimeformatter.string(from: $0.startDate) ==
+//                                                Utils.dateTimeformatter.string(from: rhr.startDate)} ) {
+//                existingRecord.rhr = rhr.quantity.doubleValue(for: HKUnit(from: "count/min"))
+//            } else {
+//                let record = Activity(startDate: rhr.startDate, rhr: rhr.quantity.doubleValue(for: HKUnit(from: "count/min")))
+//                activities.append(record)
+//            }
+//        }
+//
+//        for respRate in respRates {
+//            if let existingRecord = activities.first(where: {Utils.dateTimeformatter.string(from: $0.startDate) ==
+//                                                Utils.dateTimeformatter.string(from: respRate.startDate)} ) {
+//                existingRecord.respRate = respRate.quantity.doubleValue(for: HKUnit(from: "count/min"))
+//            } else {
+//                let record = Activity(startDate: respRate.startDate, respRate: respRate.quantity.doubleValue(for: HKUnit(from: "count/min")))
+//                activities.append(record)
+//            }
+//        }
+        
         activities = activities.sorted { a,b in
             a.startDate < b.startDate
         }
         
 //      used for debug
 //        for record in activities {
-//            print("\(record.startDate.formatted());\(record.hr ?? 999);\(record.actEng ?? 999)")
+//            print("\(record.startDate.formatted());"
+//                  + "\(record.hr ?? 999);"
+//                  + "\(record.actEng ?? 999);"
+//                  + "\(record.hrv ?? 999);"
+//                  + "\(record.rhr ?? 999);"
+//                  + "\(record.respRate ?? 999)")
 //        }
         
         return activities

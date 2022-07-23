@@ -35,6 +35,14 @@ class Utils {
         return formatter
     }()
     
+    static var timeForrmatedAbr: DateComponentsFormatter = {
+        let formatter = DateComponentsFormatter()
+        formatter.zeroFormattingBehavior = .pad
+        formatter.allowedUnits = [.hour, .minute]
+        formatter.unitsStyle = .abbreviated
+        return formatter
+    }()
+    
     static func getAverage(array: [Activity], by: HKQuantityTypeIdentifier) -> Double {
         if by == .heartRate {
             let sumResultHr = array.compactMap(\.hr).reduce(0.0, +)

@@ -29,11 +29,7 @@ class SleepManager: ObservableObject {
                     var tmpSleeps: [Sleep] = []
                     let rawSleeps: [HKCategorySample] = await healthStore.sleepQuery(date: date)
                     for rawSleep in rawSleeps {
-                        print(rawSleep.startDate.formatted())
-                        let heartRates = await healthStore.startHeartRateQuery(startDate: rawSleep.startDate, endDate: rawSleep.endDate)
-//                        let activeEnergy = await healthStore.activeEnergyQuery(startDate: rawSleep.startDate, endDate: rawSleep.endDate)
-//                        let sleep: Sleep = Sleep(rawSleep: rawSleep, heartRates: heartRates, activeEnergy: activeEnergy)
-                        let activities: [Activity] = self.getActivitiesFromRawData(heartRates: heartRates)
+                        let activities: [Activity] = await self.getActivitiesFromRawData(healthStore, rawSleep.startDate, rawSleep.endDate)
                         let sleep: Sleep = Sleep(startDate: rawSleep.startDate, endDate: rawSleep.endDate, activities: activities)
                         updateActivityEndDate(sleep)
                         tmpSleeps.append(sleep)
@@ -135,13 +131,56 @@ class SleepManager: ObservableObject {
         return sum / Double(sleeps.count)
     }
     
-    private func getActivitiesFromRawData(heartRates: [HKQuantitySample]) -> [Activity] {
+    private func getActivitiesFromRawData(_ healthStore: HealthStore, _ startDate: Date, _ endDate: Date) async -> [Activity] {
         var activities: [Activity] = []
+        
+        let heartRates = await healthStore.startHeartRateQuery(startDate: startDate, endDate: endDate)
+//        let activeEnergys = await healthStore.activeEnergyQuery(startDate: startDate, endDate: endDate)
+//        let hrvs = await healthStore.startHeartRateVariabilityQuery(startDate: startDate, endDate: endDate)
+//        let rhrs = await healthStore.startRestingHeartRateQuery(startDate: startDate, endDate: endDate)
+//        let respRates = await healthStore.startRespiratoryRateQuery(startDate: startDate, endDate: endDate)
         
         for heartRate in heartRates {
             let record = Activity(startDate: heartRate.startDate, hr: heartRate.quantity.doubleValue(for: HKUnit(from: "count/min")))
             activities.append(record)
         }
+//        for act in activeEnergys {
+//            if let existingRecord = activities.first(where: {Utils.dateTimeformatter.string(from: $0.startDate) ==
+//                                                Utils.dateTimeformatter.string(from: act.startDate)} ) {
+//                existingRecord.actEng = act.quantity.doubleValue(for: HKUnit.kilocalorie())
+//            } else {
+//                let record = Activity(startDate: act.startDate, actEng: act.quantity.doubleValue(for: HKUnit.kilocalorie()))
+//                activities.append(record)
+//            }
+//        }
+//        for hrv in hrvs {
+//            if let existingRecord = activities.first(where: {Utils.dateTimeformatter.string(from: $0.startDate) ==
+//                                                Utils.dateTimeformatter.string(from: hrv.startDate)} ) {
+//                existingRecord.hrv = hrv.quantity.doubleValue(for: HKUnit(from: "ms"))
+//            } else {
+//                let record = Activity(startDate: hrv.startDate, hrv: hrv.quantity.doubleValue(for: HKUnit(from: "ms")))
+//                activities.append(record)
+//            }
+//        }
+//
+//        for rhr in rhrs {
+//            if let existingRecord = activities.first(where: { rhr.startDate >= $0.startDate } ) {
+//                existingRecord.rhr = rhr.quantity.doubleValue(for: HKUnit(from: "count/min"))
+//            } else {
+//                let record = Activity(startDate: rhr.startDate, rhr: rhr.quantity.doubleValue(for: HKUnit(from: "count/min")))
+//                activities.append(record)
+//            }
+//        }
+//
+//        for respRate in respRates {
+//            if let existingRecord = activities.first(where: {Utils.dateTimeformatter.string(from: $0.startDate) ==
+//                                                Utils.dateTimeformatter.string(from: respRate.startDate)} ) {
+//                existingRecord.respRate = respRate.quantity.doubleValue(for: HKUnit(from: "count/min"))
+//            } else {
+//                let record = Activity(startDate: respRate.startDate, respRate: respRate.quantity.doubleValue(for: HKUnit(from: "count/min")))
+//                activities.append(record)
+//            }
+//        }
         
         activities = activities.sorted { a,b in
             a.startDate < b.startDate
@@ -149,7 +188,12 @@ class SleepManager: ObservableObject {
         
 //      used for debug
 //        for record in activities {
-//            print("\(record.startDate.formatted());\(record.hr ?? 999);\(record.actEng ?? 999)")
+//            print("\(record.startDate.formatted());"
+//                  + "\(record.hr ?? 999);"
+//                  + "\(record.actEng ?? 999);"
+//                  + "\(record.hrv ?? 999);"
+//                  + "\(record.rhr ?? 999);"
+//                  + "\(record.respRate ?? 999)")
 //        }
         
         return activities
