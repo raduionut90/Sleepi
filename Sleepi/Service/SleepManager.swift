@@ -33,7 +33,11 @@ class SleepManager: ObservableObject {
                 let authorized: Bool = try await healthStore.requestAuthorization()
                 if authorized {
                     var tmpSleeps: [Sleep] = []
-                    let rawSleeps: [HKCategorySample] = await healthStore.sleepQuery(date: date)
+                    var startDate = Calendar.current.startOfDay(for: date)
+                    startDate = Calendar.current.date(byAdding: .hour, value: -4, to: startDate)!
+                    let endDate = Calendar.current.date(byAdding: .day, value: 1, to: startDate)!
+                    
+                    let rawSleeps: [HKCategorySample] = await healthStore.getSleeps(startTime: startDate, endTime: endDate)
                     for rawSleep in rawSleeps {
                         let activities: [Activity] = await self.getActivitiesFromRawData(healthStore, rawSleep.startDate, rawSleep.endDate)
                         let sleep: Sleep = Sleep(startDate: rawSleep.startDate, endDate: rawSleep.endDate, activities: activities)
@@ -141,7 +145,8 @@ class SleepManager: ObservableObject {
     private func getActivitiesFromRawData(_ healthStore: HealthStore, _ startDate: Date, _ endDate: Date) async -> [Activity] {
         var activities: [Activity] = []
         
-        let heartRates = await healthStore.startHeartRateQuery(startDate: startDate, endDate: endDate)
+//        let heartRates = await healthStore.startHeartRateQuery(startDate: startDate, endDate: endDate)
+        let heartRates = await healthStore.getSamples(startDate: startDate, endDate: endDate, type: .heartRate)
 //        let activeEnergys = await healthStore.activeEnergyQuery(startDate: startDate, endDate: endDate)
 //        let hrvs = await healthStore.startHeartRateVariabilityQuery(startDate: startDate, endDate: endDate)
 //        let rhrs = await healthStore.startRestingHeartRateQuery(startDate: startDate, endDate: endDate)

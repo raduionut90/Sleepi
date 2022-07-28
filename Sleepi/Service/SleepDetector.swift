@@ -20,8 +20,8 @@ class SleepDetector: ObservableObject {
     }
     
     fileprivate func getActivities(_ healthStore: HealthStore, _ startDate: Date, _ endDate: Date) async -> [Activity] {
-        let heartRates = await healthStore.startHeartRateQuery(startDate: startDate, endDate: endDate)
-        let activeEnergy = await healthStore.activeEnergyQuery(startDate: startDate, endDate: endDate)
+        let heartRates = await healthStore.getSamples(startDate: startDate, endDate: endDate, type: .heartRate)
+        let activeEnergy = await healthStore.getSamples(startDate: startDate, endDate: endDate, type: .activeEnergyBurned)
         //                    let hrv = await healthStore.startHeartRateVariabilityQuery(startDate: startDate, endDate: endDate)
         //                    let rhr = await healthStore.startRestingHeartRateQuery(startDate: startDate, endDate: endDate)
         //                    let resp = await healthStore.startRespiratoryRateQuery(startDate: startDate, endDate: endDate)
@@ -132,7 +132,7 @@ class SleepDetector: ObservableObject {
 
         let ten10daysAgo = Calendar.current.date(byAdding: .day, value: -10, to: endDate)!
         
-        let sleeps = await healthStore.readRecordedSleepsBySleepi(startTime: ten10daysAgo, endTime: endDate)
+        let sleeps = await healthStore.getSleeps(startTime: ten10daysAgo, endTime: endDate)
 
         return sleeps.last?.endDate ?? result
     }
@@ -154,7 +154,7 @@ class SleepDetector: ObservableObject {
 
             if let start = lowActivities.first?.startDate, let end = lowActivities.last?.startDate {
 //                print("\(start.formatted()) \(end.formatted())")
-                healthStore?.saveSleepAnalysis(startTime: start, endTime: end)
+                healthStore?.saveSleep(startTime: start, endTime: end)
             }
 //            print("")
         }
