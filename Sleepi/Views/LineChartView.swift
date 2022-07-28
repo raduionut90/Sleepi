@@ -113,6 +113,7 @@ struct LineChartView: View {
 
         return EmptyView()
     }
+
     
     var body: some View {
         VStack {
@@ -188,9 +189,6 @@ struct LineChartView: View {
                 .overlay(
                     RoundedRectangle(cornerRadius: 16)
                             .stroke(.gray, lineWidth: 1))
-//                VStack{
-//
-//                }
             }
 
             VStack {

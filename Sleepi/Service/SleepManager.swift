@@ -7,9 +7,15 @@
 
 import Foundation
 import HealthKit
+import os
 
 @MainActor
 class SleepManager: ObservableObject {
+    private static let logger = Logger(
+        subsystem: Bundle.main.bundleIdentifier!,
+        category: String(describing: SleepManager.self)
+    )
+    
     private var healthStore: HealthStore?
     @Published var nsHeartRateAverage: Double = 0.0
     @Published var nightSleeps: [Sleep] = []
@@ -51,6 +57,7 @@ class SleepManager: ObservableObject {
     
     private func updateActivityStage(_ sleeps: [Sleep]) {
         for sleep in sleeps {
+            Self.logger.debug("hravr: \(self.nsHeartRateAverage)")
             for activity in sleep.activities {
                 activity.setStage(nsHeartRateAverage)
             }

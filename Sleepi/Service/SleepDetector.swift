@@ -127,29 +127,14 @@ class SleepDetector: ObservableObject {
     
     private func getStartDate(_ healthStore: HealthStore, _ endDate: Date) async -> Date {
         
-        var tmpStartDate = Calendar.current.startOfDay(for: endDate)
-        tmpStartDate = Calendar.current.date(byAdding: .hour, value: -3, to: tmpStartDate)!
+        var result = Calendar.current.startOfDay(for: endDate)
+        result = Calendar.current.date(byAdding: .hour, value: -3, to: result)!
 
-        var tmpEndDate = endDate
+        let ten10daysAgo = Calendar.current.date(byAdding: .day, value: -10, to: endDate)!
+        
+        let sleeps = await healthStore.readRecordedSleepsBySleepi(startTime: ten10daysAgo, endTime: endDate)
 
-        var appSleeps: [HKSample] = []
-        let result: Date = tmpStartDate
-
-        while appSleeps.isEmpty || tmpStartDate < Calendar.current.date(byAdding: .day, value: -90, to: endDate)! {
-            let sleeps = await healthStore.readRecordedSleepsBySleepi(startTime: tmpStartDate, endTime: tmpEndDate)
-            
-            for sleep in sleeps {
-                let bundleIdentifier: String = Bundle.main.bundleIdentifier!
-                if sleep.sourceRevision.source.bundleIdentifier.contains(bundleIdentifier){
-                    appSleeps.append(sleep)
-                }
-            }
-            
-            tmpEndDate = tmpStartDate
-            tmpStartDate = Calendar.current.date(byAdding: .day, value: -7, to: tmpStartDate)!
-        }
-
-        return appSleeps.last?.endDate ?? result
+        return sleeps.last?.endDate ?? result
     }
     
     private func isDataContinuity(_ currentDate: Date, _ nextDate: Date) -> Bool {

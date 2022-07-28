@@ -6,8 +6,14 @@
 //
 
 import Foundation
+import os
 
 class Activity: Equatable {
+    private static let logger = Logger(
+        subsystem: Bundle.main.bundleIdentifier!,
+        category: String(describing: Activity.self)
+    )
+    
     internal init(startDate: Date, endDate: Date? = nil, hr: Double? = nil, actEng: Double? = nil, hrv: Double? = nil, rhr: Double? = nil, respRate: Double? = nil, stage: SleepStage? = nil) {
         self.startDate = startDate
         self.endDate = endDate
@@ -55,5 +61,8 @@ class Activity: Equatable {
             }
         }
         self.stage = result
+//        Self.logger.debug("\(self.startDate) hr: \(self.hr!, format: .fixed), hrAvr: \(nsHeartRateAverage), stage: \(result.rawValue, privacy: .private)")
+        print("\(startDate.formatted()) \(hr!) \(result.rawValue)")
+//        Self.logger.debug("hr: \(self.hr), hrAvr: \(nsHeartRateAverage), stage: \(self.stage)")
     }
 }

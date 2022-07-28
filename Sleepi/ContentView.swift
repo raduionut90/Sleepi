@@ -58,7 +58,7 @@ struct ContentView: View {
                                         .font(.subheadline)
                                         .fontWeight(.light)
                                         
-                                    Text(Utils.timeForrmatedAbr.string(from: sleepManager.getInBedTime() )! )
+                                    Text(Utils.timeForrmatedAbr.string(from: sleepManager.getSleepDuration(type: .NightSleep) )! )
                                         .font(.title2)
                                         .fontWeight(.medium)
                                 }
@@ -113,12 +113,12 @@ struct ContentView: View {
                         VStack {
                             Group {
                                 HStack {
-                                    let percent = sleepManager.getSleepStageDuration(stage: .Awake) / sleepManager.getInBedTime() * 100
+                                    let times = sleepManager.nightSleeps.count - 1
                                     Circle()
                                         .fill(Color(UIColor(named: "AppAwakeSleep")!))
                                         .frame(width: 10, height: 10)
                                     VStack(alignment: .leading) {
-                                        Text("Awake \(String(format: "%.0f", percent)) %")
+                                        Text("Awake \(String(times)) times")
                                         Text("Reference: 1 time")
                                             .font(.caption2)
                                             .foregroundColor(Color("TextColorSec"))

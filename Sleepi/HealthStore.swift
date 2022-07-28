@@ -370,7 +370,20 @@ class HealthStore {
                 }
 
                 if let result = tmpResult {
-                    continuation.resume(returning: result)
+                    var sleeps: [HKCategorySample] = []
+
+                    for item in result {
+                        if let sample = item as? HKCategorySample {
+//                            print(sample.sourceRevision.source)
+//                            print("\(sample.startDate.formatted());\(sample.endDate.formatted());\(sample.sourceRevision.source)")
+
+                            if sample.sourceRevision.source.bundleIdentifier == Bundle.main.bundleIdentifier {
+                                sleeps.append(sample)
+//                                print("\(sleep.startDate.formatted());\(sleep.endDate.formatted())")
+                            }
+                        }
+                    }
+                    continuation.resume(returning: sleeps)
                 }
             }
             
