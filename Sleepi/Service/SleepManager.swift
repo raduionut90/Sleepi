@@ -27,6 +27,11 @@ class SleepManager: ObservableObject {
         }
     }
     
+    fileprivate func getHeartRateAveragePerDay(_ healthStore: HealthStore, _ startDate: Date, _ endDate: Date) async -> Double{
+        let heartRatesAllDay = await healthStore.getSamples(startDate: startDate, endDate: endDate, type: .heartRate)
+        return heartRatesAllDay.map( { $0.quantity.doubleValue(for: HKUnit(from: "count/min")) } ).reduce(0, +) / Double(heartRatesAllDay.count)
+    }
+    
     func refreshSleeps(date: Date) {
         Task.init {
             if let healthStore = healthStore {
@@ -36,6 +41,9 @@ class SleepManager: ObservableObject {
                     var startDate = Calendar.current.startOfDay(for: date)
                     startDate = Calendar.current.date(byAdding: .hour, value: -4, to: startDate)!
                     let endDate = Calendar.current.date(byAdding: .day, value: 1, to: startDate)!
+                    
+                    let heartRateAveragePerDay = await getHeartRateAveragePerDay(healthStore, startDate, endDate)
+//                    print("HeartRateAveragePerDay: \(heartRateAveragePerDay)")
                     
                     let rawSleeps: [HKCategorySample] = await healthStore.getSleeps(startTime: startDate, endTime: endDate)
                     for rawSleep in rawSleeps {
@@ -61,7 +69,7 @@ class SleepManager: ObservableObject {
     
     private func updateActivityStage(_ sleeps: [Sleep]) {
         for sleep in sleeps {
-            Self.logger.debug("hravr: \(self.nsHeartRateAverage)")
+//            Self.logger.debug("hravr: \(self.nsHeartRateAverage)")
             for activity in sleep.activities {
                 activity.setStage(nsHeartRateAverage)
             }
@@ -145,9 +153,8 @@ class SleepManager: ObservableObject {
     private func getActivitiesFromRawData(_ healthStore: HealthStore, _ startDate: Date, _ endDate: Date) async -> [Activity] {
         var activities: [Activity] = []
         
-//        let heartRates = await healthStore.startHeartRateQuery(startDate: startDate, endDate: endDate)
         let heartRates = await healthStore.getSamples(startDate: startDate, endDate: endDate, type: .heartRate)
-//        let activeEnergys = await healthStore.activeEnergyQuery(startDate: startDate, endDate: endDate)
+        let activeEnergys = await healthStore.getSamples(startDate: startDate, endDate: endDate, type: .activeEnergyBurned)
 //        let hrvs = await healthStore.startHeartRateVariabilityQuery(startDate: startDate, endDate: endDate)
 //        let rhrs = await healthStore.startRestingHeartRateQuery(startDate: startDate, endDate: endDate)
 //        let respRates = await healthStore.startRespiratoryRateQuery(startDate: startDate, endDate: endDate)
@@ -156,15 +163,15 @@ class SleepManager: ObservableObject {
             let record = Activity(startDate: heartRate.startDate, hr: heartRate.quantity.doubleValue(for: HKUnit(from: "count/min")))
             activities.append(record)
         }
-//        for act in activeEnergys {
-//            if let existingRecord = activities.first(where: {Utils.dateTimeformatter.string(from: $0.startDate) ==
-//                                                Utils.dateTimeformatter.string(from: act.startDate)} ) {
-//                existingRecord.actEng = act.quantity.doubleValue(for: HKUnit.kilocalorie())
-//            } else {
-//                let record = Activity(startDate: act.startDate, actEng: act.quantity.doubleValue(for: HKUnit.kilocalorie()))
-//                activities.append(record)
-//            }
-//        }
+        for act in activeEnergys {
+            if let existingRecord = activities.first(where: {Utils.dateTimeformatter.string(from: $0.startDate) ==
+                                                Utils.dateTimeformatter.string(from: act.startDate)} ) {
+                existingRecord.actEng = act.quantity.doubleValue(for: HKUnit.kilocalorie())
+            } else {
+                let record = Activity(startDate: act.startDate, actEng: act.quantity.doubleValue(for: HKUnit.kilocalorie()))
+                activities.append(record)
+            }
+        }
 //        for hrv in hrvs {
 //            if let existingRecord = activities.first(where: {Utils.dateTimeformatter.string(from: $0.startDate) ==
 //                                                Utils.dateTimeformatter.string(from: hrv.startDate)} ) {

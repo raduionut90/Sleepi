@@ -39,17 +39,6 @@ class Activity: Equatable {
     var respRate: Double?
     var stage: SleepStage?
     
-//    init(startDate: Date, hr: Double){
-//        self.startDate = startDate
-//        self.hr = hr
-//    }
-//
-//    init(startDate: Date, endDate: Date, actEng: Double){
-//        self.startDate = startDate
-//        self.endDate = endDate
-//        self.actEng = actEng
-//    }
-    
     func setStage(_ nsHeartRateAverage: Double) {
         var result: SleepStage = SleepStage.LightSleep
                 
@@ -62,7 +51,7 @@ class Activity: Equatable {
         }
         self.stage = result
 //        Self.logger.debug("\(self.startDate) hr: \(self.hr!, format: .fixed), hrAvr: \(nsHeartRateAverage), stage: \(result.rawValue, privacy: .private)")
-        print("\(startDate.formatted()) \(hr!) \(result.rawValue)")
+//        Activity.logger.debug("\(self.startDate.formatted()) \(self.hr ?? 999) \(result.rawValue) \(self.actEng ?? 999)")
 //        Self.logger.debug("hr: \(self.hr), hrAvr: \(nsHeartRateAverage), stage: \(self.stage)")
     }
 }

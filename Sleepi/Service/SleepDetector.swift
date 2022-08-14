@@ -7,9 +7,14 @@
 
 import Foundation
 import HealthKit
+import os
 
 @MainActor
 class SleepDetector: ObservableObject {
+    private static let logger = Logger(
+        subsystem: Bundle.main.bundleIdentifier!,
+        category: String(describing: SleepDetector.self)
+    )
     private var healthStore: HealthStore?
     @Published var loading: Bool = true
 
@@ -61,7 +66,7 @@ class SleepDetector: ObservableObject {
 //                     stop debugging
                     
                     
-                    print("before while: startDate: \(startDate.formatted()) , endDate: \(endDate.formatted())")
+//                    print("before while: startDate: \(startDate.formatted()) , endDate: \(endDate.formatted())")
                     while endDate.timeIntervalSinceReferenceDate - startDate.timeIntervalSinceReferenceDate > 84600 {
                         let next24h = Calendar.current.date(byAdding: .day, value: 1, to: startDate)!
                         let startOfNextDay = Calendar.current.startOfDay(for: next24h)
@@ -246,14 +251,16 @@ class SleepDetector: ObservableObject {
         }
         
 //      used for debug
-//        for record in activities {
-//            print("\(record.startDate.formatted());"
-//                  + "\(record.hr ?? 999);"
-//                  + "\(record.actEng ?? 999);"
+        for record in activities {
+            print("\(record.startDate.formatted());"
+                  + "\(record.hr ?? 999);"
+                  + "\(record.actEng ?? 999);"
 //                  + "\(record.hrv ?? 999);"
 //                  + "\(record.rhr ?? 999);"
-//                  + "\(record.respRate ?? 999)")
-//        }
+//                  + "\(record.respRate ?? 999)"
+            )
+//            Self.logger.debug("\(record.startDate.formatted()) \(record.hr ?? 0) \(record.actEng ?? 0)")
+        }
         
         return activities
     }
