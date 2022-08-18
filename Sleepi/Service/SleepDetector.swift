@@ -24,26 +24,15 @@ class SleepDetector: ObservableObject {
         }
     }
     
-    fileprivate func getActivities(_ healthStore: HealthStore, _ startDate: Date, _ endDate: Date) async -> [Activity] {
-        let heartRates = await healthStore.getSamples(startDate: startDate, endDate: endDate, type: .heartRate)
-        let activeEnergy = await healthStore.getSamples(startDate: startDate, endDate: endDate, type: .activeEnergyBurned)
-        //                    let hrv = await healthStore.startHeartRateVariabilityQuery(startDate: startDate, endDate: endDate)
-        //                    let rhr = await healthStore.startRestingHeartRateQuery(startDate: startDate, endDate: endDate)
-        //                    let resp = await healthStore.startRespiratoryRateQuery(startDate: startDate, endDate: endDate)
-        
-        let activities: [Activity] = self.getActivitiesFromRawData(heartRates: heartRates, activeEnergy: activeEnergy, hrvs: [], rhrs: [], respRates: [])
-        return activities
-    }
-    
     func performSleepDetection() {
         Task.init {
             if let healthStore = healthStore {
                 let authorized: Bool = try await healthStore.requestAuthorization()
                 if authorized {
 
-                    let endDate = Date()
+                    let currentDate = Date()
                     
-                    var startDate = await getStartDate(healthStore, endDate)
+                    var startDate = await getStartDate(currentDate)
                     
 
                     // for debugging
@@ -67,24 +56,119 @@ class SleepDetector: ObservableObject {
                     
                     
 //                    print("before while: startDate: \(startDate.formatted()) , endDate: \(endDate.formatted())")
-                    while endDate.timeIntervalSinceReferenceDate - startDate.timeIntervalSinceReferenceDate > 84600 {
-                        let next24h = Calendar.current.date(byAdding: .day, value: 1, to: startDate)!
-                        let startOfNextDay = Calendar.current.startOfDay(for: next24h)
-                        let nextDay12am = Calendar.current.date(byAdding: .hour, value: 12, to: startOfNextDay)!
-                        
-//                        print("sleepDetector: startDate: \(startDate.formatted()) , endDate: \(nextDay12am.formatted())")
+                    let aWeekBefore = Calendar.current.date(byAdding: .day, value: -7, to: startDate)!
+                    let sleeps = await healthStore.getSleeps(startTime: aWeekBefore, endTime: currentDate)
+                    let lastSleepEndDate = sleeps.last?.endDate ?? aWeekBefore
 
-                        let activities: [Activity] = await getActivities(healthStore, startDate, nextDay12am)
-                        self.performCalculation(activities: activities)
-                        startDate = nextDay12am
+                    if currentDate.timeIntervalSinceReferenceDate - lastSleepEndDate.timeIntervalSinceReferenceDate > 86400 {
+                        startDate = lastSleepEndDate
                     }
 
-                    let activities: [Activity] = await getActivities(healthStore, startDate, endDate)
-                    performCalculation(activities: activities)
+                    let heartRates = await healthStore.getSamples(startDate: startDate, endDate: currentDate, type: .heartRate)
+                    let meanHR = heartRates.map( { $0.quantity.doubleValue(for: HKUnit(from: "count/min")) } ).reduce(0, +) / Double(heartRates.count)
+                    let activeEnergy = await healthStore.getSamples(startDate: startDate, endDate: currentDate, type: .activeEnergyBurned)
+                    //                    let hrv = await healthStore.startHeartRateVariabilityQuery(startDate: startDate, endDate: endDate)
+                    //                    let rhr = await healthStore.startRestingHeartRateQuery(startDate: startDate, endDate: endDate)
+                    //                    let resp = await healthStore.startRespiratoryRateQuery(startDate: startDate, endDate: endDate)
+                    
+                    let activities: [Activity] = self.getActivitiesFromRawData(heartRates: heartRates, activeEnergy: activeEnergy, hrvs: [], rhrs: [], respRates: [])
+                    let sortedActivEnergy = activities.map({ $0.actEng ?? 0 } ).filter({ $0 > 0.0 }).sorted(by: <)
+                    let quariles = getQuartiles(values: sortedActivEnergy)
+
+                    print(quariles)
+                    
+                    let firstQuartile = quariles[Constants.FIRST_QUARTILE]!
+                    let thirdQuartile = quariles[Constants.THIRD_QUARTILE]!
+                    
+                    var detectedPairs = sleepDetection(activities: activities, firstQuartile: firstQuartile, thirdQuartile: thirdQuartile)
+                    if sleeps.count > 0 {
+                        //filter by last sleep date
+                        detectedPairs = detectedPairs.filter( { $0.key.startDate > (sleeps.last?.endDate)! } )
+                    }
+                    let filteredSleep = removeShortSleepPairs(pairs: detectedPairs)
+                    let potentialSleeps = evaluateActivitiesForPairs(pairs: filteredSleep, activities: activities, firstQuartile: firstQuartile)
+
+                    let finalSleeps = evaluateHR(sleeps: potentialSleeps, meanHR: meanHR)
+                    
+                    for sleep in finalSleeps {
+//                        print(sleep)
+                        healthStore.saveSleep(startTime: sleep.startDate, endTime: sleep.endDate)
+                    }
+
                     self.loading = false
                 }
             }
         }
+    }
+    
+    private func evaluateHR(sleeps: [Sleep], meanHR: Double) -> [Sleep] {
+        var result: [Sleep] = []
+        for sleep in sleeps {
+            let hr = sleep.activities.compactMap( { $0.hr } )
+            let sleepMeanHr:Double = hr.reduce(0, +) / Double(hr.count)
+            if meanHR > sleepMeanHr {
+                result.append(sleep)
+            }
+        }
+        return result
+    }
+    
+    private func evaluateActivitiesForPairs(pairs: [Activity: Activity], activities: [Activity], firstQuartile: Double) -> [Sleep] {
+        var sleeps: [Sleep] = []
+        for pair in pairs {
+            let startIndex = activities.firstIndex(where: {$0 == pair.key })!
+            let endIndex = activities.firstIndex(where: {$0 == pair.value })!
+            let totalActivitiesPerInterval = Array(activities[startIndex...endIndex])
+            let lowActivity = totalActivitiesPerInterval.filter({ $0.actEng ?? 0 < firstQuartile })
+            let percent = lowActivity.count * 100 / totalActivitiesPerInterval.count
+            if percent > 70 {
+                let sleep = Sleep(startDate: pair.key.startDate, endDate: pair.value.startDate, activities: totalActivitiesPerInterval)
+                sleeps.append(sleep)
+            }
+            
+            print("\(pair.key.startDate.formatted());\(pair.value.startDate.formatted());\(percent) ")
+        }
+        
+        return sleeps
+    }
+    
+    
+    private func removeShortSleepPairs(pairs: [Activity: Activity]) -> [Activity: Activity] {
+        // filter key value interval > 30 min
+        return pairs.filter( { $0.value.startDate.timeIntervalSinceReferenceDate - $0.key.startDate.timeIntervalSinceReferenceDate > 1800} )
+    }
+    
+    private func sleepDetection(activities: [Activity], firstQuartile: Double, thirdQuartile: Double) -> [Activity: Activity] {
+        var acts = activities
+        var indexSleepPairs: [Activity: Activity] = [:]
+        
+        while acts.first(where: { $0.actEng ?? 0 <  firstQuartile }) != nil {
+            if let startAct = acts.first(where: { $0.actEng ?? 0 <  firstQuartile }){
+                let startActIndex = acts.firstIndex(where: { $0.actEng ?? 0 <  firstQuartile })!
+                acts = Array(acts[(startActIndex + 1)...])
+                let endAct = acts.first(where: { $0.actEng ?? 99 >  thirdQuartile } ) ?? acts.last!
+                let endActIndex = acts.firstIndex(where: { $0.actEng ?? 99 >  thirdQuartile } ) ?? acts.count - 1
+                indexSleepPairs[startAct] = endAct
+                acts = Array(acts[(endActIndex + 1)...])
+            }
+
+        }
+        
+        return indexSleepPairs
+    }
+    
+    private func getQuartiles(values: [Double]) -> [Int: Double] {
+        var result: [Int: Double] = [Constants.FIRST_QUARTILE: 0, Constants.MEDIAN: 0, Constants.THIRD_QUARTILE: 0];
+        for quartileType in result {
+            let length = values.count
+            let quartileSize: Double = Double(length) * (Double(quartileType.key) * 25.0 / 100.0)
+            if quartileSize.truncatingRemainder(dividingBy: 1) == 0 {
+                result.updateValue(values[Int(quartileSize)], forKey: quartileType.key)
+            } else {
+                result.updateValue(((values[Int(quartileSize)] + values[Int(quartileSize) + 1]) / 2), forKey: quartileType.key)
+            }
+        }
+        return result;
     }
     
     private func performCalculation(activities: [Activity]) {
@@ -130,16 +214,12 @@ class SleepDetector: ObservableObject {
         }
     }
     
-    private func getStartDate(_ healthStore: HealthStore, _ endDate: Date) async -> Date {
+    private func getStartDate(_ currentDate: Date) async -> Date {
         
-        var result = Calendar.current.startOfDay(for: endDate)
-        result = Calendar.current.date(byAdding: .hour, value: -3, to: result)!
+        var result = Calendar.current.startOfDay(for: currentDate)
+        result = Calendar.current.date(byAdding: .hour, value: -12, to: result)!
 
-        let ten10daysAgo = Calendar.current.date(byAdding: .day, value: -10, to: endDate)!
-        
-        let sleeps = await healthStore.getSleeps(startTime: ten10daysAgo, endTime: endDate)
-
-        return sleeps.last?.endDate ?? result
+        return result
     }
     
     private func isDataContinuity(_ currentDate: Date, _ nextDate: Date) -> Bool {
@@ -190,6 +270,48 @@ class SleepDetector: ObservableObject {
             return true
         }
         return false
+    }
+    
+    fileprivate func processActivities(_ activities: inout [Activity]) {
+        //      used for debug
+        //        for record in activities {
+        //            print("\(record.startDate.formatted());"
+        //                  + "\(record.hr ?? 999);"
+        //                  + "\(record.actEng ?? 999);"
+        //                  + "\(record.hrv ?? 999);"
+        //                  + "\(record.rhr ?? 999);"
+        //                  + "\(record.respRate ?? 999)"
+        //            )
+        //            Self.logger.debug("\(record.startDate.formatted()) \(record.hr ?? 0) \(record.actEng ?? 0)")
+        //        }
+        
+        for (index, record) in activities.enumerated() {
+            var prev1: Double = 0.0
+            var prev2: Double = 0.0
+            var next1: Double = 0.0
+            var next2: Double = 0.0
+            
+            if index - 2 >= 0 {
+                prev2 = (activities[index - 2].actEng ?? 0) * (1/25)
+            }
+            if index - 1 >= 0 {
+                prev1 = (activities[index - 1].actEng ?? 0) * (1/5)
+            }
+            let current = record.actEng ?? 0
+            if index + 1 < activities.count {
+                next1 = (activities[index + 1].actEng ?? 0) * (1/5)
+            }
+            if index + 2 < activities.count {
+                next2 = (activities[index + 2].actEng ?? 0) * (1/25)
+            }
+            
+            let sum = prev2 + prev1 + current + next1 + next2
+            record.actEng = sum
+//            print("\(record.startDate.formatted());"
+//                  + "\(record.hr ?? 0);"
+//                  + "\(sum);"
+//            )
+        }
     }
     
     private func getActivitiesFromRawData(
@@ -250,17 +372,7 @@ class SleepDetector: ObservableObject {
             a.startDate < b.startDate
         }
         
-//      used for debug
-        for record in activities {
-            print("\(record.startDate.formatted());"
-                  + "\(record.hr ?? 999);"
-                  + "\(record.actEng ?? 999);"
-//                  + "\(record.hrv ?? 999);"
-//                  + "\(record.rhr ?? 999);"
-//                  + "\(record.respRate ?? 999)"
-            )
-//            Self.logger.debug("\(record.startDate.formatted()) \(record.hr ?? 0) \(record.actEng ?? 0)")
-        }
+        processActivities(&activities)
         
         return activities
     }

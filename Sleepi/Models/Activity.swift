@@ -8,7 +8,11 @@
 import Foundation
 import os
 
-class Activity: Equatable {
+class Activity: Equatable, Hashable {
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
+    
     private static let logger = Logger(
         subsystem: Bundle.main.bundleIdentifier!,
         category: String(describing: Activity.self)
