@@ -11,5 +11,6 @@ struct Constants {
     static let FIRST_QUARTILE: Int = 1
     static let MEDIAN: Int = 2
     static let THIRD_QUARTILE: Int = 3
+    static let TwentyMinutes: Double = 1200
 
  }

@@ -42,6 +42,7 @@ class Activity: Equatable, Hashable {
     var rhr: Double?
     var respRate: Double?
     var stage: SleepStage?
+    var firstAfterGap: Bool?
     
     func setStage(_ nsHeartRateAverage: Double) {
         var result: SleepStage = SleepStage.LightSleep
