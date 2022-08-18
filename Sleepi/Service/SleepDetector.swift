@@ -63,7 +63,7 @@ class SleepDetector: ObservableObject {
 //                      let hrv = await healthStore.startHeartRateVariabilityQuery(startDate: startDate, endDate: endDate)
 //                      let rhr = await healthStore.startRestingHeartRateQuery(startDate: startDate, endDate: endDate)
 //                      let resp = await healthStore.startRespiratoryRateQuery(startDate: startDate, endDate: endDate)
-                        let meanHR = heartRates.map( { $0.quantity.doubleValue(for: HKUnit(from: "count/min")) } ).reduce(0, +) / Double(heartRates.count)
+                        let dailyMeanHr = heartRates.map( { $0.quantity.doubleValue(for: HKUnit(from: "count/min")) } ).reduce(0, +) / Double(heartRates.count)
                         
                         let activities: [Activity] = self.getActivitiesFromRawData(heartRates: heartRates, activeEnergy: activeEnergy, hrvs: [], rhrs: [], respRates: [])
                         let sortedActivEnergy = activities.map({ $0.actEng ?? 0 } ).filter({ $0 > 0.0 }).sorted(by: <)
@@ -72,6 +72,7 @@ class SleepDetector: ObservableObject {
                         print(quariles)
                         
                         let firstQuartile = quariles[Constants.FIRST_QUARTILE]!
+                        let median = quariles[Constants.MEDIAN]!
                         let thirdQuartile = quariles[Constants.THIRD_QUARTILE]!
                         
                         var detectedPairs = sleepDetection(activities: activities, firstQuartile: firstQuartile, thirdQuartile: thirdQuartile)
@@ -80,13 +81,13 @@ class SleepDetector: ObservableObject {
                             detectedPairs = detectedPairs.filter( { $0.key.startDate > (sleeps.last?.endDate)! } )
                         }
                         let filteredSleep = removeShortSleepPairs(pairs: detectedPairs)
-                        let potentialSleeps = evaluateActivitiesForPairs(pairs: filteredSleep, activities: activities, firstQuartile: firstQuartile)
+                        let potentialSleeps = evaluateActivitiesForPairs(pairs: filteredSleep, activities: activities, quartile: firstQuartile)
 
-                        let finalSleeps = evaluateHR(sleeps: potentialSleeps, meanHR: meanHR)
+                        let finalSleeps = potentialSleeps.filter({$0.heartRateAverage < dailyMeanHr})
                         
                         for sleep in finalSleeps {
-    //                        print(sleep)
-    //                        healthStore.saveSleep(startTime: sleep.startDate, endTime: sleep.endDate)
+//                            print(sleep)
+                            healthStore.saveSleep(startTime: sleep.startDate, endTime: sleep.endDate)
                         }
                         
                         currentDate = aDayBefore
@@ -114,60 +115,54 @@ class SleepDetector: ObservableObject {
         return result
     }
     
-    private func evaluateActivitiesForPairs(pairs: [Activity: Activity], activities: [Activity], firstQuartile: Double) -> [Sleep] {
+    private func evaluateActivitiesForPairs(pairs: [Activity: Activity], activities: [Activity], quartile: Double) -> [Sleep] {
         var sleeps: [Sleep] = []
         for pair in pairs {
+            print("")
+            print("start: \(pair.key.startDate.formatted())")
             let startIndex = activities.firstIndex(where: {$0 == pair.key })!
             let endIndex = activities.firstIndex(where: {$0 == pair.value })!
-            let totalActivitiesPerInterval = Array(activities[startIndex...endIndex])
-            let lowActivity = totalActivitiesPerInterval.filter({ $0.actEng ?? 0 < firstQuartile })
-            let percent = lowActivity.count * 100 / totalActivitiesPerInterval.count
-            if percent > 70 {
-                let sleep = Sleep(startDate: pair.key.startDate, endDate: pair.value.startDate, activities: totalActivitiesPerInterval)
-                sleeps.append(sleep)
-            } else {
-                print("")
-                print("percent: \(percent)")
-//                for activity in totalActivitiesPerInterval {
-//                    print("\(activity.startDate.formatted());"
-//                          + "\(activity.hr ?? 0);"
-//                          + "\(activity.actEng ?? 0);"
-//                    )
-//                }
-                var counter = 0
-                var startDate: Date?
+            let totalActivitiesPerInterval = Array(activities[startIndex..<endIndex])
 
-                while counter < totalActivitiesPerInterval.count {
-                    let offset = counter + 5 > totalActivitiesPerInterval.count - 1 ? totalActivitiesPerInterval.count - 1 : counter + 5
-                    let epoch = totalActivitiesPerInterval[counter..<offset]
-                    print("epoch.count: \(epoch.count)")
-                    let meanAct = epoch.compactMap({ $0.actEng }).reduce(0.0, +) / Double(epoch.compactMap({ $0.actEng }).count)
-                    if meanAct < firstQuartile {
-                        if startDate == nil {
-                            startDate = epoch.first?.startDate
+                for activity in totalActivitiesPerInterval {
+                    print("\(activity.startDate.formatted());"
+                          + "\(activity.hr ?? 0);"
+                          + "\(activity.actEng ?? 0);"
+                    )
+                }
+            var counter = 0
+            var startDate: Date?
+            var epochActivities: [Activity] = []
+            while counter < totalActivitiesPerInterval.count {
+                let offset = counter + 5 > totalActivitiesPerInterval.count - 1 ? totalActivitiesPerInterval.count : counter + 5
+                let epoch = totalActivitiesPerInterval[counter..<offset]
+                let epochMeanAct = epoch.compactMap({ $0.actEng }).reduce(0.0, +) / Double(epoch.compactMap({ $0.actEng }).count)
+                if epochMeanAct < quartile {
+                    if startDate == nil {
+                        startDate = epoch.first?.startDate
+                    }
+                    epochActivities.append(contentsOf: epoch)
+                } else {
+                    if startDate != nil {
+                        //20 min interval = 1200
+                        if (epoch.first?.startDate.timeIntervalSinceReferenceDate)! - startDate!.timeIntervalSinceReferenceDate > Constants.MIN_SLEEP_DURATION {
+                            sleeps.append(Sleep(startDate: startDate!, endDate: epoch.first!.startDate, activities: epochActivities))
                         }
-                    } else {
-                        if startDate != nil {
-                            //20 min interval = 1200
-                            if (epoch.first?.startDate.timeIntervalSinceReferenceDate)! - startDate!.timeIntervalSinceReferenceDate > Constants.TwentyMinutes {
-                                sleeps.append(Sleep(startDate: startDate!, endDate: epoch.first!.startDate, activities: []))
-                            }
-                            startDate = nil
-                        }
+                        startDate = nil
+                        epochActivities = []
+                    }
 
-                    }
-                    
-                    counter += 5
-                    if counter >= totalActivitiesPerInterval.count {
-                        break
-                    }
                 }
                 
-                
+                counter += 5
+                if counter >= totalActivitiesPerInterval.count - 1 {
+                    if startDate != nil && (epoch.first?.startDate.timeIntervalSinceReferenceDate)! - startDate!.timeIntervalSinceReferenceDate > Constants.MIN_SLEEP_DURATION {
+                        sleeps.append(Sleep(startDate: startDate!, endDate: epoch.first!.startDate, activities: epochActivities))
+                    }
+                    break
+                }
             }
-            
-            print("pairs: ")
-            print("\(pair.key.startDate.formatted());\(pair.value.startDate.formatted());\(percent) ")
+            print("pairs: \(pair.key.startDate.formatted());\(pair.value.startDate.formatted())")
         }
         
         return sleeps
@@ -274,7 +269,7 @@ class SleepDetector: ObservableObject {
 //            if let existingRecord = activities.first(where: { $0.startDate == heartRate.startDate } ) {
 //                existingRecord.hr = heartRate.quantity.doubleValue(for: HKUnit(from: "count/min"))
 //            } else {
-                let record = Activity(startDate: heartRate.startDate, hr: heartRate.quantity.doubleValue(for: HKUnit(from: "count/min")))
+            let record = Activity(startDate: heartRate.startDate, endDate: heartRate.endDate, hr: heartRate.quantity.doubleValue(for: HKUnit(from: "count/min")))
                 activities.append(record)
 //            }
         }
