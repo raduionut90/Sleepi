@@ -19,8 +19,9 @@
 		171535332815C1EA00B1A499 /* HealthStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 171535322815C1EA00B1A499 /* HealthStore.swift */; };
 		171535362815D7F200B1A499 /* Sleep.swift in Sources */ = {isa = PBXBuildFile; fileRef = 171535352815D7F200B1A499 /* Sleep.swift */; };
 		172553A928ACB39C0055C441 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 172553A828ACB39C0055C441 /* Constants.swift */; };
-		174E5F2B28720D6F00D423A0 /* Activity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 174E5F2A28720D6F00D423A0 /* Activity.swift */; };
+		174E5F2B28720D6F00D423A0 /* Records.swift in Sources */ = {isa = PBXBuildFile; fileRef = 174E5F2A28720D6F00D423A0 /* Records.swift */; };
 		17A4C3C7283511F5005D92F7 /* SleepManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17A4C3C6283511F5005D92F7 /* SleepManager.swift */; };
+		17D6FAF428AF6AEC00F46F2F /* Epoch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17D6FAF328AF6AEC00F46F2F /* Epoch.swift */; };
 		17EA8C8C28282B6800545BDD /* LineChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17EA8C8B28282B6800545BDD /* LineChartView.swift */; };
 /* End PBXBuildFile section */
 
@@ -53,9 +54,10 @@
 		171535352815D7F200B1A499 /* Sleep.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sleep.swift; sourceTree = "<group>"; };
 		172553A828ACB39C0055C441 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		172D18272853302900A0FD42 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
-		174E5F2A28720D6F00D423A0 /* Activity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Activity.swift; sourceTree = "<group>"; };
+		174E5F2A28720D6F00D423A0 /* Records.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Records.swift; sourceTree = "<group>"; };
 		17A4C3C6283511F5005D92F7 /* SleepManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepManager.swift; sourceTree = "<group>"; };
 		17C8516F284A86B500E93C26 /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = Platforms/WatchOS.platform/Developer/SDKs/WatchOS8.5.sdk/System/Library/Frameworks/HealthKit.framework; sourceTree = DEVELOPER_DIR; };
+		17D6FAF328AF6AEC00F46F2F /* Epoch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Epoch.swift; sourceTree = "<group>"; };
 		17EA8C8B28282B6800545BDD /* LineChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LineChartView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -128,7 +130,8 @@
 				171535352815D7F200B1A499 /* Sleep.swift */,
 				170F2D8728342AA800D00A7C /* SleepStage.swift */,
 				170A4ADB283FBF87009FB756 /* SleepPoint.swift */,
-				174E5F2A28720D6F00D423A0 /* Activity.swift */,
+				174E5F2A28720D6F00D423A0 /* Records.swift */,
+				17D6FAF328AF6AEC00F46F2F /* Epoch.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -233,7 +236,8 @@
 				170A4ADC283FBF87009FB756 /* SleepPoint.swift in Sources */,
 				171535362815D7F200B1A499 /* Sleep.swift in Sources */,
 				171535332815C1EA00B1A499 /* HealthStore.swift in Sources */,
-				174E5F2B28720D6F00D423A0 /* Activity.swift in Sources */,
+				174E5F2B28720D6F00D423A0 /* Records.swift in Sources */,
+				17D6FAF428AF6AEC00F46F2F /* Epoch.swift in Sources */,
 				17EA8C8C28282B6800545BDD /* LineChartView.swift in Sources */,
 				170F2D8828342AA800D00A7C /* SleepStage.swift in Sources */,
 				171535212815C02F00B1A499 /* SleepiApp.swift in Sources */,

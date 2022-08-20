@@ -127,7 +127,7 @@ struct ContentView: View {
                                     Text(Utils.timeForrmatedAbr.string(from: sleepManager.getSleepStageDuration(stage: .Awake))!)
                                 }
                                 HStack {
-                                    let percent = sleepManager.getSleepStageDuration(stage: .RemSleep) / sleepManager.getInBedTime() * 100
+                                    let percent = sleepManager.getSleepStageDuration(stage: .RemSleep) / sleepManager.getSleepDuration(type: .NightSleep) * 100
                                     Circle()
                                         .fill(Color(UIColor(named: "AppRemSleep")!))
                                         .frame(width: 10, height: 10)
@@ -141,7 +141,7 @@ struct ContentView: View {
                                     Text(Utils.timeForrmatedAbr.string(from: sleepManager.getSleepStageDuration(stage: .RemSleep))!)
                                 }
                                 HStack {
-                                    let percent = sleepManager.getSleepStageDuration(stage: .LightSleep) / sleepManager.getInBedTime() * 100
+                                    let percent = sleepManager.getSleepStageDuration(stage: .LightSleep) / sleepManager.getSleepDuration(type: .NightSleep) * 100
                                     Circle()
                                         .fill(Color(UIColor(named: "AppLightSleep")!))
                                         .frame(width: 10, height: 10)
@@ -157,7 +157,7 @@ struct ContentView: View {
                                     
                                 }
                                 HStack {
-                                    let percent = sleepManager.getSleepStageDuration(stage: .DeepSleep) / sleepManager.getInBedTime() * 100
+                                    let percent = sleepManager.getSleepStageDuration(stage: .DeepSleep) / sleepManager.getSleepDuration(type: .NightSleep) * 100
                                     Circle()
                                         .fill(Color(UIColor(named: "AppDeepSleep")!))
                                         .frame(width: 10, height: 10)
@@ -169,6 +169,7 @@ struct ContentView: View {
                                     }
                                     Spacer()
                                     Text(Utils.timeForrmatedAbr.string(from: sleepManager.getSleepStageDuration(stage: .DeepSleep))!)
+
                                 }
                                 ForEach(sleepManager.naps) { nap in
                                     HStack {
