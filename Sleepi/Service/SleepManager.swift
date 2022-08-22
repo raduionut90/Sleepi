@@ -75,7 +75,7 @@ class SleepManager: ObservableObject {
         let hrQuartiles = Utils.getQuartiles(values: allSleepsEpochs.filter({ !$0.meanHR.isNaN }).map {$0.meanHR} )
         
         for epoch in allSleepsEpochs {
-            if epoch.meanActivity < activityQuartiles.median && epoch.meanHR <= hrQuartiles.median {
+            if (epoch.meanActivity.isNaN && epoch.meanHR <= hrQuartiles.firstQuartile) || (epoch.meanActivity <= activityQuartiles.firstQuartile && epoch.meanHR <= hrQuartiles.firstQuartile) {
                 epoch.sleepClasification = SleepStage.DeepSleep
             } else if epoch.meanActivity > activityQuartiles.median {
                 epoch.sleepClasification = SleepStage.RemSleep

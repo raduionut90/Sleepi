@@ -16,7 +16,7 @@ class Epoch: Equatable {
     let records: [Records]
     let startDate: Date
     var endDate: Date
-    let meanHR: Double
+    var meanHR: Double
     let meanActivity: Double
     var sleepClasification: SleepStage?
     

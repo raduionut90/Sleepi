@@ -44,7 +44,7 @@ class Utils {
     }()
     
     static func getAverage(values: [Double]) -> Double {
-        return values.reduce(0, +) / Double(values.count);
+        return values.filter({!$0.isNaN}).reduce(0, +) / Double(values.filter({!$0.isNaN}).count);
     }
     
     static func getQuartiles(values: [Double]) -> (firstQuartile: Double, median: Double, thirdQuartile: Double) {
@@ -67,13 +67,14 @@ class Utils {
     }
     
     static func getEpochsFromActivities(activities: [Records]) -> [Epoch]{
+        let recordsPerEpoch = 3
         var epochs: [Epoch] = []
         var counter = 0
         while counter  < activities.count {
-            let offset = counter + 5 > activities.count - 1 ? activities.count : counter + 5
+            let offset = counter + recordsPerEpoch > activities.count - 1 ? activities.count : counter + recordsPerEpoch
             let epoch: Epoch = Epoch(activities: Array(activities[counter..<offset]))
             epochs.append(epoch)
-            counter += 5
+            counter += recordsPerEpoch
             if counter > activities.count {
                 break
             }
@@ -99,11 +100,16 @@ class Utils {
                 allHr.append(record)
         }
         
-        Utils.processActivities(&allActiveEnergies)
+//        Utils.processActivities(&allActiveEnergies)
         allRecords.append(contentsOf: allActiveEnergies)
         allRecords.append(contentsOf: allHr)
         allRecords = allRecords.sorted { a,b in
             a.startDate < b.startDate
+        }
+        for (index, record) in allRecords.enumerated() {
+            if index - 1 > 0 && record.startDate.timeIntervalSinceReferenceDate - allRecords[index - 1].endDate.timeIntervalSinceReferenceDate > 600 {
+                record.firstAfterGap = true
+            }
         }
         
         return allRecords
@@ -121,9 +127,6 @@ class Utils {
             }
             if index - 1 >= 0 {
                 prev1 = (activities[index - 1].actEng ?? 0) * (1/5)
-                if activity.startDate.timeIntervalSinceReferenceDate - activities[index - 1].startDate.timeIntervalSinceReferenceDate > 600 {
-                    activities[index - 1].firstAfterGap = true
-                }
             }
             let current = activity.actEng ?? 0
             if index + 1 < activities.count {

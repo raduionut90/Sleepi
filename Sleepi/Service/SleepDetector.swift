@@ -89,6 +89,8 @@ class SleepDetector: ObservableObject {
                         if aDayBefore < Calendar.current.date(byAdding: .day, value: -14, to: Date())! {
                             break
                         }
+                        
+                        print("")
                     }
 
                     self.loading = false
@@ -105,10 +107,14 @@ class SleepDetector: ObservableObject {
         
         var startDate: Date?
         var lowActivityEpochs: [Epoch] = []
-        let epochs = Utils.getEpochsFromActivities(activities: Array(activities[firstActivityIndex...]))
+        var epochs = Utils.getEpochsFromActivities(activities: Array(activities[firstActivityIndex...]))
+        
+//        epochs = epochs.filter({ !$0.meanActivity.isNaN })
+        print("firstQuartile: \(quartile)")
         
         for epoch in epochs {
-            if epoch.meanActivity < quartile && !epoch.records.contains(where: { $0.firstAfterGap ?? false }){
+            print("\(epoch.startDate.formatted());\(epoch.endDate.formatted());\(epoch.meanActivity);\(epoch.meanHR)")
+            if epoch.meanActivity.isNaN || epoch.meanActivity < quartile && !epoch.records.contains(where: { $0.firstAfterGap ?? false }){
                 if startDate == nil {
                     startDate = epoch.records.first?.startDate
                 }

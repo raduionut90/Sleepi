@@ -31,7 +31,7 @@ struct LineChartView: View {
             let nextAwakeTime = sleeps[index + 1].startDate.timeIntervalSinceReferenceDate - sleep.endDate.timeIntervalSinceReferenceDate
             let awakeOffset = getOffset(timeInterval: nextAwakeTime, screenWidth: screenWidth)
 
-            print(Utils.timeForrmatedAbr.string(from: nextAwakeTime)!)
+//            print(Utils.timeForrmatedAbr.string(from: nextAwakeTime)!)
             offsetX += awakeOffset
             
 
@@ -43,38 +43,21 @@ struct LineChartView: View {
         }
     }
     
-    fileprivate func processEachActivity(_ sleep: Sleep, _ path: inout Path, _ offsetX: inout Double,_ offsetY: inout Double, _ screenWidth: CGFloat) {
-        var rectWidth = 0.0
-//        print("sleepStart: \(sleep.rawSleep.startDate.formatted())")
-        for (index, epoch) in sleep.epochs.enumerated() {
+    fileprivate func processEpochs(_ sleep: Sleep, _ path: inout Path, _ offsetX: inout Double,_ offsetY: inout Double, _ screenWidth: CGFloat) {
+
+        for epoch in sleep.epochs {
             let interval: Double = epoch.endDate.timeIntervalSinceReferenceDate - epoch.startDate.timeIntervalSinceReferenceDate
-//            (index == 0 ? sleep.startDate.timeIntervalSinceReferenceDate : sleep.epochs[index - 1].endDate.timeIntervalSinceReferenceDate)
             
             let newOffsetY = epoch.sleepClasification!.rawValue
-            let offset = getOffset(timeInterval: interval, screenWidth: screenWidth)
-            
-//            print("\(activity.startDate.formatted()); \(activity.hr!); \(activity)")
-            
-            offsetX += offset
-            rectWidth += offset
-
             if offsetY != newOffsetY{
-                path.addLine(to: CGPoint(x: offsetX, y: offsetY)) //horizontal line
-//                path.addRoundedRect(in: CGRect(x: offsetX - rectWidth, y: offsetY - 10, width: rectWidth, height: 20), cornerSize: CGSize(width: 5, height: 5), style: .circular)
-//                path.move(to: CGPoint(x: offsetX, y: offsetY))
-                
-                path.addLine(to: CGPoint(x: offsetX, y: newOffsetY)) // vertical line
-                
-                rectWidth = 0.0
+                offsetY = newOffsetY
+                path.addLine(to: CGPoint(x: offsetX, y: offsetY)) // vertical line
             }
             
-            //last activity to end sleep
-            if index == sleep.epochs.count - 1{
-                let lastInterval: Double = sleep.endDate.timeIntervalSinceReferenceDate - epoch.endDate.timeIntervalSinceReferenceDate
-                offsetX += getOffset(timeInterval: lastInterval, screenWidth: screenWidth)
-                path.addLine(to: CGPoint(x: offsetX, y: newOffsetY))
-            }
-            offsetY = newOffsetY
+            let offset = getOffset(timeInterval: interval, screenWidth: screenWidth)
+            offsetX += offset
+            path.addLine(to: CGPoint(x: offsetX, y: offsetY)) // horizontal line
+
         }
 
     }
@@ -94,8 +77,7 @@ struct LineChartView: View {
         path.move(to: CGPoint(x: offsetX, y: SleepStage.LightSleep.rawValue))
 
         for (index, sleep) in sleeps.enumerated() {
-            processEachActivity(sleep, &path, &offsetX, &offsetY, chartWidth)
-            
+            processEpochs(sleep, &path, &offsetX, &offsetY, chartWidth)
             checkAwakeTime(index, &path, &offsetX, &offsetY, sleep, chartWidth)
         }
         return path
