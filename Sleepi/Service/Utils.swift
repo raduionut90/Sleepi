@@ -66,8 +66,8 @@ class Utils {
         return (result[0], result[1], result[2]);
     }
     
-    static func getEpochsFromActivities(activities: [Records]) -> [Epoch]{
-        let recordsPerEpoch = 3
+    static func getEpochsFromActivities(activities: [Records], epochLenght: Int) -> [Epoch]{
+        let recordsPerEpoch = epochLenght
         var epochs: [Epoch] = []
         var counter = 0
         while counter  < activities.count {
@@ -80,6 +80,33 @@ class Utils {
             }
         }
         return epochs
+    }
+    
+    static func isLowTrending(heartRates: [Double]) -> Bool {
+        if heartRates.count == 0 {
+            return false
+        }
+        var result: Bool = false
+        let spliter = Int(heartRates.count / 3)
+        var counter = 0
+        var prevResult: Double = 0
+        for i in 1...3 {
+            let offset = spliter * i < heartRates.count ? spliter * i : heartRates.count - 1
+            let epoch = heartRates[counter...offset]
+            let mean = epoch.reduce(0, +) / Double(epoch.count)
+            if prevResult == 0 {
+                prevResult = mean
+            } else {
+                if prevResult > mean {
+                    result = true
+                } else {
+                    return false
+                }
+            }
+            prevResult = mean
+            counter = spliter * i
+        }
+        return result
     }
     
     static func getActivitiesFromRawData(

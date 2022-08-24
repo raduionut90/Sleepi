@@ -50,7 +50,7 @@ class SleepManager: ObservableObject {
                         let heartRates = await healthStore.getSamples(startDate: rawSleep.startDate, endDate: rawSleep.endDate, type: .heartRate)
                         let activeEnergys = await healthStore.getSamples(startDate: rawSleep.startDate, endDate: rawSleep.endDate, type: .activeEnergyBurned)
                         let activities: [Records] = Utils.getActivitiesFromRawData(heartRates: heartRates, activeEnergy: activeEnergys)
-                        let epochs = Utils.getEpochsFromActivities(activities: activities)
+                        let epochs = Utils.getEpochsFromActivities(activities: activities, epochLenght: 5)
                         let sleep: Sleep = Sleep(startDate: rawSleep.startDate, endDate: rawSleep.endDate, epochs: epochs)
                         tmpSleeps.append(sleep)
                     }
@@ -75,9 +75,13 @@ class SleepManager: ObservableObject {
         let hrQuartiles = Utils.getQuartiles(values: allSleepsEpochs.filter({ !$0.meanHR.isNaN }).map {$0.meanHR} )
         
         for epoch in allSleepsEpochs {
-            if (epoch.meanActivity.isNaN && epoch.meanHR <= hrQuartiles.firstQuartile) || (epoch.meanActivity <= activityQuartiles.firstQuartile && epoch.meanHR <= hrQuartiles.firstQuartile) {
+            if (
+//                epoch.meanHR < hrQuartiles.firstQuartile ||
+                ((epoch.meanActivity < activityQuartiles.median) && epoch.meanHR < hrQuartiles.firstQuartile)  ||
+                ((epoch.meanActivity.isNaN || epoch.meanActivity < activityQuartiles.firstQuartile) && epoch.meanHR < hrQuartiles.median)
+            ) {
                 epoch.sleepClasification = SleepStage.DeepSleep
-            } else if epoch.meanActivity > activityQuartiles.median {
+            } else if epoch.meanActivity > activityQuartiles.firstQuartile && epoch.meanHR > hrQuartiles.thirdQuartile{
                 epoch.sleepClasification = SleepStage.RemSleep
             } else {
                 epoch.sleepClasification = SleepStage.LightSleep

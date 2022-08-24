@@ -21,8 +21,11 @@ struct ContentView: View {
     }
     
     var body: some View {
-        NavigationView{
+//        NavigationView{
+        ScrollView(.vertical){
+
                 VStack {
+
                     VStack {
                     // Date Component View
                         VStack {
@@ -108,8 +111,6 @@ struct ContentView: View {
                     }
                     .background(Color("BackgroundSec"))
                     
-                    ScrollView(.vertical){
-                        
                         VStack {
                             Group {
                                 HStack {
@@ -205,14 +206,18 @@ struct ContentView: View {
                                 }
                             }
                         )
+//                        .background(Color.red)
+
+
+
                     }
 
                 }
-                .navigationTitle("Sleepi")
-                .navigationBarTitleDisplayMode(.inline)
-                .background(Color("BackgroundPrim"))
-
-        }
+//                .navigationTitle("Sleepi")
+//                .navigationBarTitleDisplayMode(.inline)
+//                .background(Color("BackgroundPrim"))
+//
+//        }
             .navigationViewStyle(StackNavigationViewStyle())
             .onAppear(){
                 sleepDetector.performSleepDetection()
@@ -246,16 +251,14 @@ struct ContentView: View {
 //                    }
 //                }
 //            )
-        }
-
-    
+    }
 }
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
             ContentView()
-                .previewInterfaceOrientation(.portraitUpsideDown)
+                .previewInterfaceOrientation(.portrait)
             ContentView()
                 .previewInterfaceOrientation(.landscapeLeft)
             ContentView()
