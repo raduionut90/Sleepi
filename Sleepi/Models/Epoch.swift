@@ -7,7 +7,11 @@
 
 import Foundation
 
-class Epoch: Equatable {
+class Epoch: Equatable, Comparable {
+    static func < (lhs: Epoch, rhs: Epoch) -> Bool {
+        lhs.id == rhs.id
+    }
+    
     static func == (lhs: Epoch, rhs: Epoch) -> Bool {
         lhs.id == rhs.id
     }

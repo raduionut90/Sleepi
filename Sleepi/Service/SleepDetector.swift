@@ -85,10 +85,10 @@ class SleepDetector: ObservableObject {
                         for sleep in potentialSleeps {
 //                            print(sleep)
                             let heartRates: [Double] = sleep.epochs.flatMap {$0.records.compactMap {$0.hr} }
-
-                            print(sleep.heartRateAverage)
-                            print(hrQuartiles)
-                            print(Utils.isLowTrending(heartRates: heartRates))
+//
+//                            print(sleep.heartRateAverage)
+//                            print(hrQuartiles)
+//                            print(Utils.isLowTrending(heartRates: heartRates))
                             if sleep.heartRateAverage < hrQuartiles.median || sleep.heartRateAverage < hrQuartiles.median && Utils.isLowTrending(heartRates: heartRates)  {
                                     healthStore.saveSleep(startTime: sleep.startDate, endTime: sleep.endDate)
                                 }
@@ -120,12 +120,12 @@ class SleepDetector: ObservableObject {
         let epochs = Utils.getEpochsFromActivities(activities: Array(activities[firstActivityIndex...]), epochLenght: 1)
         
 //        epochs = epochs.filter({ !$0.meanActivity.isNaN })
-        print("firstQuartile: \(quartile)")
+//        print("firstQuartile: \(quartile)")
         
         for (index, epoch) in epochs.enumerated() {
-            print("\(epoch.startDate.formatted());\(epoch.endDate.formatted());\(epoch.meanActivity);\(epoch.meanHR)")
+//            print("\(epoch.startDate.formatted());\(epoch.endDate.formatted());\(epoch.meanActivity);\(epoch.meanHR)")
             
-            if epoch.records.contains(where: {$0.startDate.formatted() == "21.08.2022, 23:03"}){
+            if epoch.records.contains(where: {$0.startDate.formatted() == "20.08.2022, 23:42"}){
                 print("")
             }
             
@@ -135,21 +135,18 @@ class SleepDetector: ObservableObject {
                     startDate = epoch.records.first?.startDate
                 }
                 lowActivityEpochs.append(epoch)
-                //if is nan
-//            } else if epoch.meanActivity.isNaN {
-//                if startDate != nil {
-//                    lowActivityEpochs.append(epoch)
-//                }
+
             } else if // last < Q1
                 (epochs.indices.contains(index - 1) ? (epochs[index - 1].meanActivity.isNaN || epochs[index - 1].meanActivity < quartile.firstQuartile) : false) &&
+                    (epoch.meanActivity < quartile.median || epoch.meanActivity.isNaN) &&
                     !epoch.records.contains(where: { $0.firstAfterGap ?? false }) {
                 if startDate != nil {
                     lowActivityEpochs.append(epoch)
                 }
             } else if //last < median and last -2 is < Q1 || nan and current < med
                 (epochs.indices.contains(index - 1) ? epochs[index - 1].meanActivity.isNaN || epochs[index - 1].meanActivity < quartile.thirdQuartile : false) &&
-                (epochs.indices.contains(index - 2) ? epochs[index - 2].meanActivity.isNaN || epochs[index - 2].meanActivity < quartile.thirdQuartile : false) &&
-                epoch.meanActivity < quartile.median &&
+                (epochs.indices.contains(index - 2) ? epochs[index - 2].meanActivity.isNaN || epochs[index - 2].meanActivity < quartile.firstQuartile : false) &&
+                    (epoch.meanActivity < quartile.median || epoch.meanActivity.isNaN) &&
                 !epoch.records.contains(where: { $0.firstAfterGap ?? false }) {
                 if startDate != nil {
 //                    print("lastEpoch: q1: \(quartile.firstQuartile) med: \(quartile.median)")
@@ -162,8 +159,17 @@ class SleepDetector: ObservableObject {
             else {
                 if startDate != nil && !lowActivityEpochs.isEmpty {
                     //20 min interval = 1200
-                    let epochMeanActivities = Utils.getAverage(values: lowActivityEpochs.map {$0.meanActivity})
+                    let lastLowRecord = lowActivityEpochs.lastIndex(where: {$0.meanActivity.isNaN || $0.meanActivity < quartile.firstQuartile})!
+                    let potentialSleepAfterFiltering = lowActivityEpochs[...lastLowRecord]
+                    let highActivities = lowActivityEpochs.filter( {$0.meanActivity != nil && $0.meanActivity > quartile.firstQuartile} ).count
+
                     if (lowActivityEpochs.last!.records.last!.startDate.timeIntervalSinceReferenceDate) - startDate!.timeIntervalSinceReferenceDate > Constants.MIN_SLEEP_DURATION {
+                        print("\(lowActivityEpochs.first!.startDate.formatted()); \((potentialSleepAfterFiltering.last?.endDate.formatted())!)")
+                        print("high: \(highActivities); total: \(lowActivityEpochs.count);")
+                        let p: Double = Double(highActivities) / Double(lowActivityEpochs.count) * 100.0
+                        print("percent: \(p);")
+
+                        print("")
                         sleeps.append(Sleep(startDate: startDate!, endDate: lowActivityEpochs.last!.records.last!.endDate, epochs: lowActivityEpochs))
                     }
                     startDate = nil
