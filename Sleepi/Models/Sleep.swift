@@ -31,15 +31,7 @@ struct Sleep: Hashable, Identifiable, Equatable {
         return self.endDate.timeIntervalSinceReferenceDate - self.startDate.timeIntervalSinceReferenceDate
     }
     
-    fileprivate func updateMeanHr(_ epoch: Epoch, _ index: Int) {
-        //update meanHr if nil
-        if epoch.meanHR.isNaN {
-            let prevMeanHr: Double = epochs[..<index].reversed().first( where: {!$0.meanHR.isNaN} ).map( {$0.meanHR} ) ?? 0.0
-            let nextMeanHr: Double = epochs[index...].first( where: {!$0.meanHR.isNaN} ).map({$0.meanHR} ) ?? 0.0
-            let meanHR = (prevMeanHr + nextMeanHr) / 2
-            epoch.meanHR = meanHR
-        }
-    }
+
     
     private func updateEpochEndTime() {
         for (index, epoch) in epochs.enumerated() {
@@ -50,7 +42,7 @@ struct Sleep: Hashable, Identifiable, Equatable {
                 epoch.endDate = self.endDate
             }
             
-            updateMeanHr(epoch, index)
+//            updateMeanHr(epoch, index)
         }
     }
     

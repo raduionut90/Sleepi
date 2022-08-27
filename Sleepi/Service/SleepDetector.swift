@@ -83,14 +83,9 @@ class SleepDetector: ObservableObject {
                         
                         for sleep in potentialSleeps {
 //                            print(sleep)
-                            let heartRates: [Double] = sleep.epochs.flatMap {$0.records.compactMap {$0.hr} }
-//
-//                            print(sleep.heartRateAverage)
 //                            print(hrQuartiles)
 //                            print(Utils.isLowTrending(heartRates: heartRates))
-                            if sleep.getDuration() >= Constants.SLEEP_DURATION  {
                                     healthStore.saveSleep(startTime: sleep.startDate, endTime: sleep.endDate)
-                            }
                         }
                         
                         currentDate = aDayBefore
@@ -105,8 +100,16 @@ class SleepDetector: ObservableObject {
             }
         }
     }
-    
-    fileprivate func extractedFunc(_ epochs: [Epoch], _ quartile: (firstQuartile: Double, median: Double, thirdQuartile: Double), _ startDate: inout Date?, _ lowActivityEpochs: inout [Epoch], _ tmpSleeps: inout [Sleep]) {
+
+    private func identifySleeps(activities: [Records], quartile: (firstQuartile: Double, median: Double, thirdQuartile: Double), lastSleepEndDate: Date) -> [Sleep] {
+        var sleeps: [Sleep] = []
+        var tmpSleeps: [Sleep] = []
+        let firstActivityIndex = activities.firstIndex(where: { $0.startDate > lastSleepEndDate }) ?? 0
+        
+        var startDate: Date?
+        var lowActivityEpochs: [Epoch] = []
+        let epochs = Utils.getEpochsFromActivities(activities: Array(activities[firstActivityIndex...]), epochLenght: 1)
+        
         for epoch in epochs {
             print("\(epoch.startDate.formatted());\(epoch.endDate.formatted());\(epoch.meanActivity);\(epoch.meanHR)")
             
@@ -123,7 +126,7 @@ class SleepDetector: ObservableObject {
             } else {
                 if startDate != nil && !lowActivityEpochs.isEmpty {
                     
-                    if (lowActivityEpochs.last!.records.last!.startDate.timeIntervalSinceReferenceDate) - startDate!.timeIntervalSinceReferenceDate > Constants.MINI_SLEEP_DURATION {
+                    if (lowActivityEpochs.last!.records.last!.endDate.timeIntervalSinceReferenceDate) - startDate!.timeIntervalSinceReferenceDate > Constants.MINI_SLEEP_DURATION {
                         tmpSleeps.append(Sleep(startDate: startDate!, endDate: lowActivityEpochs.last!.records.last!.endDate, epochs: lowActivityEpochs))
                     }
                     startDate = nil
@@ -134,24 +137,31 @@ class SleepDetector: ObservableObject {
                 tmpSleeps.append(Sleep(startDate: startDate!, endDate: epoch.records.last!.endDate, epochs: lowActivityEpochs))
             }
         }
-    }
-    
-    private func identifySleeps(activities: [Records], quartile: (firstQuartile: Double, median: Double, thirdQuartile: Double), lastSleepEndDate: Date) -> [Sleep] {
-        var sleeps: [Sleep] = []
-        var tmpSleeps: [Sleep] = []
-        let firstActivityIndex = activities.firstIndex(where: { $0.startDate > lastSleepEndDate }) ?? 0
         
-        var startDate: Date?
-        var lowActivityEpochs: [Epoch] = []
-        let epochs = Utils.getEpochsFromActivities(activities: Array(activities[firstActivityIndex...]), epochLenght: 1)
-        
-
-        
-        extractedFunc(epochs, quartile, &startDate, &lowActivityEpochs, &tmpSleeps)
         sleeps = getConcatenatedSleeps(sleeps: tmpSleeps)
+        sleeps = sleeps.filter( {$0.getDuration() >= Constants.SLEEP_DURATION} )
         sleeps = getSleepEpochs(sleeps: sleeps, epochs: epochs)
+        sleeps = filterSleepByHr(sleeps: sleeps, epochs: epochs)
         sleeps = filterByLowActivityPercent(sleeps: sleeps, quartile: quartile)
         return sleeps
+    }
+    
+    private func filterSleepByHr(sleeps: [Sleep], epochs: [Epoch]) -> [Sleep] {
+        var result: [Sleep] = []
+        for sleep in sleeps {
+
+            let lastEpochs = epochs.reversed().filter({!$0.meanHR.isNaN}).first(where: {$0.startDate < sleep.startDate})
+            let nextEpochs = epochs.filter({!$0.meanHR.isNaN}).first(where: {$0.startDate > sleep.endDate})
+            // 95% from max
+            let maxHr = max(lastEpochs?.meanHR ?? 0, nextEpochs?.meanHR ?? 0) * 0.95
+            if sleep.heartRateAverage < maxHr {
+                result.append(sleep)
+            } else {
+                print("Sleep: \(sleep.startDate.formatted()) - \(sleep.endDate.formatted()) ignored due to HR \(sleep.heartRateAverage), maxHR: \(maxHr)")
+            }
+
+        }
+        return result
     }
     
     private func getSleepEpochs(sleeps: [Sleep], epochs: [Epoch]) -> [Sleep] {
@@ -164,8 +174,6 @@ class SleepDetector: ObservableObject {
             result.append(newSleep)
         }
         return result
-
-
     }
     
     private func filterByLowActivityPercent(sleeps: [Sleep], quartile: (firstQuartile: Double, median: Double, thirdQuartile: Double)) -> [Sleep] {
@@ -175,7 +183,7 @@ class SleepDetector: ObservableObject {
             let lowActTotalWithNan = sleep.epochs.count
             let percent: Double = Double(highActivities) / Double(lowActTotalWithNan) * 100.0
             print("\(sleep.startDate.formatted());\(sleep.endDate.formatted());percent;\(percent)")
-            if percent < 40 {
+            if percent < 35 {
                 result.append(sleep)
             }
         }

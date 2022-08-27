@@ -81,7 +81,7 @@ class SleepManager: ObservableObject {
                 ((epoch.meanActivity.isNaN || epoch.meanActivity < activityQuartiles.firstQuartile) && epoch.meanHR < hrQuartiles.median)
             ) {
                 epoch.sleepClasification = SleepStage.DeepSleep
-            } else if epoch.meanActivity > activityQuartiles.firstQuartile && epoch.meanHR > hrQuartiles.thirdQuartile{
+            } else if (epoch.meanActivity.isNaN || epoch.meanActivity > activityQuartiles.thirdQuartile) && epoch.meanHR > hrQuartiles.thirdQuartile{
                 epoch.sleepClasification = SleepStage.RemSleep
             } else {
                 epoch.sleepClasification = SleepStage.LightSleep
