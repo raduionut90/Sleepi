@@ -16,7 +16,7 @@ struct Sleep: Hashable, Identifiable, Equatable {
     let id = UUID()
     let startDate: Date
     let endDate: Date
-    let epochs: [Epoch]
+    var epochs: [Epoch]
     let heartRateAverage: Double
 
     init(startDate: Date, endDate: Date, epochs: [Epoch]) {
