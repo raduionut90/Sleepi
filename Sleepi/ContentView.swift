@@ -28,47 +28,47 @@ struct ContentView: View {
 
                     VStack {
                     // Date Component View
-                        VStack {
-                            HStack{
-                                Button(action: {
-                                    addingDays(nr: -1)
-                                }) {
-                                    Text("<")
-                                        .font(.headline)
-                                        .foregroundColor(.gray)
-                                }
-                                
-                                Spacer()
-                                Text(Utils.dateFormatter.string(from: currentDate))
-                                    .font(.title3)
-                                Spacer()
-
-                                if (Calendar.current.compare(Date(), to: currentDate, toGranularity: .day) == .orderedDescending) {
+                        Group {
+                            VStack {
+                                HStack{
                                     Button(action: {
-                                        addingDays(nr: 1)
+                                        addingDays(nr: -1)
                                     }) {
-                                        Text(">")
+                                        Text("<")
                                             .font(.headline)
                                             .foregroundColor(.gray)
                                     }
-                                }
-                            }
-                            .padding()
-                            .gesture(DragGesture(minimumDistance: 70.0, coordinateSpace: .local)
-                                .onEnded { value in
-                
-                                    if value.translation.width < 0 {
-                                        if (Calendar.current.compare(Date(), to: currentDate, toGranularity: .day) == .orderedDescending) {
-                                                addingDays(nr: 1)
+                                    
+                                    Spacer()
+                                    Text(Utils.dateFormatter.string(from: currentDate))
+                                        .font(.title3)
+                                    Spacer()
+
+                                    if (Calendar.current.compare(Date(), to: currentDate, toGranularity: .day) == .orderedDescending) {
+                                        Button(action: {
+                                            addingDays(nr: 1)
+                                        }) {
+                                            Text(">")
+                                                .font(.headline)
+                                                .foregroundColor(.gray)
                                         }
-                                    } else {
-                                        addingDays(nr: -1)
                                     }
                                 }
-                            )
-                        }
+                                .padding()
+                                .gesture(DragGesture(minimumDistance: 70.0, coordinateSpace: .local)
+                                    .onEnded { value in
+                    
+                                        if value.translation.width < 0 {
+                                            if (Calendar.current.compare(Date(), to: currentDate, toGranularity: .day) == .orderedDescending) {
+                                                    addingDays(nr: 1)
+                                            }
+                                        } else {
+                                            addingDays(nr: -1)
+                                        }
+                                    }
+                                )
+                            }
                         
-                        VStack {
                             HStack() {
                                 VStack {
                                     Text("Night Sleep")
@@ -102,17 +102,18 @@ struct ContentView: View {
                             }
                             .padding()
 
-
-                        VStack {
-                            LineChartView(sleeps: sleepManager.nightSleeps, timeInBed: sleepManager.getInBedTime(), sleepsHrAverage: sleepManager.nsHeartRateAverage)
-                        }
-                        .padding(.all, 15)
+                        
+                            VStack {
+                                LineChartView(sleeps: sleepManager.nightSleeps, timeInBed: sleepManager.getInBedTime(), sleepsHrAverage: sleepManager.nsHeartRateAverage)
+                            }
+                            .padding(.all, 15)
                         }
                         .foregroundColor(Color("TextColorPrim"))
                         .background(Color("BackgroundSec"))
                         .cornerRadius(16)
-                        .padding()
+                        
                     }
+                    .padding()
 //                    .background(Color("BackgroundSec"))
                     if !sleepManager.nightSleeps.isEmpty {
                             VStack {
