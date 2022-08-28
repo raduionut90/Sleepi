@@ -11,6 +11,5 @@ struct Constants {
     static let FIRST_QUARTILE: Int = 1
     static let MEDIAN: Int = 2
     static let THIRD_QUARTILE: Int = 3
-    static let SLEEP_DURATION: Double = 1200
-    static let MINI_SLEEP_DURATION: Double = 420 //7 min
+    static let SLEEP_DURATION: Double = 1800
  }
