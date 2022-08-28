@@ -113,7 +113,6 @@ class SleepDetector: ObservableObject {
             //                logger.log("")
             //            }
             //
-            // detecting sleep starting with epoch.activity < Q1
             if epoch.meanActivity.isNaN || epoch.meanActivity < actQuartile.median && !epoch.records.contains(where: { $0.firstAfterGap ?? false }){
                 if startDate == nil {
                     startDate = epoch.records.first?.startDate
@@ -148,7 +147,7 @@ class SleepDetector: ObservableObject {
         logger.log("before filter sleep duration \(sleeps.count)")
         sleeps = sleeps.filter( {$0.getDuration() >= Constants.SLEEP_DURATION} )
         logger.log("after filter sleep duration \(sleeps.count)")
-        sleeps = sleeps.filter( {$0.heartRateAverage < hrQuartile.thirdQuartile} )
+//        sleeps = sleeps.filter( {$0.heartRateAverage < hrQuartile.thirdQuartile} )
         logger.log("after filter hr quart Q3 \(sleeps.count)")
 //        sleeps = filterSleepByHr(sleeps: sleeps, epochs: epochs)
         sleeps = filterByLowActivityPercent(sleeps: sleeps, actQuartile: actQuartile, hrQuartile: hrQuartile)
@@ -183,10 +182,12 @@ class SleepDetector: ObservableObject {
         var result: [Sleep] = []
         for sleep in sleeps {
             let firstEpoch = epochs.firstIndex {$0.startDate >= sleep.startDate}!
-            let lastEpoch = (epochs.firstIndex {$0.endDate >= sleep.endDate})! - 1
-            let sleepEpochs = Array(epochs[firstEpoch...lastEpoch])
-            let newSleep = Sleep(startDate: sleep.startDate, endDate: sleep.endDate, epochs: sleepEpochs)
-            result.append(newSleep)
+            let lastEpoch = (epochs.firstIndex {$0.endDate >= sleep.endDate})!
+            if firstEpoch < lastEpoch {
+                let sleepEpochs = Array(epochs[firstEpoch..<lastEpoch])
+                let newSleep = Sleep(startDate: sleep.startDate, endDate: sleep.endDate, epochs: sleepEpochs)
+                result.append(newSleep)
+            }
         }
         return result
     }
