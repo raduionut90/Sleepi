@@ -54,7 +54,21 @@ struct ContentView: View {
                                 }
                             }
                             .padding()
-                            
+                            .gesture(DragGesture(minimumDistance: 70.0, coordinateSpace: .local)
+                                .onEnded { value in
+                
+                                    if value.translation.width < 0 {
+                                        if (Calendar.current.compare(Date(), to: currentDate, toGranularity: .day) == .orderedDescending) {
+                                                addingDays(nr: 1)
+                                        }
+                                    } else {
+                                        addingDays(nr: -1)
+                                    }
+                                }
+                            )
+                        }
+                        
+                        VStack {
                             HStack() {
                                 VStack {
                                     Text("Night Sleep")
@@ -87,137 +101,126 @@ struct ContentView: View {
                                 }
                             }
                             .padding()
-                        }
-                        .background(Color("BackgroundSec"))
-                        .foregroundColor(Color("TextColorPrim"))
-                        .gesture(DragGesture(minimumDistance: 70.0, coordinateSpace: .local)
-                            .onEnded { value in
-            
-                                if value.translation.width < 0 {
-                                    if (Calendar.current.compare(Date(), to: currentDate, toGranularity: .day) == .orderedDescending) {
-                                            addingDays(nr: 1)
-                                    }
-                                } else {
-                                    addingDays(nr: -1)
-                                }
-                            }
-                        )
-                        
-            
+
+
                         VStack {
                             LineChartView(sleeps: sleepManager.nightSleeps, timeInBed: sleepManager.getInBedTime(), sleepsHrAverage: sleepManager.nsHeartRateAverage)
                         }
                         .padding(.all, 15)
+                        }
+                        .foregroundColor(Color("TextColorPrim"))
+                        .background(Color("BackgroundSec"))
+                        .cornerRadius(16)
+                        .padding()
                     }
-                    .background(Color("BackgroundSec"))
-                    
-                        VStack {
-                            Group {
-                                HStack {
-                                    let times = sleepManager.nightSleeps.count - 1
-                                    Circle()
-                                        .fill(Color(UIColor(named: "AppAwakeSleep")!))
-                                        .frame(width: 10, height: 10)
-                                    VStack(alignment: .leading) {
-                                        Text("Awake \(String(times)) times")
-                                        Text("Reference: 1 time")
-                                            .font(.caption2)
-                                            .foregroundColor(Color("TextColorSec"))
-                                    }
-                                    Spacer()
-                                    Text(Utils.timeForrmatedAbr.string(from: sleepManager.getSleepStageDuration(stage: .Awake))!)
-                                }
-                                HStack {
-                                    let percent = sleepManager.getSleepStageDuration(stage: .RemSleep) / sleepManager.getSleepDuration(type: .NightSleep) * 100
-                                    Circle()
-                                        .fill(Color(UIColor(named: "AppRemSleep")!))
-                                        .frame(width: 10, height: 10)
-                                    VStack(alignment: .leading) {
-                                        Text("Rem \(String(format: "%.0f", percent)) %")
-                                        Text("Reference: 10-30%")
-                                            .font(.caption2)
-                                            .foregroundColor(Color("TextColorSec"))
-                                    }
-                                    Spacer()
-                                    Text(Utils.timeForrmatedAbr.string(from: sleepManager.getSleepStageDuration(stage: .RemSleep))!)
-                                }
-                                HStack {
-                                    let percent = sleepManager.getSleepStageDuration(stage: .LightSleep) / sleepManager.getSleepDuration(type: .NightSleep) * 100
-                                    Circle()
-                                        .fill(Color(UIColor(named: "AppLightSleep")!))
-                                        .frame(width: 10, height: 10)
-                                    VStack(alignment: .leading) {
-                               
-                                        Text("Light \(String(format: "%.0f", percent)) %")
-                                        Text("Reference: 40-60%")
-                                            .font(.caption2)
-                                            .foregroundColor(Color("TextColorSec"))
-                                    }
-                                    Spacer()
-                                    Text(Utils.timeForrmatedAbr.string(from: sleepManager.getSleepStageDuration(stage: .LightSleep))!)
-                                    
-                                }
-                                HStack {
-                                    let percent = sleepManager.getSleepStageDuration(stage: .DeepSleep) / sleepManager.getSleepDuration(type: .NightSleep) * 100
-                                    Circle()
-                                        .fill(Color(UIColor(named: "AppDeepSleep")!))
-                                        .frame(width: 10, height: 10)
-                                    VStack(alignment: .leading) {
-                                        Text("Deep \(String(format: "%.0f", percent)) %")
-                                        Text("Reference: 20-60%")
-                                            .font(.caption2)
-                                            .foregroundColor(Color("TextColorSec"))
-                                    }
-                                    Spacer()
-                                    Text(Utils.timeForrmatedAbr.string(from: sleepManager.getSleepStageDuration(stage: .DeepSleep))!)
-
-                                }
-                                ForEach(sleepManager.naps) { nap in
+//                    .background(Color("BackgroundSec"))
+                    if !sleepManager.nightSleeps.isEmpty {
+                            VStack {
+                                Group {
                                     HStack {
+                                        let times = sleepManager.nightSleeps.count - 1
                                         Circle()
-                                            .fill(Color(UIColor(named: "BackgroundSec")!))
+                                            .fill(Color(UIColor(named: "AppAwakeSleep")!))
                                             .frame(width: 10, height: 10)
                                         VStack(alignment: .leading) {
-                                            Text("Nap")
-                                            Text(Utils.hhmmtimeFormatter.string(from: nap.startDate) + " - " +  Utils.hhmmtimeFormatter.string(from: nap.endDate))
+                                            Text("Awake \(String(times)) times")
+                                            Text("Reference: 1 time")
                                                 .font(.caption2)
                                                 .foregroundColor(Color("TextColorSec"))
                                         }
                                         Spacer()
-                                        Text(Utils.timeForrmatedAbr.string(from: nap.getDuration() )!)
+                                        Text(Utils.timeForrmatedAbr.string(from: sleepManager.getSleepStageDuration(stage: .Awake))!)
+                                    }
+                                    HStack {
+                                        let percent = sleepManager.getSleepStageDuration(stage: .RemSleep) / sleepManager.getSleepDuration(type: .NightSleep) * 100
+                                        Circle()
+                                            .fill(Color(UIColor(named: "AppRemSleep")!))
+                                            .frame(width: 10, height: 10)
+                                        VStack(alignment: .leading) {
+                                            Text("Rem \(String(format: "%.0f", percent)) %")
+                                            Text("Reference: 10-30%")
+                                                .font(.caption2)
+                                                .foregroundColor(Color("TextColorSec"))
+                                        }
+                                        Spacer()
+                                        Text(Utils.timeForrmatedAbr.string(from: sleepManager.getSleepStageDuration(stage: .RemSleep))!)
+                                    }
+                                    HStack {
+                                        let percent = sleepManager.getSleepStageDuration(stage: .LightSleep) / sleepManager.getSleepDuration(type: .NightSleep) * 100
+                                        Circle()
+                                            .fill(Color(UIColor(named: "AppLightSleep")!))
+                                            .frame(width: 10, height: 10)
+                                        VStack(alignment: .leading) {
+                                   
+                                            Text("Light \(String(format: "%.0f", percent)) %")
+                                            Text("Reference: 40-60%")
+                                                .font(.caption2)
+                                                .foregroundColor(Color("TextColorSec"))
+                                        }
+                                        Spacer()
+                                        Text(Utils.timeForrmatedAbr.string(from: sleepManager.getSleepStageDuration(stage: .LightSleep))!)
+                                        
+                                    }
+                                    HStack {
+                                        let percent = sleepManager.getSleepStageDuration(stage: .DeepSleep) / sleepManager.getSleepDuration(type: .NightSleep) * 100
+                                        Circle()
+                                            .fill(Color(UIColor(named: "AppDeepSleep")!))
+                                            .frame(width: 10, height: 10)
+                                        VStack(alignment: .leading) {
+                                            Text("Deep \(String(format: "%.0f", percent)) %")
+                                            Text("Reference: 20-60%")
+                                                .font(.caption2)
+                                                .foregroundColor(Color("TextColorSec"))
+                                        }
+                                        Spacer()
+                                        Text(Utils.timeForrmatedAbr.string(from: sleepManager.getSleepStageDuration(stage: .DeepSleep))!)
+
+                                    }
+                                    ForEach(sleepManager.naps) { nap in
+                                        HStack {
+                                            Circle()
+                                                .fill(Color(UIColor(named: "BackgroundSec")!))
+                                                .frame(width: 10, height: 10)
+                                            VStack(alignment: .leading) {
+                                                Text("Nap")
+                                                Text(Utils.hhmmtimeFormatter.string(from: nap.startDate) + " - " +  Utils.hhmmtimeFormatter.string(from: nap.endDate))
+                                                    .font(.caption2)
+                                                    .foregroundColor(Color("TextColorSec"))
+                                            }
+                                            Spacer()
+                                            Text(Utils.timeForrmatedAbr.string(from: nap.getDuration() )!)
+                                        }
                                     }
                                 }
+                                .padding()
+                                .background(Color("BackgroundSec"))
+                                .foregroundColor(Color("TextColorPrim"))
+                                .cornerRadius(16)
+
                             }
-                            .padding()
-                            .background(Color("BackgroundSec"))
-                            .foregroundColor(Color("TextColorPrim"))
-                            .cornerRadius(10)
+                            .padding(.all)
+                            .gesture(DragGesture(minimumDistance: 70.0, coordinateSpace: .local)
+                                .onEnded { value in
+                                    
+                                    if value.translation.width < 0 {
+                                        if (Calendar.current.compare(Date(), to: currentDate, toGranularity: .day) == .orderedDescending) {
+                                            addingDays(nr: 1)
+                                        }
+                                    } else {
+                                        addingDays(nr: -1)
+                                    }
+                                }
+                            )
                         }
-                        .padding(.all)
-                        .gesture(DragGesture(minimumDistance: 70.0, coordinateSpace: .local)
-                            .onEnded { value in
-                                
-                                if value.translation.width < 0 {
-                                    if (Calendar.current.compare(Date(), to: currentDate, toGranularity: .day) == .orderedDescending) {
-                                        addingDays(nr: 1)
-                                    }
-                                } else {
-                                    addingDays(nr: -1)
-                                }
-                            }
-                        )
-//                        .background(Color.red)
-
-
-
                     }
 
                 }
 //                .navigationTitle("Sleepi")
 //                .navigationBarTitleDisplayMode(.inline)
-//                .background(Color("BackgroundPrim"))
+                .background(Color("BackgroundPrim"))
 //
 //        }
+//            .background(.red)
             .navigationViewStyle(StackNavigationViewStyle())
             .onAppear(){
                 sleepDetector.performSleepDetection()

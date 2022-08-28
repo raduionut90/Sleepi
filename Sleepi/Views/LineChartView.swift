@@ -141,7 +141,6 @@ struct LineChartView: View {
                             Spacer()
                         }
                     }
-                    .background(Color("BackgroundSec"))
 //                    .foregroundColor(.green)
                     .highPriorityGesture(DragGesture(minimumDistance: 0, coordinateSpace: .local)
                         .onChanged { value in
@@ -170,7 +169,8 @@ struct LineChartView: View {
                 .frame(maxWidth: .infinity, maxHeight: 300)
                 .overlay(
                     RoundedRectangle(cornerRadius: 16)
-                            .stroke(.gray, lineWidth: 1))
+                        .stroke(.gray, lineWidth: 0.3)
+                        )
             }
 
             VStack {
