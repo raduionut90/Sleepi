@@ -71,7 +71,7 @@ struct ContentView: View {
                                 .fontWeight(.medium)
                         }
                     }
-
+                    
                     
                     VStack {
                         LineChartView(sleeps: sleepManager.nightSleeps, timeInBed: sleepManager.getInBedTime(), sleepsHrAverage: sleepManager.nsHeartRateAverage)
@@ -160,13 +160,6 @@ struct ContentView: View {
                 .cornerRadius(16)
             }
             .padding()
-            .gesture(DragGesture(minimumDistance: 20.0, coordinateSpace: .local)
-                .onEnded { value in
-                    if value.translation.height > 0 {
-                        print("swipe down")
-                    }
-                }
-            )
         }
         .background(Color("BackgroundPrim"))
         .gesture(DragGesture(minimumDistance: 20.0, coordinateSpace: .local)
@@ -195,7 +188,29 @@ struct ContentView: View {
         .onChange(of: sleepDetector.loading, perform: { _ in
             sleepManager.refreshSleeps(date: currentDate)
         })
+        .onAppCameToForeground {
+            print("onAppCameToForeground")
+            sleepDetector.performSleepDetection()
+            sleepManager.refreshSleeps(date: currentDate)
+        }
+        .onAppWentToBackground {
+            print("onAppWentToBackground")
+        }
+    }
+}
 
+extension View {
+    func onAppCameToForeground(perform action: @escaping () -> Void) -> some View {
+        self.onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
+            action()
+        }
+    }
+    
+    
+    func onAppWentToBackground(perform action: @escaping () -> Void) -> some View {
+        self.onReceive(NotificationCenter.default.publisher(for: UIApplication.willResignActiveNotification)) { _ in
+            action()
+        }
     }
 }
 

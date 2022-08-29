@@ -79,7 +79,6 @@ class SleepDetector: ObservableObject {
                         
                         let potentialSleeps = identifySleeps(activities: activities, actQuartile: actQuartiles, hrQuartile: hrQuartiles, lastSleepEndDate: lastSleepEndDate)
 
-                        
                         for sleep in potentialSleeps {
                             healthStore.saveSleep(startTime: sleep.startDate, endTime: sleep.endDate)
                         }
