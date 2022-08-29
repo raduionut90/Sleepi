@@ -144,7 +144,7 @@ struct LineChartView: View {
 //                    .foregroundColor(.green)
                     .highPriorityGesture(DragGesture(minimumDistance: 0, coordinateSpace: .local)
                         .onChanged { value in
-//                            print(value.translation)
+                            print(value.translation)
                             chartLineIsVisible = true
                             chartLineOffsetX = value.startLocation.x
 

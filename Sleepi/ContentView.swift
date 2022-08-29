@@ -21,11 +21,8 @@ struct ContentView: View {
     }
     
     var body: some View {
-//        NavigationView{
-        ScrollView(.vertical){
-
+//        ScrollView(.vertical, showsIndicators: false){
                 VStack {
-
                     VStack {
                     // Date Component View
                         Group {
@@ -55,7 +52,7 @@ struct ContentView: View {
                                     }
                                 }
                                 .padding()
-                                .gesture(DragGesture(minimumDistance: 70.0, coordinateSpace: .local)
+                                .gesture(DragGesture(minimumDistance: 20.0, coordinateSpace: .local)
                                     .onEnded { value in
                     
                                         if value.translation.width < 0 {
@@ -68,7 +65,19 @@ struct ContentView: View {
                                     }
                                 )
                             }
-                        
+                            .gesture(DragGesture(minimumDistance: 20.0, coordinateSpace: .local)
+                                .onEnded { value in
+                                    
+                                    if value.translation.width < 0 {
+                                        if (Calendar.current.compare(Date(), to: currentDate, toGranularity: .day) == .orderedDescending) {
+                                            addingDays(nr: 1)
+                                        }
+                                    } else {
+                                        addingDays(nr: -1)
+                                    }
+                                }
+                            )
+                            
                             HStack() {
                                 VStack {
                                     Text("Night Sleep")
@@ -80,16 +89,6 @@ struct ContentView: View {
                                         .fontWeight(.medium)
                                 }
                                 Spacer()
-//                                VStack {
-//                                    Text("Night Sleep")
-//                                        .font(.subheadline)
-//                                        .fontWeight(.light)
-//
-//                                    Text(Utils.timeForrmatedAbr.string(from: sleepManager.getSleepDuration(type: .NightSleep) )! )
-//                                        .font(.title2)
-//                                        .fontWeight(.medium)
-//                                }
-//                                Spacer()
                                 VStack {
                                     Text("Nap")
                                         .font(.subheadline)
@@ -101,7 +100,18 @@ struct ContentView: View {
                                 }
                             }
                             .padding()
-
+                            .gesture(DragGesture(minimumDistance: 20.0, coordinateSpace: .local)
+                                .onEnded { value in
+                                    
+                                    if value.translation.width < 0 {
+                                        if (Calendar.current.compare(Date(), to: currentDate, toGranularity: .day) == .orderedDescending) {
+                                            addingDays(nr: 1)
+                                        }
+                                    } else {
+                                        addingDays(nr: -1)
+                                    }
+                                }
+                            )
                         
                             VStack {
                                 LineChartView(sleeps: sleepManager.nightSleeps, timeInBed: sleepManager.getInBedTime(), sleepsHrAverage: sleepManager.nsHeartRateAverage)
@@ -200,7 +210,7 @@ struct ContentView: View {
 
                             }
                             .padding(.all)
-                            .gesture(DragGesture(minimumDistance: 70.0, coordinateSpace: .local)
+                            .gesture(DragGesture(minimumDistance: 20.0, coordinateSpace: .local)
                                 .onEnded { value in
                                     
                                     if value.translation.width < 0 {
@@ -214,14 +224,8 @@ struct ContentView: View {
                             )
                         }
                     }
-
-                }
-//                .navigationTitle("Sleepi")
-//                .navigationBarTitleDisplayMode(.inline)
-                .background(Color("BackgroundPrim"))
-//
-//        }
-//            .background(.red)
+//                }
+            .background(Color("BackgroundPrim"))
             .navigationViewStyle(StackNavigationViewStyle())
             .onAppear(){
                 sleepDetector.performSleepDetection()
@@ -233,28 +237,6 @@ struct ContentView: View {
             .onChange(of: sleepDetector.loading, perform: { _ in
                 sleepManager.refreshSleeps(date: currentDate)
             })
-//            .onChange(of: sleepManager.nightSleeps, perform: { value in
-//                let deep = sleepManager.getSleepStageDuration(stage: .DeepSleep)
-//                print("deep: \(Utils.timeFormatter.string(from: deep)!)")
-//                let rem = sleepManager.getSleepStageDuration(stage: .RemSleep)
-//                print("rem: \(Utils.timeFormatter.string(from: rem)!)")
-//                let light = sleepManager.getSleepStageDuration(stage: .LightSleep)
-//                print("light: \(Utils.timeFormatter.string(from: light)!)")
-//                print("total: \(Utils.timeFormatter.string(from: deep + rem + light)!)")
-//
-//            })
-//            .gesture(DragGesture(minimumDistance: 70.0, coordinateSpace: .local)
-//                .onEnded { value in
-//
-//                    if value.translation.width < 0 {
-//                        if (Calendar.current.compare(Date(), to: currentDate, toGranularity: .day) == .orderedDescending) {
-//                                addingDays(nr: 1)
-//                        }
-//                    } else {
-//                        addingDays(nr: -1)
-//                    }
-//                }
-//            )
     }
 }
 
