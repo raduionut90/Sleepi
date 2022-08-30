@@ -31,4 +31,8 @@ class Epoch: Equatable, Comparable {
         self.startDate = activities.first!.startDate
         self.endDate = activities.last!.endDate
     }
+    
+    func getTotalActivities() -> Double{
+        return self.records.compactMap( {$0.actEng} ).reduce(0, +)
+    }
 }

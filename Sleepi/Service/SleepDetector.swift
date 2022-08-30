@@ -28,34 +28,14 @@ class SleepDetector: ObservableObject {
     
     func performSleepDetection() {
         Task.init {
+            loading = true
+
             if let healthStore = healthStore {
                 let authorized: Bool = try await healthStore.requestAuthorization()
                 if authorized {
 
                     var currentDate = Date()
                     var aDayBefore = getStartDate(currentDate)
-                    
-                    // for debugging
-//                    let debugStartDate = Calendar.current.date(byAdding: .day, value: -56, to: Date())!
-//                    let debugEndDate = Calendar.current.date(byAdding: .day, value: +5, to: debugStartDate)!
-//                    let debugsleeps = await healthStore.sleepQuery(date: debugStartDate)
-//                    let debugsleeps2 = await healthStore.sleepQuery(date: Calendar.current.date(byAdding: .day, value: 1, to: debugStartDate)!)
-//                    let debugsleeps3 = await healthStore.sleepQuery(date: Calendar.current.date(byAdding: .day, value: 2, to: debugStartDate)!)
-//                    let debugsleeps4 = await healthStore.sleepQuery(date: Calendar.current.date(byAdding: .day, value: 3, to: debugStartDate)!)
-//                    let debugsleeps5 = await healthStore.sleepQuery(date: Calendar.current.date(byAdding: .day, value: 4, to: debugStartDate)!)
-//
-//
-//                    let debugHeartRates = await healthStore.startHeartRateQuery(startDate: debugStartDate, endDate: debugEndDate)
-//                    let debugActiveEnergy = await healthStore.activeEnergyQuery(startDate: debugStartDate, endDate: debugEndDate)
-//                    let debughrv = await healthStore.startHeartRateVariabilityQuery(startDate: debugStartDate, endDate: debugEndDate)
-//                    let debugrhr = await healthStore.startRestingHeartRateQuery(startDate: debugStartDate, endDate: debugEndDate)
-//                    let debugresp = await healthStore.startRespiratoryRateQuery(startDate: debugStartDate, endDate: debugEndDate)
-//
-//                    self.getActivitiesFromRawData(heartRates: debugHeartRates, activeEnergy: debugActiveEnergy, hrvs: debughrv, rhrs: debugrhr, respRates: debugresp)
-//                     stop debugging
-                    
-                    
-//                    logger.log("before while: startDate: \(startDate.formatted()) , endDate: \(endDate.formatted())")
                     var sleeps: [HKCategorySample] = []
                     
                     while sleeps.isEmpty {
@@ -63,10 +43,6 @@ class SleepDetector: ObservableObject {
                         let lastSleepEndDate = sleeps.last?.endDate ?? aDayBefore
                         let heartRates = await healthStore.getSamples(startDate: aDayBefore, endDate: currentDate, type: .heartRate)
                         let activeEnergy = await healthStore.getSamples(startDate: aDayBefore, endDate: currentDate, type: .activeEnergyBurned)
-//                      let hrv = await healthStore.startHeartRateVariabilityQuery(startDate: startDate, endDate: endDate)
-//                      let rhr = await healthStore.startRestingHeartRateQuery(startDate: startDate, endDate: endDate)
-//                      let resp = await healthStore.startRespiratoryRateQuery(startDate: startDate, endDate: endDate)
-//                        let dailyMeanHr = heartRates.map( { $0.quantity.doubleValue(for: HKUnit(from: "count/min")) } ).reduce(0, +) / Double(heartRates.count)
                         
                         let activities: [Records] = Utils.getActivitiesFromRawData(heartRates: heartRates, activeEnergy: activeEnergy)
                         let sortedActivEnergy = activities.filter( { $0.actEng != nil } ).map({ $0.actEng! } )
@@ -74,13 +50,12 @@ class SleepDetector: ObservableObject {
                         let hrQuartiles = Utils.getQuartiles(values: activities.filter( { $0.hr != nil } ).map({ $0.hr! } ))
                         logger.log("\(actQuartiles.firstQuartile);\(actQuartiles.median);\(actQuartiles.thirdQuartile)")
                         logger.log("\(hrQuartiles.firstQuartile);\(hrQuartiles.median);\(hrQuartiles.thirdQuartile)")
-                        logger.log("")
+                        logger.log("last sleep end \(lastSleepEndDate)")
 
-                        
                         let potentialSleeps = identifySleeps(activities: activities, actQuartile: actQuartiles, hrQuartile: hrQuartiles, lastSleepEndDate: lastSleepEndDate)
-
+                        
                         for sleep in potentialSleeps {
-                            healthStore.saveSleep(startTime: sleep.startDate, endTime: sleep.endDate)
+                            try await healthStore.saveSleep(startTime: sleep.startDate, endTime: sleep.endDate)
                         }
                         
                         currentDate = aDayBefore
@@ -90,28 +65,31 @@ class SleepDetector: ObservableObject {
                         }
                     }
 
-                    self.loading = false
                 }
             }
+            self.loading = false
         }
     }
 
     private func identifySleeps(activities: [Records], actQuartile: (firstQuartile: Double, median: Double, thirdQuartile: Double), hrQuartile: (firstQuartile: Double, median: Double, thirdQuartile: Double), lastSleepEndDate: Date) -> [Sleep] {
-        var sleeps: [Sleep] = []
         var tmpSleeps: [Sleep] = []
-        let firstActivityIndex = activities.firstIndex(where: { $0.startDate > lastSleepEndDate }) ?? 0
+        let firstActivityIndex = activities.firstIndex(where: { $0.startDate >= lastSleepEndDate })!
         
         var startDate: Date?
         var lowActivityEpochs: [Epoch] = []
         let epochs = Utils.getEpochsFromActivities(activities: Array(activities[firstActivityIndex...]), epochLenght: 1)
-        
+        let epochsTest = Utils.getEpochsFromActivitiesByTimeInterval(activities: Array(activities[firstActivityIndex...]), minutes: 3)
+        for epo in epochsTest {
+            print("\(epo.startDate.formatted());\(epo.endDate.formatted());\(epo.getTotalActivities())")
+        }
+
         for epoch in epochs {
             logger.log("\(epoch.startDate.formatted());\(epoch.endDate.formatted());\(epoch.meanActivity);\(epoch.meanHR)")
             
-            //            if epoch.records.contains(where: {$0.startDate.formatted() == "23.08.2022, 2:07"}){
-            //                logger.log("")
-            //            }
-            //
+//            if epoch.records.contains(where: {$0.startDate.formatted() == "23.08.2022, 2:07"}){
+//                logger.log("")
+//            }
+
             if epoch.meanActivity.isNaN || epoch.meanActivity < actQuartile.median && !epoch.records.contains(where: { $0.firstAfterGap ?? false }){
                 if startDate == nil {
                     startDate = epoch.records.first?.startDate
@@ -131,11 +109,14 @@ class SleepDetector: ObservableObject {
                 tmpSleeps.append(Sleep(startDate: startDate!, endDate: epoch.records.last!.endDate, epochs: lowActivityEpochs))
             }
         }
-        
-
+        let sleeps: [Sleep] = proccesPotentialSleeps(potentialSleeps: tmpSleeps, epochs: epochs, actQuartile: actQuartile, hrQuartile: hrQuartile)
+        return sleeps
+    }
+    private func proccesPotentialSleeps(potentialSleeps: [Sleep], epochs: [Epoch], actQuartile: (firstQuartile: Double, median: Double, thirdQuartile: Double), hrQuartile: (firstQuartile: Double, median: Double, thirdQuartile: Double)) -> [Sleep] {
+        var sleeps: [Sleep] = []
 //        sleeps = getConcatenatedSleeps(sleeps: tmpSleeps)
         logger.log("")
-        sleeps = getSleepEpochs(sleeps: tmpSleeps, epochs: epochs)
+        sleeps = getSleepEpochs(sleeps: potentialSleeps, epochs: epochs)
 
         logger.log("after Concatenated:")
         for result in sleeps {

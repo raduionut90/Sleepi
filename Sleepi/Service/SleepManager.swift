@@ -20,7 +20,7 @@ class SleepManager: ObservableObject {
     @Published var nsHeartRateAverage: Double = 0.0
     @Published var nightSleeps: [Sleep] = []
     @Published var naps: [Sleep] = []
-    
+
     init(date: Date){
         if HKHealthStore.isHealthDataAvailable() {
             self.healthStore = HealthStore()
@@ -42,9 +42,6 @@ class SleepManager: ObservableObject {
                     startDate = Calendar.current.date(byAdding: .hour, value: -4, to: startDate)!
                     let endDate = Calendar.current.date(byAdding: .day, value: 1, to: startDate)!
                     
-//                    let heartRateAveragePerDay = await getHeartRateAveragePerDay(healthStore, startDate, endDate)
-//                    print("HeartRateAveragePerDay: \(heartRateAveragePerDay)")
-                    
                     let rawSleeps: [HKCategorySample] = await healthStore.getSleeps(startTime: startDate, endTime: endDate)
                     for rawSleep in rawSleeps {
                         let heartRates = await healthStore.getSamples(startDate: rawSleep.startDate, endDate: rawSleep.endDate, type: .heartRate)
@@ -63,8 +60,8 @@ class SleepManager: ObservableObject {
             }
         }
         
-//        print("sleeps refreshSleeps: \(sleeps.count)")
-//        print("naps refreshSleeps: \(naps.count)")
+        print("sleeps refreshSleeps: \(nightSleeps.count)")
+        print("naps refreshSleeps: \(naps.count)")
 
     }
     

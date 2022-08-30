@@ -82,6 +82,27 @@ class Utils {
         return epochs
     }
     
+    static func getEpochsFromActivitiesByTimeInterval(activities: [Records], minutes: Int) -> [Epoch]{
+        var epochs: [Epoch] = []
+        var firstIndex = 0
+        while true {
+            let startDate: Date = activities[firstIndex].startDate
+            let endDate = Calendar.current.date(byAdding: .minute, value: minutes, to: startDate)!
+            let lastIndex = activities.lastIndex(where: {$0.startDate < endDate} )!
+            let epoch: Epoch = Epoch(activities: Array(activities[firstIndex...lastIndex]))
+            epochs.append(epoch)
+            if lastIndex == activities.indices.last {
+                break
+            }
+            firstIndex = lastIndex + 1
+        }
+        let recordsCount = epochs.flatMap({$0.records})
+        if recordsCount.count != activities.count {
+            print("ERROR-COUNTER \(epochs.map {$0.records}.count) - \(activities.count)")
+        }
+        return epochs
+    }
+    
     static func isLowTrending(heartRates: [Double]) -> Bool {
         if heartRates.count == 0 {
             return false

@@ -164,16 +164,12 @@ struct ContentView: View {
         .background(Color("BackgroundPrim"))
         .gesture(DragGesture(minimumDistance: 20.0, coordinateSpace: .local)
             .onEnded { value in
-                
                 if value.translation.width < 0 {
                     if (Calendar.current.compare(Date(), to: currentDate, toGranularity: .day) == .orderedDescending) {
                         addingDays(nr: 1)
                     }
                 } else {
                     addingDays(nr: -1)
-                }
-                if value.translation.height > 0 {
-                    print("swipe down ggg")
                 }
             }
         )
