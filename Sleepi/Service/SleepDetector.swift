@@ -45,14 +45,10 @@ class SleepDetector: ObservableObject {
                         let activeEnergy = await healthStore.getSamples(startDate: aDayBefore, endDate: currentDate, type: .activeEnergyBurned)
                         
                         let activities: [Records] = Utils.getActivitiesFromRawData(heartRates: heartRates, activeEnergy: activeEnergy)
-                        let sortedActivEnergy = activities.filter( { $0.actEng != nil } ).map({ $0.actEng! } )
-                        let actQuartiles = Utils.getQuartiles(values: sortedActivEnergy)
-                        let hrQuartiles = Utils.getQuartiles(values: activities.filter( { $0.hr != nil } ).map({ $0.hr! } ))
-                        logger.log("\(actQuartiles.firstQuartile);\(actQuartiles.median);\(actQuartiles.thirdQuartile)")
-                        logger.log("\(hrQuartiles.firstQuartile);\(hrQuartiles.median);\(hrQuartiles.thirdQuartile)")
+                        
                         logger.log("last sleep end \(lastSleepEndDate)")
 
-                        let potentialSleeps = identifySleeps(activities: activities, actQuartile: actQuartiles, hrQuartile: hrQuartiles, lastSleepEndDate: lastSleepEndDate)
+                        let potentialSleeps = identifySleeps(activities: activities, lastSleepEndDate: lastSleepEndDate)
                         
                         for sleep in potentialSleeps {
                             try await healthStore.saveSleep(startTime: sleep.startDate, endTime: sleep.endDate)
@@ -71,42 +67,52 @@ class SleepDetector: ObservableObject {
         }
     }
 
-    private func identifySleeps(activities: [Records], actQuartile: (firstQuartile: Double, median: Double, thirdQuartile: Double), hrQuartile: (firstQuartile: Double, median: Double, thirdQuartile: Double), lastSleepEndDate: Date) -> [Sleep] {
+    private func identifySleeps(activities: [Records], lastSleepEndDate: Date) -> [Sleep] {
         var tmpSleeps: [Sleep] = []
         let firstActivityIndex = activities.firstIndex(where: { $0.startDate >= lastSleepEndDate })!
         
         var startDate: Date?
         var lowActivityEpochs: [Epoch] = []
-        let epochs = Utils.getEpochsFromActivities(activities: Array(activities[firstActivityIndex...]), epochLenght: 1)
-        let epochsTest = Utils.getEpochsFromActivitiesByTimeInterval(activities: Array(activities[firstActivityIndex...]), minutes: 3)
-        for epo in epochsTest {
-            print("\(epo.startDate.formatted());\(epo.endDate.formatted());\(epo.getTotalActivities())")
-        }
+//        let epochs = Utils.getEpochsFromActivities(activities: Array(activities[firstActivityIndex...]), epochLenght: 1)
+        let epochs = Utils.getEpochsFromActivitiesByTimeInterval(activities: Array(activities[firstActivityIndex...]), minutes: 5)
+        let allEpochs = Utils.getEpochsFromActivitiesByTimeInterval(activities: activities, minutes: 5)
 
-        for epoch in epochs {
-            logger.log("\(epoch.startDate.formatted());\(epoch.endDate.formatted());\(epoch.meanActivity);\(epoch.meanHR)")
+        let actQuartile = Utils.getQuartiles(values: allEpochs.compactMap({$0.meanActivity}) )
+        let hrQuartile = Utils.getQuartiles(values: allEpochs.compactMap({$0.meanHR}) )
+
+        logger.log(";\(actQuartile.firstQuartile);\(actQuartile.median);\(actQuartile.thirdQuartile)")
+        logger.log(";\(hrQuartile.firstQuartile);\(hrQuartile.median);\(hrQuartile.thirdQuartile)")
+        
+        for (index, epoch) in epochs.enumerated() {
+            logger.log(";\(epoch.startDate.formatted());\(epoch.endDate.formatted());\(epoch.meanActivity);\(epoch.meanHR)")
             
-//            if epoch.records.contains(where: {$0.startDate.formatted() == "23.08.2022, 2:07"}){
+//            if epoch.records.contains(where: {$0.startDate.formatted() == "26/08/2022, 8:51"}){
 //                logger.log("")
 //            }
 
-            if epoch.meanActivity.isNaN || epoch.meanActivity < actQuartile.median && !epoch.records.contains(where: { $0.firstAfterGap ?? false }){
+            if epoch.meanActivity.isNaN || epoch.meanActivity < actQuartile.firstQuartile &&
+                epochs.indices.contains(index - 1) && epoch.startDate.timeIntervalSinceReferenceDate - epochs[index - 1].endDate.timeIntervalSinceReferenceDate < 600 {
                 if startDate == nil {
-                    startDate = epoch.records.first?.startDate
+                    startDate = epochs.indices.contains(index - 1) ? epochs[index - 1].endDate : epoch.startDate
                 }
                 lowActivityEpochs.append(epoch)
+//            } else if epochs.indices.contains(index - 1) && epochs[index - 1].meanActivity < actQuartile.firstQuartile &&
+//                        epoch.meanActivity < actQuartile.median {
+//                if startDate != nil {
+//                    lowActivityEpochs.append(epoch)
+//                }
             } else {
                 if startDate != nil && !lowActivityEpochs.isEmpty {
                     
                     if (lowActivityEpochs.last!.endDate.timeIntervalSinceReferenceDate) - startDate!.timeIntervalSinceReferenceDate > Constants.SLEEP_DURATION {
-                        tmpSleeps.append(Sleep(startDate: startDate!, endDate: lowActivityEpochs.last!.records.last!.endDate, epochs: []))
+                        tmpSleeps.append(Sleep(startDate: startDate!, endDate: epoch.startDate, epochs: []))
                     }
                     startDate = nil
                     lowActivityEpochs = []
                 }
             }
-            if epoch == epochs.last && startDate != nil {
-                tmpSleeps.append(Sleep(startDate: startDate!, endDate: epoch.records.last!.endDate, epochs: lowActivityEpochs))
+            if epoch == epochs.last && startDate != nil && epoch.endDate.timeIntervalSinceReferenceDate - startDate!.timeIntervalSinceReferenceDate > Constants.SLEEP_DURATION {
+                tmpSleeps.append(Sleep(startDate: startDate!, endDate: epoch.endDate, epochs: []))
             }
         }
         let sleeps: [Sleep] = proccesPotentialSleeps(potentialSleeps: tmpSleeps, epochs: epochs, actQuartile: actQuartile, hrQuartile: hrQuartile)
@@ -114,28 +120,28 @@ class SleepDetector: ObservableObject {
     }
     private func proccesPotentialSleeps(potentialSleeps: [Sleep], epochs: [Epoch], actQuartile: (firstQuartile: Double, median: Double, thirdQuartile: Double), hrQuartile: (firstQuartile: Double, median: Double, thirdQuartile: Double)) -> [Sleep] {
         var sleeps: [Sleep] = []
-//        sleeps = getConcatenatedSleeps(sleeps: tmpSleeps)
+        sleeps = getConcatenatedSleeps(sleeps: potentialSleeps)
         logger.log("")
-        sleeps = getSleepEpochs(sleeps: potentialSleeps, epochs: epochs)
+        sleeps = getSleepEpochs(sleeps: sleeps, epochs: epochs)
 
         logger.log("after Concatenated:")
         for result in sleeps {
-            let meanActivity = result.epochs.compactMap({$0.meanActivity}).filter({!$0.isNaN}).reduce(0, +) / Double(result.epochs.compactMap({$0.meanActivity}).filter({!$0.isNaN}).count)
-            logger.log("\(result.startDate.formatted());\(result.endDate.formatted());\(meanActivity);")
+            let meanActivity = result.epochs.filter({!$0.meanActivity.isNaN }).map {$0.meanActivity}.reduce(0, +)
+            logger.log("\(result.startDate.formatted());\(result.endDate.formatted());\(meanActivity);\(result.heartRateAverage)")
         }
 
-        logger.log("before filter sleep duration \(sleeps.count)")
-        sleeps = sleeps.filter( {$0.getDuration() >= Constants.SLEEP_DURATION} )
-        logger.log("after filter sleep duration \(sleeps.count)")
+        logger.log(";before filter sleep duration \(sleeps.count)")
+        sleeps = sleeps.filter( {$0.getDuration() >= 1500} )
+        logger.log(";after filter sleep duration \(sleeps.count)")
 //        sleeps = sleeps.filter( {$0.heartRateAverage < hrQuartile.thirdQuartile} )
-        logger.log("after filter hr quart Q3 \(sleeps.count)")
+        logger.log(";after filter hr quart Q3 \(sleeps.count)")
 //        sleeps = filterSleepByHr(sleeps: sleeps, epochs: epochs)
         sleeps = filterByLowActivityPercent(sleeps: sleeps, actQuartile: actQuartile, hrQuartile: hrQuartile)
-        logger.log("result:")
+        logger.log(";result:")
         for result in sleeps {
-            let meanActivity = result.epochs.compactMap({$0.meanActivity}).filter({!$0.isNaN}).reduce(0, +) / Double(result.epochs.compactMap({$0.meanActivity}).filter({!$0.isNaN}).count)
+            let meanActivity = result.epochs.filter({!$0.meanActivity.isNaN }).map {$0.meanActivity}.reduce(0, +)
 
-            logger.log("\(result.startDate.formatted());\(result.endDate.formatted());\(result.heartRateAverage);\(meanActivity) ")
+            logger.log(";\(result.startDate.formatted());\(result.endDate.formatted());\(meanActivity);\(result.heartRateAverage)")
         }
         return sleeps
     }
@@ -175,16 +181,16 @@ class SleepDetector: ObservableObject {
     private func filterByLowActivityPercent(sleeps: [Sleep], actQuartile: (firstQuartile: Double, median: Double, thirdQuartile: Double), hrQuartile: (firstQuartile: Double, median: Double, thirdQuartile: Double)) -> [Sleep] {
         var result: [Sleep] = []
         for sleep in sleeps {
-            let highActivities = sleep.epochs.filter( { !$0.meanActivity.isNaN && $0.meanActivity > actQuartile.firstQuartile} ).count
+            let sumActivity = sleep.epochs.filter({!$0.meanActivity.isNaN }).map {$0.meanActivity}.reduce(0, +)
 
-            let percent = 3600.0 * Double(highActivities) / sleep.getDuration()
+            let percent = 3600.0 * Double(sumActivity) / sleep.getDuration()
             
-            logger.log("\(sleep.startDate.formatted());\(sleep.endDate.formatted());percent;\(percent);\(sleep.heartRateAverage);\(hrQuartile.firstQuartile);\(hrQuartile.median);\(hrQuartile.thirdQuartile)")
-            if percent < 5 {
+            logger.log(";\(sleep.startDate.formatted());\(sleep.endDate.formatted());percent;\(percent);\(sleep.heartRateAverage);\(hrQuartile.firstQuartile);\(hrQuartile.median);\(hrQuartile.thirdQuartile)")
+            if percent < 2 && sleep.heartRateAverage < hrQuartile.median {
                 result.append(sleep)
-            } else if percent < 15 && sleep.heartRateAverage < hrQuartile.firstQuartile {
+            } else if percent < 5 && sleep.heartRateAverage < hrQuartile.firstQuartile {
                 result.append(sleep)
-                logger.log("percent 15%")
+                logger.log(";\(sleep.startDate.formatted());\(sleep.endDate.formatted());5percent;\(percent);\(sleep.heartRateAverage);\(hrQuartile.firstQuartile);\(hrQuartile.median);\(hrQuartile.thirdQuartile)")
             }
         }
         return result

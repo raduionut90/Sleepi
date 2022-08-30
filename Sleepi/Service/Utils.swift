@@ -52,7 +52,7 @@ class Utils {
         if values.count < 3 {
             return (0.0, 0.0, 0.0)
         }
-        let sortedValues = values.sorted(by: <)
+        let sortedValues = values.filter({ $0 != 0.0 } ).filter({ !$0.isNaN }).sorted(by: <)
 
         for quartileType in 1...3 {
             let length = sortedValues.count + 1
@@ -66,21 +66,21 @@ class Utils {
         return (result[0], result[1], result[2]);
     }
     
-    static func getEpochsFromActivities(activities: [Records], epochLenght: Int) -> [Epoch]{
-        let recordsPerEpoch = epochLenght
-        var epochs: [Epoch] = []
-        var counter = 0
-        while counter  < activities.count {
-            let offset = counter + recordsPerEpoch > activities.count - 1 ? activities.count : counter + recordsPerEpoch
-            let epoch: Epoch = Epoch(activities: Array(activities[counter..<offset]))
-            epochs.append(epoch)
-            counter += recordsPerEpoch
-            if counter > activities.count {
-                break
-            }
-        }
-        return epochs
-    }
+//    static func getEpochsFromActivities(activities: [Records], epochLenght: Int) -> [Epoch]{
+//        let recordsPerEpoch = epochLenght
+//        var epochs: [Epoch] = []
+//        var counter = 0
+//        while counter  < activities.count {
+//            let offset = counter + recordsPerEpoch > activities.count - 1 ? activities.count : counter + recordsPerEpoch
+//            let epoch: Epoch = Epoch(activities: Array(activities[counter..<offset]))
+//            epochs.append(epoch)
+//            counter += recordsPerEpoch
+//            if counter > activities.count {
+//                break
+//            }
+//        }
+//        return epochs
+//    }
     
     static func getEpochsFromActivitiesByTimeInterval(activities: [Records], minutes: Int) -> [Epoch]{
         var epochs: [Epoch] = []

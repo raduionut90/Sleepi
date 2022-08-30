@@ -27,7 +27,8 @@ class Epoch: Equatable, Comparable {
     init(activities: [Records]){
         self.records = activities
         self.meanHR = activities.compactMap( {$0.hr }).reduce(0, +) / Double(activities.compactMap( {$0.hr }).count)
-        self.meanActivity = activities.compactMap( {$0.actEng }).reduce(0, +) / Double(activities.compactMap( {$0.actEng }).count)
+//        self.meanActivity = activities.compactMap( {$0.actEng }).reduce(0, +) / Double(activities.compactMap( {$0.actEng }).count)
+        self.meanActivity = activities.compactMap( {$0.actEng} ).reduce(0, +)
         self.startDate = activities.first!.startDate
         self.endDate = activities.last!.endDate
     }

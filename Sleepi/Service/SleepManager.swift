@@ -47,7 +47,7 @@ class SleepManager: ObservableObject {
                         let heartRates = await healthStore.getSamples(startDate: rawSleep.startDate, endDate: rawSleep.endDate, type: .heartRate)
                         let activeEnergys = await healthStore.getSamples(startDate: rawSleep.startDate, endDate: rawSleep.endDate, type: .activeEnergyBurned)
                         let activities: [Records] = Utils.getActivitiesFromRawData(heartRates: heartRates, activeEnergy: activeEnergys)
-                        let epochs = Utils.getEpochsFromActivities(activities: activities, epochLenght: 5)
+                        let epochs = Utils.getEpochsFromActivitiesByTimeInterval(activities: activities, minutes: 5)
                         let sleep: Sleep = Sleep(startDate: rawSleep.startDate, endDate: rawSleep.endDate, epochs: epochs)
                         tmpSleeps.append(sleep)
                     }
@@ -59,22 +59,22 @@ class SleepManager: ObservableObject {
                 }
             }
         }
-        
-        print("sleeps refreshSleeps: \(nightSleeps.count)")
-        print("naps refreshSleeps: \(naps.count)")
+//
+//        print("sleeps refreshSleeps: \(nightSleeps.count)")
+//        print("naps refreshSleeps: \(naps.count)")
 
     }
     
     private func updateEpochsClasification() {
         let allSleepsEpochs = self.nightSleeps.flatMap {$0.epochs}
         
-        let activityQuartiles = Utils.getQuartiles(values: allSleepsEpochs.filter({ !$0.meanActivity.isNaN }).map {$0.meanActivity} )
-        let hrQuartiles = Utils.getQuartiles(values: allSleepsEpochs.filter({ !$0.meanHR.isNaN }).map {$0.meanHR} )
+        let activityQuartiles = Utils.getQuartiles(values: allSleepsEpochs.map {$0.meanActivity} )
+        let hrQuartiles = Utils.getQuartiles(values: allSleepsEpochs.map {$0.meanHR} )
         
         for epoch in allSleepsEpochs {
-            if (epoch.meanActivity.isNaN || epoch.meanActivity < activityQuartiles.firstQuartile) && epoch.meanHR < hrQuartiles.median {
+            if epoch.meanActivity <= activityQuartiles.firstQuartile && epoch.meanHR <= hrQuartiles.firstQuartile {
                 epoch.sleepClasification = SleepStage.DeepSleep
-            } else if (epoch.meanActivity.isNaN || epoch.meanActivity > activityQuartiles.thirdQuartile) && epoch.meanHR > hrQuartiles.thirdQuartile{
+            } else if epoch.meanActivity >= activityQuartiles.thirdQuartile && epoch.meanHR >= hrQuartiles.thirdQuartile{
                 epoch.sleepClasification = SleepStage.RemSleep
             } else {
                 epoch.sleepClasification = SleepStage.LightSleep
