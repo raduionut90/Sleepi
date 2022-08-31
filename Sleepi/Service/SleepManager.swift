@@ -55,7 +55,7 @@ class SleepManager: ObservableObject {
                             print("acts last: \(activities.last!.endDate)")
                             print("")
                         }
-                        let epochs = Utils.getEpochsFromActivitiesByTimeInterval(start: rawSleep.startDate, end: rawSleep.endDate, activities: activities, minutes: 5)
+                        let epochs = Utils.getEpochsFromActivitiesByTimeInterval(start: rawSleep.startDate, end: rawSleep.endDate, activities: activities, minutes: 10)
                         let sleep: Sleep = Sleep(startDate: rawSleep.startDate, endDate: rawSleep.endDate, epochs: epochs)
                         tmpSleeps.append(sleep)
                         print("")
@@ -81,10 +81,11 @@ class SleepManager: ObservableObject {
         let hrQuartiles = Utils.getQuartiles(values: allSleepsEpochs.map {$0.meanHR} )
         
         for epoch in allSleepsEpochs {
-            if epoch.sumActivity <= activityQuartiles.firstQuartile && epoch.meanHR <= hrQuartiles.firstQuartile {
+            let maxHr = epoch.records.compactMap({ $0.hr }).max() ?? epoch.meanHR
+            let minHr = epoch.records.compactMap({ $0.hr }).min() ?? epoch.meanHR
+            if epoch.sumActivity <= activityQuartiles.firstQuartile && minHr <= hrQuartiles.firstQuartile {
                 epoch.sleepClasification = SleepStage.DeepSleep
-//            } else if epoch.sumActivity >= activityQuartiles.thirdQuartile && (epoch.meanHR >= hrQuartiles.thirdQuartile || epoch.meanHR.isNaN) {
-            } else if epoch.meanHR >= hrQuartiles.thirdQuartile {
+            } else if maxHr >= hrQuartiles.thirdQuartile {
                 epoch.sleepClasification = SleepStage.RemSleep
             } else {
                 epoch.sleepClasification = SleepStage.LightSleep

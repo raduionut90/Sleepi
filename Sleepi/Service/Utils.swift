@@ -52,7 +52,7 @@ class Utils {
         if values.count < 3 {
             return (0.0, 0.0, 0.0)
         }
-        let sortedValues = values.filter({ $0 != 0.0 } ).filter({ !$0.isNaN }).sorted(by: <)
+        let sortedValues = values.filter( {$0 != 0}).filter({ !$0.isNaN }).sorted(by: <)
 
         for quartileType in 1...3 {
             let length = sortedValues.count + 1
@@ -82,13 +82,13 @@ class Utils {
             }
             firstIndex = lastIndex + 1
         }
-        let recordsCount = epochs.flatMap({$0.records})
-        if recordsCount.count != activities.count {
-            print("ERROR-COUNTER \(epochs.map {$0.records}.count) - \(activities.count)")
-        }
-        if end != activities.last?.endDate {
-            print("")
-        }
+//        let recordsCount = epochs.flatMap({$0.records})
+//        if recordsCount.count != activities.count {
+//            print("ERROR-COUNTER \(epochs.map {$0.records}.count) - \(activities.count)")
+//        }
+//        if end != activities.last?.endDate {
+//            print("")
+//        }
         return epochs
     }
     

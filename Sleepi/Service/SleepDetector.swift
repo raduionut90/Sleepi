@@ -101,14 +101,14 @@ class SleepDetector: ObservableObject {
                 if startDate != nil && !lowActivityEpochs.isEmpty {
                     
                     if (lowActivityEpochs.last!.endDate.timeIntervalSinceReferenceDate) - startDate!.timeIntervalSinceReferenceDate > Constants.MINI_SLEEP_DURATION {
-                        tmpSleeps.append(Sleep(startDate: startDate!, endDate: epochs[index - 1].endDate, epochs: []))
+                        tmpSleeps.append(Sleep(startDate: startDate!, endDate: epochs[index - 1].records.last!.endDate, epochs: []))
                     }
                     startDate = nil
                     lowActivityEpochs = []
                 }
             }
             if epoch == epochs.last && startDate != nil && epoch.endDate.timeIntervalSinceReferenceDate - startDate!.timeIntervalSinceReferenceDate > Constants.MINI_SLEEP_DURATION {
-                tmpSleeps.append(Sleep(startDate: startDate!, endDate: epochs[index - 1].endDate, epochs: []))
+                tmpSleeps.append(Sleep(startDate: startDate!, endDate: epochs[index - 1].records.last!.endDate, epochs: []))
             }
         }
         let sleeps: [Sleep] = proccesPotentialSleeps(potentialSleeps: tmpSleeps, epochs: epochs, actQuartile: actQuartile, hrQuartile: hrQuartile)
