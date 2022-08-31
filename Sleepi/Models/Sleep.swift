@@ -24,26 +24,11 @@ struct Sleep: Hashable, Identifiable, Equatable {
         self.endDate = endDate
         self.epochs = epochs
         self.heartRateAverage = Utils.getAverage(values: epochs.map( {$0.meanHR} ))
-        self.updateEpochEndTime()
+//        self.updateEpochEndTime()
     }
     
     func getDuration() -> Double {
         return self.endDate.timeIntervalSinceReferenceDate - self.startDate.timeIntervalSinceReferenceDate
-    }
-    
-
-    
-    private func updateEpochEndTime() {
-        for (index, epoch) in epochs.enumerated() {
-            if index < epochs.count - 1 {
-                epoch.endDate = epochs[index + 1].startDate
-            }
-            if index == epochs.count - 1 {
-                epoch.endDate = self.endDate
-            }
-            
-//            updateMeanHr(epoch, index)
-        }
     }
     
     func getStageSleepDuration(allSleepsHrAverage: Double, stage: SleepStage) -> Double {

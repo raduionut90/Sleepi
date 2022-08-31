@@ -66,30 +66,16 @@ class Utils {
         return (result[0], result[1], result[2]);
     }
     
-//    static func getEpochsFromActivities(activities: [Records], epochLenght: Int) -> [Epoch]{
-//        let recordsPerEpoch = epochLenght
-//        var epochs: [Epoch] = []
-//        var counter = 0
-//        while counter  < activities.count {
-//            let offset = counter + recordsPerEpoch > activities.count - 1 ? activities.count : counter + recordsPerEpoch
-//            let epoch: Epoch = Epoch(activities: Array(activities[counter..<offset]))
-//            epochs.append(epoch)
-//            counter += recordsPerEpoch
-//            if counter > activities.count {
-//                break
-//            }
-//        }
-//        return epochs
-//    }
-    
-    static func getEpochsFromActivitiesByTimeInterval(activities: [Records], minutes: Int) -> [Epoch]{
+    static func getEpochsFromActivitiesByTimeInterval(start: Date, end: Date, activities: [Records], minutes: Int) -> [Epoch]{
         var epochs: [Epoch] = []
         var firstIndex = 0
         while true {
             let startDate: Date = activities[firstIndex].startDate
             let endDate = Calendar.current.date(byAdding: .minute, value: minutes, to: startDate)!
             let lastIndex = activities.lastIndex(where: {$0.startDate < endDate} )!
-            let epoch: Epoch = Epoch(activities: Array(activities[firstIndex...lastIndex]))
+            let epoch: Epoch = Epoch(start: activities[firstIndex].startDate, end: activities.indices.contains(lastIndex + 1) ?
+                                     activities[lastIndex + 1].startDate : activities[lastIndex].endDate
+                                     , records: Array(activities[firstIndex...lastIndex]))
             epochs.append(epoch)
             if lastIndex == activities.indices.last {
                 break
@@ -100,34 +86,10 @@ class Utils {
         if recordsCount.count != activities.count {
             print("ERROR-COUNTER \(epochs.map {$0.records}.count) - \(activities.count)")
         }
+        if end != activities.last?.endDate {
+            print("")
+        }
         return epochs
-    }
-    
-    static func isLowTrending(heartRates: [Double]) -> Bool {
-        if heartRates.count == 0 {
-            return false
-        }
-        var result: Bool = false
-        let spliter = Int(heartRates.count / 3)
-        var counter = 0
-        var prevResult: Double = 0
-        for i in 1...3 {
-            let offset = spliter * i < heartRates.count ? spliter * i : heartRates.count - 1
-            let epoch = heartRates[counter...offset]
-            let mean = epoch.reduce(0, +) / Double(epoch.count)
-            if prevResult == 0 {
-                prevResult = mean
-            } else {
-                if prevResult > mean {
-                    result = true
-                } else {
-                    return false
-                }
-            }
-            prevResult = mean
-            counter = spliter * i
-        }
-        return result
     }
     
     static func getActivitiesFromRawData(

@@ -21,19 +21,15 @@ class Epoch: Equatable, Comparable {
     let startDate: Date
     var endDate: Date
     var meanHR: Double
-    let meanActivity: Double
+    let sumActivity: Double
     var sleepClasification: SleepStage?
     
-    init(activities: [Records]){
-        self.records = activities
-        self.meanHR = activities.compactMap( {$0.hr }).reduce(0, +) / Double(activities.compactMap( {$0.hr }).count)
-//        self.meanActivity = activities.compactMap( {$0.actEng }).reduce(0, +) / Double(activities.compactMap( {$0.actEng }).count)
-        self.meanActivity = activities.compactMap( {$0.actEng} ).reduce(0, +)
-        self.startDate = activities.first!.startDate
-        self.endDate = activities.last!.endDate
+    init(start: Date, end: Date, records: [Records]){
+        self.records = records
+        self.meanHR = records.compactMap( {$0.hr }).reduce(0, +) / Double(records.compactMap( {$0.hr }).count)
+        self.sumActivity = records.compactMap( {$0.actEng} ).reduce(0, +)
+        self.startDate = start
+        self.endDate = end
     }
     
-    func getTotalActivities() -> Double{
-        return self.records.compactMap( {$0.actEng} ).reduce(0, +)
-    }
 }

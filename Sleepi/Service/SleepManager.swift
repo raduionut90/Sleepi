@@ -44,12 +44,21 @@ class SleepManager: ObservableObject {
                     
                     let rawSleeps: [HKCategorySample] = await healthStore.getSleeps(startTime: startDate, endTime: endDate)
                     for rawSleep in rawSleeps {
-                        let heartRates = await healthStore.getSamples(startDate: rawSleep.startDate, endDate: rawSleep.endDate, type: .heartRate)
-                        let activeEnergys = await healthStore.getSamples(startDate: rawSleep.startDate, endDate: rawSleep.endDate, type: .activeEnergyBurned)
+                        let rawSleepEnd = Calendar.current.date(byAdding: .second, value: 1, to: rawSleep.endDate)!
+                        let heartRates = await healthStore.getSamples(startDate: rawSleep.startDate, endDate: rawSleepEnd, type: .heartRate)
+                        let activeEnergys = await healthStore.getSamples(startDate: rawSleep.startDate, endDate: rawSleepEnd, type: .activeEnergyBurned)
                         let activities: [Records] = Utils.getActivitiesFromRawData(heartRates: heartRates, activeEnergy: activeEnergys)
-                        let epochs = Utils.getEpochsFromActivitiesByTimeInterval(activities: activities, minutes: 5)
+                        if rawSleep.endDate != activities.last?.endDate {
+                            print("rawSle \(rawSleep.endDate)")
+                            print("hr last: \(heartRates.last!.endDate)")
+                            print("actr last: \(activeEnergys.last!.endDate)")
+                            print("acts last: \(activities.last!.endDate)")
+                            print("")
+                        }
+                        let epochs = Utils.getEpochsFromActivitiesByTimeInterval(start: rawSleep.startDate, end: rawSleep.endDate, activities: activities, minutes: 5)
                         let sleep: Sleep = Sleep(startDate: rawSleep.startDate, endDate: rawSleep.endDate, epochs: epochs)
                         tmpSleeps.append(sleep)
+                        print("")
                     }
                     let sleeps = self.sleepFilter(sleeps: tmpSleeps, date: date)
                     self.nsHeartRateAverage = getNightSleepsHeartRateAverage(sleeps: sleeps.nightSleep)
@@ -68,13 +77,14 @@ class SleepManager: ObservableObject {
     private func updateEpochsClasification() {
         let allSleepsEpochs = self.nightSleeps.flatMap {$0.epochs}
         
-        let activityQuartiles = Utils.getQuartiles(values: allSleepsEpochs.map {$0.meanActivity} )
+        let activityQuartiles = Utils.getQuartiles(values: allSleepsEpochs.map {$0.sumActivity} )
         let hrQuartiles = Utils.getQuartiles(values: allSleepsEpochs.map {$0.meanHR} )
         
         for epoch in allSleepsEpochs {
-            if epoch.meanActivity <= activityQuartiles.firstQuartile && epoch.meanHR <= hrQuartiles.firstQuartile {
+            if epoch.sumActivity <= activityQuartiles.firstQuartile && epoch.meanHR <= hrQuartiles.firstQuartile {
                 epoch.sleepClasification = SleepStage.DeepSleep
-            } else if epoch.meanActivity >= activityQuartiles.thirdQuartile && epoch.meanHR >= hrQuartiles.thirdQuartile{
+//            } else if epoch.sumActivity >= activityQuartiles.thirdQuartile && (epoch.meanHR >= hrQuartiles.thirdQuartile || epoch.meanHR.isNaN) {
+            } else if epoch.meanHR >= hrQuartiles.thirdQuartile {
                 epoch.sleepClasification = SleepStage.RemSleep
             } else {
                 epoch.sleepClasification = SleepStage.LightSleep

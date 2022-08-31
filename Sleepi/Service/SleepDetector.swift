@@ -35,7 +35,7 @@ class SleepDetector: ObservableObject {
                 if authorized {
 
                     var currentDate = Date()
-                    var aDayBefore = getStartDate(currentDate)
+                    var aDayBefore = Calendar.current.date(byAdding: .hour, value: -24, to: currentDate)!
                     var sleeps: [HKCategorySample] = []
                     
                     while sleeps.isEmpty {
@@ -74,74 +74,65 @@ class SleepDetector: ObservableObject {
         var startDate: Date?
         var lowActivityEpochs: [Epoch] = []
 //        let epochs = Utils.getEpochsFromActivities(activities: Array(activities[firstActivityIndex...]), epochLenght: 1)
-        let epochs = Utils.getEpochsFromActivitiesByTimeInterval(activities: Array(activities[firstActivityIndex...]), minutes: 5)
-        let allEpochs = Utils.getEpochsFromActivitiesByTimeInterval(activities: activities, minutes: 5)
+        let relevantActivities = Array(activities[firstActivityIndex...])
+        let epochs = Utils.getEpochsFromActivitiesByTimeInterval(start: relevantActivities.first!.startDate, end: relevantActivities.last!.endDate, activities: relevantActivities, minutes: 5)
+        let allEpochs = Utils.getEpochsFromActivitiesByTimeInterval(start: activities.first!.startDate, end: activities.last!.endDate, activities: activities, minutes: 5)
 
-        let actQuartile = Utils.getQuartiles(values: allEpochs.compactMap({$0.meanActivity}) )
+        let actQuartile = Utils.getQuartiles(values: allEpochs.compactMap({$0.sumActivity}) )
         let hrQuartile = Utils.getQuartiles(values: allEpochs.compactMap({$0.meanHR}) )
 
         logger.log(";\(actQuartile.firstQuartile);\(actQuartile.median);\(actQuartile.thirdQuartile)")
         logger.log(";\(hrQuartile.firstQuartile);\(hrQuartile.median);\(hrQuartile.thirdQuartile)")
         
         for (index, epoch) in epochs.enumerated() {
-            logger.log(";\(epoch.startDate.formatted());\(epoch.endDate.formatted());\(epoch.meanActivity);\(epoch.meanHR)")
+            logger.log(";\(epoch.startDate.formatted());\(epoch.endDate.formatted());\(epoch.sumActivity);\(epoch.meanHR)")
             
-//            if epoch.records.contains(where: {$0.startDate.formatted() == "26/08/2022, 8:51"}){
-//                logger.log("")
-//            }
+            if epoch.records.contains(where: {$0.startDate.formatted() == "28/08/2022, 9:23"}){
+                logger.log("")
+            }
 
-            if epoch.meanActivity.isNaN || epoch.meanActivity < actQuartile.firstQuartile &&
+            if epoch.sumActivity < actQuartile.firstQuartile &&
                 epochs.indices.contains(index - 1) && epoch.startDate.timeIntervalSinceReferenceDate - epochs[index - 1].endDate.timeIntervalSinceReferenceDate < 600 {
                 if startDate == nil {
-                    startDate = epochs.indices.contains(index - 1) ? epochs[index - 1].endDate : epoch.startDate
+                    startDate = epoch.startDate
                 }
                 lowActivityEpochs.append(epoch)
-//            } else if epochs.indices.contains(index - 1) && epochs[index - 1].meanActivity < actQuartile.firstQuartile &&
-//                        epoch.meanActivity < actQuartile.median {
-//                if startDate != nil {
-//                    lowActivityEpochs.append(epoch)
-//                }
             } else {
                 if startDate != nil && !lowActivityEpochs.isEmpty {
                     
-                    if (lowActivityEpochs.last!.endDate.timeIntervalSinceReferenceDate) - startDate!.timeIntervalSinceReferenceDate > Constants.SLEEP_DURATION {
-                        tmpSleeps.append(Sleep(startDate: startDate!, endDate: epoch.startDate, epochs: []))
+                    if (lowActivityEpochs.last!.endDate.timeIntervalSinceReferenceDate) - startDate!.timeIntervalSinceReferenceDate > Constants.MINI_SLEEP_DURATION {
+                        tmpSleeps.append(Sleep(startDate: startDate!, endDate: epochs[index - 1].endDate, epochs: []))
                     }
                     startDate = nil
                     lowActivityEpochs = []
                 }
             }
-            if epoch == epochs.last && startDate != nil && epoch.endDate.timeIntervalSinceReferenceDate - startDate!.timeIntervalSinceReferenceDate > Constants.SLEEP_DURATION {
-                tmpSleeps.append(Sleep(startDate: startDate!, endDate: epoch.endDate, epochs: []))
+            if epoch == epochs.last && startDate != nil && epoch.endDate.timeIntervalSinceReferenceDate - startDate!.timeIntervalSinceReferenceDate > Constants.MINI_SLEEP_DURATION {
+                tmpSleeps.append(Sleep(startDate: startDate!, endDate: epochs[index - 1].endDate, epochs: []))
             }
         }
         let sleeps: [Sleep] = proccesPotentialSleeps(potentialSleeps: tmpSleeps, epochs: epochs, actQuartile: actQuartile, hrQuartile: hrQuartile)
         return sleeps
     }
     private func proccesPotentialSleeps(potentialSleeps: [Sleep], epochs: [Epoch], actQuartile: (firstQuartile: Double, median: Double, thirdQuartile: Double), hrQuartile: (firstQuartile: Double, median: Double, thirdQuartile: Double)) -> [Sleep] {
-        var sleeps: [Sleep] = []
-        sleeps = getConcatenatedSleeps(sleeps: potentialSleeps)
-        logger.log("")
-        sleeps = getSleepEpochs(sleeps: sleeps, epochs: epochs)
-
-        logger.log("after Concatenated:")
-        for result in sleeps {
-            let meanActivity = result.epochs.filter({!$0.meanActivity.isNaN }).map {$0.meanActivity}.reduce(0, +)
+        logger.log(";before filter sleep duration \(potentialSleeps.count)")
+        for result in potentialSleeps {
+            let meanActivity = result.epochs.filter({!$0.sumActivity.isNaN }).map {$0.sumActivity}.reduce(0, +)
             logger.log("\(result.startDate.formatted());\(result.endDate.formatted());\(meanActivity);\(result.heartRateAverage)")
         }
+        var concatSleeps = getConcatenatedSleeps(sleeps: potentialSleeps)
+        concatSleeps = concatSleeps.filter({$0.getDuration() >= Constants.SLEEP_DURATION})
 
-        logger.log(";before filter sleep duration \(sleeps.count)")
-        sleeps = sleeps.filter( {$0.getDuration() >= 1500} )
-        logger.log(";after filter sleep duration \(sleeps.count)")
-//        sleeps = sleeps.filter( {$0.heartRateAverage < hrQuartile.thirdQuartile} )
-        logger.log(";after filter hr quart Q3 \(sleeps.count)")
-//        sleeps = filterSleepByHr(sleeps: sleeps, epochs: epochs)
+        var sleeps: [Sleep] = getValidatedSleeps(potentialSleeps: potentialSleeps, concatenatedSleeps: concatSleeps)
+        sleeps = getSleepEpochs(sleeps: sleeps, epochs: epochs)
+
+        logger.log("after Concatenated: \(sleeps.count)")
+
         sleeps = filterByLowActivityPercent(sleeps: sleeps, actQuartile: actQuartile, hrQuartile: hrQuartile)
-        logger.log(";result:")
+        logger.log(";after percent: \(sleeps.count)")
         for result in sleeps {
-            let meanActivity = result.epochs.filter({!$0.meanActivity.isNaN }).map {$0.meanActivity}.reduce(0, +)
-
-            logger.log(";\(result.startDate.formatted());\(result.endDate.formatted());\(meanActivity);\(result.heartRateAverage)")
+            let meanActivity = result.epochs.filter({!$0.sumActivity.isNaN }).map {$0.sumActivity}.reduce(0, +)
+            logger.log("\(result.startDate.formatted());\(result.endDate.formatted());\(meanActivity);\(result.heartRateAverage)")
         }
         return sleeps
     }
@@ -170,7 +161,7 @@ class SleepDetector: ObservableObject {
             let firstEpoch = epochs.firstIndex {$0.startDate >= sleep.startDate}!
             let lastEpoch = (epochs.firstIndex {$0.endDate >= sleep.endDate})!
             if firstEpoch < lastEpoch {
-                let sleepEpochs = Array(epochs[firstEpoch..<lastEpoch])
+                let sleepEpochs = Array(epochs[firstEpoch...lastEpoch])
                 let newSleep = Sleep(startDate: sleep.startDate, endDate: sleep.endDate, epochs: sleepEpochs)
                 result.append(newSleep)
             }
@@ -181,7 +172,7 @@ class SleepDetector: ObservableObject {
     private func filterByLowActivityPercent(sleeps: [Sleep], actQuartile: (firstQuartile: Double, median: Double, thirdQuartile: Double), hrQuartile: (firstQuartile: Double, median: Double, thirdQuartile: Double)) -> [Sleep] {
         var result: [Sleep] = []
         for sleep in sleeps {
-            let sumActivity = sleep.epochs.filter({!$0.meanActivity.isNaN }).map {$0.meanActivity}.reduce(0, +)
+            let sumActivity = sleep.epochs.filter({!$0.sumActivity.isNaN }).map {$0.sumActivity}.reduce(0, +)
 
             let percent = 3600.0 * Double(sumActivity) / sleep.getDuration()
             
@@ -195,23 +186,32 @@ class SleepDetector: ObservableObject {
         }
         return result
     }
-    
-    private func getConcatenatedSleeps(sleeps: [Sleep]) -> [Sleep] {
+    private func getValidatedSleeps(potentialSleeps: [Sleep], concatenatedSleeps: [Sleep]) -> [Sleep] {
         var result: [Sleep] = []
-        for (index, sleep) in sleeps.enumerated() {
-            if sleeps.indices.contains(index - 1) {
-                if sleep.startDate.timeIntervalSinceReferenceDate - (result.last?.endDate.timeIntervalSinceReferenceDate)! < 300 {
-                    let newSleep = Sleep(startDate: result.last!.startDate, endDate: sleep.endDate, epochs: [])
-                    result.removeLast()
-                    result.append(newSleep)
-                } else {
-                    result.append(sleep)
-                }
-            } else {
-                result.append(sleep)
-            }
+        for concatSleep in concatenatedSleeps {
+            let validatedSleeps = potentialSleeps.filter({$0.startDate >= concatSleep.startDate && $0.endDate <= concatSleep.endDate})
+            result.append(contentsOf: validatedSleeps)
         }
         return result
+    }
+    
+    private func getConcatenatedSleeps(sleeps: [Sleep]) -> [Sleep] {
+        var concatenatedSleeps: [Sleep] = []
+        
+        for (index, sleep) in sleeps.enumerated() {
+            if sleeps.indices.contains(index - 1) {
+                if sleep.startDate.timeIntervalSinceReferenceDate - (concatenatedSleeps.last?.endDate.timeIntervalSinceReferenceDate)! < Constants.CONCATENATE_SLEEP_DURATION {
+                    let newSleep = Sleep(startDate: concatenatedSleeps.last!.startDate, endDate: sleep.endDate, epochs: [])
+                    concatenatedSleeps.removeLast()
+                    concatenatedSleeps.append(newSleep)
+                } else {
+                    concatenatedSleeps.append(sleep)
+                }
+            } else {
+                concatenatedSleeps.append(sleep)
+            }
+        }
+        return concatenatedSleeps
     }
     
     private func getStartDate(_ currentDate: Date) -> Date {
