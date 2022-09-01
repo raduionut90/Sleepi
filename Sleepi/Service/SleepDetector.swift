@@ -98,7 +98,8 @@ class SleepDetector: ObservableObject {
             if epoch.sumActivity < actQuartile.firstQuartile {
                 if epochs.indices.contains(index - 1) && epoch.startDate.timeIntervalSinceReferenceDate - epochs[index - 1].endDate.timeIntervalSinceReferenceDate < 600 {
                     if startDate == nil {
-                        startDate = epochs[index - 1].records.last!.endDate
+//                        startDate = epochs[index - 1].records.last!.endDate
+                        startDate = epoch.startDate
                     }
                     lowActivityEpochs.append(epoch)
                 } else if !epochs.indices.contains(index - 1) {

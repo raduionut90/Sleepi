@@ -291,22 +291,6 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "7EB4B158-6316-46CF-8BB1-32F19022F108"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Sleepi/Service/Utils.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "53"
-            endingLineNumber = "53"
-            landmarkName = "getQuartiles(values:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
             uuid = "21A76E88-E93C-4473-BA1B-DD52591ABD49"
             shouldBeEnabled = "No"
             ignoreCount = "0"
@@ -380,8 +364,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "75"
             endingLineNumber = "75"
-            landmarkName = "SleepManager"
-            landmarkType = "3">
+            landmarkName = "updateEpochsClasification()"
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -444,7 +428,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "73"
             endingLineNumber = "73"
-            landmarkName = "refreshSleeps(date:)"
+            landmarkName = "updateEpochsClasification()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -506,8 +490,8 @@
             filePath = "Sleepi/Service/SleepDetector.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "221"
-            endingLineNumber = "221"
+            startingLineNumber = "222"
+            endingLineNumber = "222"
             landmarkName = "getConcatenatedSleeps(sleeps:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -538,8 +522,8 @@
             filePath = "Sleepi/Service/SleepDetector.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "155"
-            endingLineNumber = "155"
+            startingLineNumber = "156"
+            endingLineNumber = "156"
             landmarkName = "filterSleepByHr(sleeps:epochs:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -554,8 +538,8 @@
             filePath = "Sleepi/Service/SleepDetector.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "109"
-            endingLineNumber = "109"
+            startingLineNumber = "110"
+            endingLineNumber = "110"
             landmarkName = "identifySleeps(activities:lastSleepEndDate:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -586,8 +570,8 @@
             filePath = "Sleepi/Service/SleepDetector.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "125"
-            endingLineNumber = "125"
+            startingLineNumber = "126"
+            endingLineNumber = "126"
             landmarkName = "proccesPotentialSleeps(potentialSleeps:epochs:actQuartile:hrQuartile:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -596,38 +580,6 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "58243DED-46E4-4B65-9E6E-56DAAFA4A0FA"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Sleepi/Service/SleepDetector.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "111"
-            endingLineNumber = "111"
-            landmarkName = "identifySleeps(activities:lastSleepEndDate:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "F9571FA4-12EA-4BCD-AC20-A67A6F56255D"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Sleepi/Service/SleepDetector.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "113"
-            endingLineNumber = "113"
-            landmarkName = "identifySleeps(activities:lastSleepEndDate:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "D4911BAD-ED0A-46F9-88C9-A0E247939238"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
@@ -643,6 +595,38 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
+            uuid = "F9571FA4-12EA-4BCD-AC20-A67A6F56255D"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Sleepi/Service/SleepDetector.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "114"
+            endingLineNumber = "114"
+            landmarkName = "identifySleeps(activities:lastSleepEndDate:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "D4911BAD-ED0A-46F9-88C9-A0E247939238"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Sleepi/Service/SleepDetector.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "113"
+            endingLineNumber = "113"
+            landmarkName = "identifySleeps(activities:lastSleepEndDate:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
             uuid = "0A97F5F1-EEC4-4CE4-95A9-BA96D0BFF43D"
             shouldBeEnabled = "No"
             ignoreCount = "0"
@@ -650,8 +634,8 @@
             filePath = "Sleepi/Service/SleepDetector.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "116"
-            endingLineNumber = "116"
+            startingLineNumber = "117"
+            endingLineNumber = "117"
             landmarkName = "identifySleeps(activities:lastSleepEndDate:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -794,8 +778,8 @@
             filePath = "Sleepi/Service/SleepDetector.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "185"
-            endingLineNumber = "185"
+            startingLineNumber = "186"
+            endingLineNumber = "186"
             landmarkName = "filterByLowActivityPercent(sleeps:actQuartile:hrQuartile:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -810,8 +794,8 @@
             filePath = "Sleepi/Service/SleepDetector.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "188"
-            endingLineNumber = "188"
+            startingLineNumber = "189"
+            endingLineNumber = "189"
             landmarkName = "filterByLowActivityPercent(sleeps:actQuartile:hrQuartile:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -826,8 +810,8 @@
             filePath = "Sleepi/Service/SleepDetector.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "211"
-            endingLineNumber = "211"
+            startingLineNumber = "212"
+            endingLineNumber = "212"
             landmarkName = "getConcatenatedSleeps(sleeps:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -842,8 +826,8 @@
             filePath = "Sleepi/Service/SleepDetector.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "212"
-            endingLineNumber = "212"
+            startingLineNumber = "213"
+            endingLineNumber = "213"
             landmarkName = "getConcatenatedSleeps(sleeps:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -860,7 +844,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "74"
             endingLineNumber = "74"
-            landmarkName = "refreshSleeps(date:)"
+            landmarkName = "updateEpochsClasification()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -874,8 +858,8 @@
             filePath = "Sleepi/Service/SleepDetector.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "119"
-            endingLineNumber = "119"
+            startingLineNumber = "120"
+            endingLineNumber = "120"
             landmarkName = "identifySleeps(activities:lastSleepEndDate:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -890,8 +874,8 @@
             filePath = "Sleepi/Service/SleepDetector.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "214"
-            endingLineNumber = "214"
+            startingLineNumber = "215"
+            endingLineNumber = "215"
             landmarkName = "getConcatenatedSleeps(sleeps:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -906,8 +890,8 @@
             filePath = "Sleepi/Service/SleepDetector.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "145"
-            endingLineNumber = "145"
+            startingLineNumber = "146"
+            endingLineNumber = "146"
             landmarkName = "proccesPotentialSleeps(potentialSleeps:epochs:actQuartile:hrQuartile:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1146,8 +1130,8 @@
             filePath = "Sleepi/Service/SleepDetector.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "135"
-            endingLineNumber = "135"
+            startingLineNumber = "136"
+            endingLineNumber = "136"
             landmarkName = "proccesPotentialSleeps(potentialSleeps:epochs:actQuartile:hrQuartile:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1162,8 +1146,8 @@
             filePath = "Sleepi/Service/SleepDetector.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "137"
-            endingLineNumber = "137"
+            startingLineNumber = "138"
+            endingLineNumber = "138"
             landmarkName = "proccesPotentialSleeps(potentialSleeps:epochs:actQuartile:hrQuartile:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1213,6 +1197,86 @@
             startingLineNumber = "77"
             endingLineNumber = "77"
             landmarkName = "getEpochsFromActivitiesByTimeInterval(start:end:activities:minutes:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "E839B146-DDC6-45E8-9532-E2883DB8A3D8"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Sleepi/Service/SleepDetector.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "55"
+            endingLineNumber = "55"
+            landmarkName = "performSleepDetection()"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "E839B146-DDC6-45E8-9532-E2883DB8A3D8 - af64f010131185c9"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(9) suspend resume partial function for closure #1 @Sendable () async throws -&gt; () in Sleepi.SleepDetector.performSleepDetection() -&gt; ()"
+                  moduleName = "Sleepi"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/radu/Desktop/Xcode%20Projects/Sleepi/Sleepi/Service/SleepDetector.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "55"
+                  endingLineNumber = "55"
+                  offsetFromSymbolStart = "3620">
+               </Location>
+               <Location
+                  uuid = "E839B146-DDC6-45E8-9532-E2883DB8A3D8 - 9a37f9856a9c6834"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(11) suspend resume partial function for closure #1 @Sendable () async throws -&gt; () in Sleepi.SleepDetector.performSleepDetection() -&gt; ()"
+                  moduleName = "Sleepi"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/radu/Desktop/Xcode%20Projects/Sleepi/Sleepi/Service/SleepDetector.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "55"
+                  endingLineNumber = "55"
+                  offsetFromSymbolStart = "1512">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "33059FDC-E0C4-4552-AB03-4B88A09D36BB"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Sleepi/Service/Utils.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "55"
+            endingLineNumber = "55"
+            landmarkName = "getQuartiles(values:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "E4143124-421E-4C32-AD87-51B916EC7BFE"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Sleepi/Service/SleepDetector.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "49"
+            endingLineNumber = "49"
+            landmarkName = "performSleepDetection()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

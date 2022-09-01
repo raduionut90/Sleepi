@@ -49,11 +49,11 @@ class Utils {
     
     static func getQuartiles(values: [Double]) -> (firstQuartile: Double, median: Double, thirdQuartile: Double) {
         var result: [Double] = [];
-        if values.count < 3 {
+
+        let sortedValues = values.filter( {$0 != 0}).filter({ !$0.isNaN }).sorted(by: <)
+        if sortedValues.count < 3 {
             return (0.0, 0.0, 0.0)
         }
-        let sortedValues = values.filter( {$0 != 0}).filter({ !$0.isNaN }).sorted(by: <)
-
         for quartileType in 1...3 {
             let length = sortedValues.count + 1
             let quartileSize: Double = (Double(length) * (Double(quartileType) * 25.0 / 100.0)) - 1.0
@@ -70,7 +70,7 @@ class Utils {
         var epochs: [Epoch] = []
         var firstIndex = 0
         while firstIndex <= activities.indices.last! {
-            let startEpoch: Date = firstIndex == activities.indices.first ? start : activities[firstIndex].startDate
+            let startEpoch: Date = activities[firstIndex].startDate
             let endPeriod = Calendar.current.date(byAdding: .minute, value: minutes, to: startEpoch)!
             let lastIndex = activities.lastIndex(where: {$0.startDate < endPeriod} )!
             let endEpoch = activities.indices.contains(lastIndex + 1) ? activities[lastIndex + 1].startDate : end
