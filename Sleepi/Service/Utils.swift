@@ -69,17 +69,16 @@ class Utils {
     static func getEpochsFromActivitiesByTimeInterval(start: Date, end: Date, activities: [Records], minutes: Int) -> [Epoch]{
         var epochs: [Epoch] = []
         var firstIndex = 0
-        while true {
-            let startDate: Date = activities[firstIndex].startDate
-            let endDate = Calendar.current.date(byAdding: .minute, value: minutes, to: startDate)!
-            let lastIndex = activities.lastIndex(where: {$0.startDate < endDate} )!
-            let epoch: Epoch = Epoch(start: activities[firstIndex].startDate, end: activities.indices.contains(lastIndex + 1) ?
-                                     activities[lastIndex + 1].startDate : activities[lastIndex].endDate
-                                     , records: Array(activities[firstIndex...lastIndex]))
+        while firstIndex <= activities.indices.last! {
+            let startEpoch: Date = firstIndex == activities.indices.first ? start : activities[firstIndex].startDate
+            let endPeriod = Calendar.current.date(byAdding: .minute, value: minutes, to: startEpoch)!
+            let lastIndex = activities.lastIndex(where: {$0.startDate < endPeriod} )!
+            let endEpoch = activities.indices.contains(lastIndex + 1) ? activities[lastIndex + 1].startDate : end
+            let epoch: Epoch = Epoch(start: startEpoch, end: endEpoch, records: Array(activities[firstIndex...lastIndex]))
             epochs.append(epoch)
-            if lastIndex == activities.indices.last {
-                break
-            }
+//            if lastIndex == activities.indices.last {
+//                break
+//            }
             firstIndex = lastIndex + 1
         }
 //        let recordsCount = epochs.flatMap({$0.records})

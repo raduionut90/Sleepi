@@ -46,12 +46,16 @@ class SleepDetector: ObservableObject {
                         
                         let activities: [Records] = Utils.getActivitiesFromRawData(heartRates: heartRates, activeEnergy: activeEnergy)
                         
-                        logger.log("last sleep end \(lastSleepEndDate)")
+                        if !activities.isEmpty {
+                            logger.log("last sleep end \(lastSleepEndDate)")
 
-                        let potentialSleeps = identifySleeps(activities: activities, lastSleepEndDate: lastSleepEndDate)
-                        
-                        for sleep in potentialSleeps {
-                            try await healthStore.saveSleep(startTime: sleep.startDate, endTime: sleep.endDate)
+                            let potentialSleeps = identifySleeps(activities: activities, lastSleepEndDate: lastSleepEndDate)
+                            
+                            for sleep in potentialSleeps {
+                                try await healthStore.saveSleep(startTime: sleep.startDate, endTime: sleep.endDate)
+                            }
+                        } else {
+                            logger.log("no activities \(aDayBefore) - \(currentDate)")
                         }
                         
                         currentDate = aDayBefore
@@ -91,24 +95,28 @@ class SleepDetector: ObservableObject {
                 logger.log("")
             }
 
-            if epoch.sumActivity < actQuartile.firstQuartile &&
-                epochs.indices.contains(index - 1) && epoch.startDate.timeIntervalSinceReferenceDate - epochs[index - 1].endDate.timeIntervalSinceReferenceDate < 600 {
-                if startDate == nil {
+            if epoch.sumActivity < actQuartile.firstQuartile {
+                if epochs.indices.contains(index - 1) && epoch.startDate.timeIntervalSinceReferenceDate - epochs[index - 1].endDate.timeIntervalSinceReferenceDate < 600 {
+                    if startDate == nil {
+                        startDate = epochs[index - 1].records.last!.endDate
+                    }
+                    lowActivityEpochs.append(epoch)
+                } else if !epochs.indices.contains(index - 1) {
                     startDate = epoch.startDate
+                    lowActivityEpochs.append(epoch)
                 }
-                lowActivityEpochs.append(epoch)
             } else {
                 if startDate != nil && !lowActivityEpochs.isEmpty {
                     
                     if (lowActivityEpochs.last!.endDate.timeIntervalSinceReferenceDate) - startDate!.timeIntervalSinceReferenceDate > Constants.MINI_SLEEP_DURATION {
-                        tmpSleeps.append(Sleep(startDate: startDate!, endDate: epochs[index - 1].records.last!.endDate, epochs: []))
+                        tmpSleeps.append(Sleep(startDate: startDate!, endDate: epochs[index - 1].endDate, epochs: []))
                     }
                     startDate = nil
                     lowActivityEpochs = []
                 }
             }
             if epoch == epochs.last && startDate != nil && epoch.endDate.timeIntervalSinceReferenceDate - startDate!.timeIntervalSinceReferenceDate > Constants.MINI_SLEEP_DURATION {
-                tmpSleeps.append(Sleep(startDate: startDate!, endDate: epochs[index - 1].records.last!.endDate, epochs: []))
+                tmpSleeps.append(Sleep(startDate: startDate!, endDate: epochs[index - 1].endDate, epochs: []))
             }
         }
         let sleeps: [Sleep] = proccesPotentialSleeps(potentialSleeps: tmpSleeps, epochs: epochs, actQuartile: actQuartile, hrQuartile: hrQuartile)

@@ -53,7 +53,7 @@ class HealthStore {
             .predicateForSamples(
                 withStart: startDate,
                 end: endDate,
-                options: .strictEndDate)
+                options: [.strictStartDate, .strictEndDate])
         
         /// Set sorting by date.
         let sortDescriptor = NSSortDescriptor(

@@ -44,18 +44,11 @@ class SleepManager: ObservableObject {
                     
                     let rawSleeps: [HKCategorySample] = await healthStore.getSleeps(startTime: startDate, endTime: endDate)
                     for rawSleep in rawSleeps {
-                        let rawSleepEnd = Calendar.current.date(byAdding: .second, value: 1, to: rawSleep.endDate)!
-                        let heartRates = await healthStore.getSamples(startDate: rawSleep.startDate, endDate: rawSleepEnd, type: .heartRate)
-                        let activeEnergys = await healthStore.getSamples(startDate: rawSleep.startDate, endDate: rawSleepEnd, type: .activeEnergyBurned)
+                        let heartRates = await healthStore.getSamples(startDate: rawSleep.startDate, endDate: rawSleep.endDate, type: .heartRate)
+                        let activeEnergys = await healthStore.getSamples(startDate: rawSleep.startDate, endDate: rawSleep.endDate, type: .activeEnergyBurned)
                         let activities: [Records] = Utils.getActivitiesFromRawData(heartRates: heartRates, activeEnergy: activeEnergys)
-                        if rawSleep.endDate != activities.last?.endDate {
-                            print("rawSle \(rawSleep.endDate)")
-                            print("hr last: \(heartRates.last!.endDate)")
-                            print("actr last: \(activeEnergys.last!.endDate)")
-                            print("acts last: \(activities.last!.endDate)")
-                            print("")
-                        }
                         let epochs = Utils.getEpochsFromActivitiesByTimeInterval(start: rawSleep.startDate, end: rawSleep.endDate, activities: activities, minutes: 10)
+
                         let sleep: Sleep = Sleep(startDate: rawSleep.startDate, endDate: rawSleep.endDate, epochs: epochs)
                         tmpSleeps.append(sleep)
                         print("")
