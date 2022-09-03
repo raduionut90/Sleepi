@@ -9,12 +9,13 @@ import Foundation
 import HealthKit
 import os
 
+private let logger = Logger(
+    subsystem: Bundle.main.bundleIdentifier!,
+    category: "SleepManager"
+)
+
 @MainActor
 class SleepManager: ObservableObject {
-    private static let logger = Logger(
-        subsystem: Bundle.main.bundleIdentifier!,
-        category: String(describing: SleepManager.self)
-    )
     
     private var healthStore: HealthStore?
     @Published var nsHeartRateAverage: Double = 0.0
@@ -74,6 +75,8 @@ class SleepManager: ObservableObject {
         let hrQuartiles = Utils.getQuartiles(values: allSleepsEpochs.map {$0.meanHR} )
         
         for epoch in allSleepsEpochs {
+            logger.log(";\(epoch.startDate.formatted());\(epoch.endDate.formatted());\(epoch.sumActivity);\(epoch.meanHR)")
+
             let maxHr = epoch.records.compactMap({ $0.hr }).max() ?? epoch.meanHR
             let minHr = epoch.records.compactMap({ $0.hr }).min() ?? epoch.meanHR
             if epoch.sumActivity <= activityQuartiles.firstQuartile && minHr <= hrQuartiles.firstQuartile {
@@ -153,7 +156,6 @@ class SleepManager: ObservableObject {
         }
         return sum / Double(sleeps.count)
     }
-    
 }
 
 enum SleepType: Double {
@@ -161,3 +163,4 @@ enum SleepType: Double {
     case Nap
     case All
 }
+

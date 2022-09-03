@@ -95,27 +95,27 @@ class HealthStore {
         // we now push the object to HealthStore
         
         if let healthStore = healthStore {
-  
+            
             let res: ()? = try? await healthStore.save(object)
             guard res != nil else {
                 logger.error("ERROR: Sleep has not been saved")
                 throw HKError(.errorDatabaseInaccessible)
             }
             
-//            healthStore.save(object, withCompletion: { (success, error) -> Void in
-//
-//                if error != nil {
-//                    logger.error("ERROR: HealthStore.saveSleepAnalysis: \(error.debugDescription)")
-//                    return
-//                }
-//
-//                if success {
-//                    logger.log("New sleep was saved in Healthkit \(startTime) - \(endTime)")
-//                } else {
-//                    // It was an error again
-//                    logger.error("ERROR: HealthStore.saveSleepAnalysis: Data was not saved for sleep startTime \(startTime) endTime: \(endTime)")
-//                }
-//            })
+            //            healthStore.save(object, withCompletion: { (success, error) -> Void in
+            //
+            //                if error != nil {
+            //                    logger.error("ERROR: HealthStore.saveSleepAnalysis: \(error.debugDescription)")
+            //                    return
+            //                }
+            //
+            //                if success {
+            //                    logger.log("New sleep was saved in Healthkit \(startTime) - \(endTime)")
+            //                } else {
+            //                    // It was an error again
+            //                    logger.error("ERROR: HealthStore.saveSleepAnalysis: Data was not saved for sleep startTime \(startTime) endTime: \(endTime)")
+            //                }
+            //            })
         }
     }
     
@@ -139,12 +139,12 @@ class HealthStore {
                     
                     for item in result {
                         if let sample = item as? HKCategorySample {
-//                            print(sample.sourceRevision.source)
-//                            print("\(sample.startDate.formatted());\(sample.endDate.formatted());\(sample.sourceRevision.source)")
+                            //                            print(sample.sourceRevision.source)
+                            //                            print("\(sample.startDate.formatted());\(sample.endDate.formatted());\(sample.sourceRevision.source)")
                             
                             if sample.sourceRevision.source.bundleIdentifier == Bundle.main.bundleIdentifier {
                                 sleeps.append(sample)
-//                                print("\(sleep.startDate.formatted());\(sleep.endDate.formatted())")
+                                //                                print("\(sleep.startDate.formatted());\(sleep.endDate.formatted())")
                             }
                         }
                     }
@@ -157,4 +157,5 @@ class HealthStore {
             }
         }
     }
+    
 }
