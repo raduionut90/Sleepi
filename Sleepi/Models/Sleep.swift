@@ -38,20 +38,22 @@ struct Sleep: Hashable, Identifiable, Equatable {
 //            result.append(self.activities.first!.startDate.timeIntervalSinceReferenceDate - self.startDate.timeIntervalSinceReferenceDate)
 //        }
         
-        for epoch in epochs {
+        for (index, epoch) in epochs.enumerated() {
             switch stage {
             case .DeepSleep:
                 if epoch.sleepClasification == .DeepSleep {
-                    result.append(epoch.endDate.timeIntervalSinceReferenceDate - epoch.startDate.timeIntervalSinceReferenceDate)
+                    let timeInterval = epochs.indices.contains(index + 1) ? epochs[index + 1].startDate.timeIntervalSinceReferenceDate - epoch.startDate.timeIntervalSinceReferenceDate : self.endDate.timeIntervalSinceReferenceDate - epoch.startDate.timeIntervalSinceReferenceDate
+                    result.append(timeInterval)
                 }
             case .LightSleep:
                 if epoch.sleepClasification == .LightSleep {
-                    result.append(epoch.endDate.timeIntervalSinceReferenceDate - epoch.startDate.timeIntervalSinceReferenceDate)
+                    let timeInterval = epochs.indices.contains(index + 1) ? epochs[index + 1].startDate.timeIntervalSinceReferenceDate - epoch.startDate.timeIntervalSinceReferenceDate : self.endDate.timeIntervalSinceReferenceDate - epoch.startDate.timeIntervalSinceReferenceDate
+                    result.append(timeInterval)
                 }
             case .RemSleep:
                 if epoch.sleepClasification == .RemSleep {
-                    result.append(epoch.endDate.timeIntervalSinceReferenceDate - epoch.startDate.timeIntervalSinceReferenceDate)
-                }
+                    let timeInterval = epochs.indices.contains(index + 1) ? epochs[index + 1].startDate.timeIntervalSinceReferenceDate - epoch.startDate.timeIntervalSinceReferenceDate : self.endDate.timeIntervalSinceReferenceDate - epoch.startDate.timeIntervalSinceReferenceDate
+                    result.append(timeInterval)                }
             case .Awake:
                 ()
             }

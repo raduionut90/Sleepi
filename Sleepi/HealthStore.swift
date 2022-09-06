@@ -75,7 +75,10 @@ class HealthStore {
                     }
                     
                     if let result = tmpResult as? [HKQuantitySample] {
-                        continuation.resume(returning: result)
+                        let desiredSources = result.filter {
+                            $0.sourceRevision.source.bundleIdentifier.starts(with: "com.apple.health")
+                        }
+                        continuation.resume(returning: desiredSources)
                     }
                 }
             
@@ -101,21 +104,6 @@ class HealthStore {
                 logger.error("ERROR: Sleep has not been saved")
                 throw HKError(.errorDatabaseInaccessible)
             }
-            
-            //            healthStore.save(object, withCompletion: { (success, error) -> Void in
-            //
-            //                if error != nil {
-            //                    logger.error("ERROR: HealthStore.saveSleepAnalysis: \(error.debugDescription)")
-            //                    return
-            //                }
-            //
-            //                if success {
-            //                    logger.log("New sleep was saved in Healthkit \(startTime) - \(endTime)")
-            //                } else {
-            //                    // It was an error again
-            //                    logger.error("ERROR: HealthStore.saveSleepAnalysis: Data was not saved for sleep startTime \(startTime) endTime: \(endTime)")
-            //                }
-            //            })
         }
     }
     

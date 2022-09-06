@@ -77,10 +77,10 @@ class SleepDetector: ObservableObject {
         
         var startDate: Date?
         var lowActivityEpochs: [Epoch] = []
-//        let epochs = Utils.getEpochsFromActivities(activities: Array(activities[firstActivityIndex...]), epochLenght: 1)
+
         let relevantActivities = Array(activities[firstActivityIndex...])
-        let epochs = Utils.getEpochsFromActivitiesByTimeInterval(start: relevantActivities.first!.startDate, end: relevantActivities.last!.endDate, activities: relevantActivities, minutes: 5)
-        let allEpochs = Utils.getEpochsFromActivitiesByTimeInterval(start: activities.first!.startDate, end: activities.last!.endDate, activities: activities, minutes: 5)
+        let epochs = Utils.getEpochs(activities: relevantActivities, minutes: 5)
+        let allEpochs = Utils.getEpochs(activities: activities, minutes: 5)
 
         let actQuartile = Utils.getQuartiles(values: allEpochs.compactMap({$0.sumActivity}) )
         let hrQuartile = Utils.getQuartiles(values: allEpochs.compactMap({$0.meanHR}) )
@@ -89,17 +89,21 @@ class SleepDetector: ObservableObject {
         logger.log(";\(hrQuartile.firstQuartile);\(hrQuartile.median);\(hrQuartile.thirdQuartile)")
         
         for (index, epoch) in epochs.enumerated() {
-            logger.log(";\(epoch.startDate.formatted());\(epoch.endDate.formatted());\(epoch.sumActivity);\(epoch.meanHR)")
-            
-            if epoch.records.contains(where: {$0.startDate.formatted() == "28/08/2022, 9:23"}){
-                logger.log("")
-            }
+//            logger.log(";\(epoch.startDate.formatted());\(epoch.endDate.formatted());\(epoch.sumActivity);\(epoch.meanHR)")
+            for record in epoch.records {
+                logger.log(";\(epoch.startDate.formatted());\(epoch.endDate.formatted());\(epoch.sumActivity);\(epoch.meanHR);\(record.startDate.formatted());\(record.endDate.formatted());\(record.actEng ?? 0);\(record.hr ?? 999)")
 
-            if epoch.sumActivity < actQuartile.firstQuartile {
+            }
+            
+//            if epoch.records.contains(where: {$0.startDate.formatted() == "05/09/2022, 21:57"}){
+//                logger.log("")
+//            }
+
+            if epoch.sumActivity < 1 {
                 if epochs.indices.contains(index - 1) && epoch.startDate.timeIntervalSinceReferenceDate - epochs[index - 1].endDate.timeIntervalSinceReferenceDate < 600 {
                     if startDate == nil {
-//                        startDate = epochs[index - 1].records.last!.endDate
-                        startDate = epoch.startDate
+                        startDate = epochs[index - 1].records.last!.endDate
+//                        startDate = epoch.startDate
                     }
                     lowActivityEpochs.append(epoch)
                 } else if !epochs.indices.contains(index - 1) {
@@ -110,14 +114,14 @@ class SleepDetector: ObservableObject {
                 if startDate != nil && !lowActivityEpochs.isEmpty {
                     
                     if (lowActivityEpochs.last!.endDate.timeIntervalSinceReferenceDate) - startDate!.timeIntervalSinceReferenceDate > Constants.MINI_SLEEP_DURATION {
-                        tmpSleeps.append(Sleep(startDate: startDate!, endDate: epochs[index - 1].endDate, epochs: []))
+                        tmpSleeps.append(Sleep(startDate: startDate!, endDate: epoch.startDate, epochs: []))
                     }
                     startDate = nil
                     lowActivityEpochs = []
                 }
             }
             if epoch == epochs.last && startDate != nil && epoch.endDate.timeIntervalSinceReferenceDate - startDate!.timeIntervalSinceReferenceDate > Constants.MINI_SLEEP_DURATION {
-                tmpSleeps.append(Sleep(startDate: startDate!, endDate: epochs[index - 1].endDate, epochs: []))
+                tmpSleeps.append(Sleep(startDate: startDate!, endDate: epoch.startDate, epochs: []))
             }
         }
         let sleeps: [Sleep] = proccesPotentialSleeps(potentialSleeps: tmpSleeps, epochs: epochs, actQuartile: actQuartile, hrQuartile: hrQuartile)

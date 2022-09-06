@@ -45,8 +45,8 @@ struct LineChartView: View {
     
     fileprivate func processEpochs(_ sleep: Sleep, _ path: inout Path, _ offsetX: inout Double,_ offsetY: inout Double, _ screenWidth: CGFloat) {
 
-        for epoch in sleep.epochs {
-            let interval: Double = epoch.endDate.timeIntervalSinceReferenceDate - epoch.startDate.timeIntervalSinceReferenceDate
+        for (index, epoch) in sleep.epochs.enumerated() {
+            let interval: Double = sleep.epochs.indices.contains(index + 1) ? sleep.epochs[index + 1].startDate.timeIntervalSinceReferenceDate - epoch.startDate.timeIntervalSinceReferenceDate : sleep.endDate.timeIntervalSinceReferenceDate - epoch.startDate.timeIntervalSinceReferenceDate
             
             let newOffsetY = epoch.sleepClasification!.rawValue
             if offsetY != newOffsetY{

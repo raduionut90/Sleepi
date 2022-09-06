@@ -50,7 +50,7 @@ class Utils {
     static func getQuartiles(values: [Double]) -> (firstQuartile: Double, median: Double, thirdQuartile: Double) {
         var result: [Double] = [];
 
-        let sortedValues = values.filter( {$0 != 0}).filter({ !$0.isNaN }).sorted(by: <)
+        let sortedValues = values.filter({ !$0.isNaN }).sorted(by: <)
         if sortedValues.count < 3 {
             return (0.0, 0.0, 0.0)
         }
@@ -66,11 +66,28 @@ class Utils {
         return (result[0], result[1], result[2]);
     }
     
-    static func getEpochsFromActivitiesByTimeInterval(start: Date, end: Date, activities: [Records], minutes: Int) -> [Epoch]{
+    static func getEpochs(activities: [Records], minutes: Int) -> [Epoch]{
         var epochs: [Epoch] = []
         var firstIndex = 0
         while firstIndex <= activities.indices.last! {
             let startEpoch: Date = activities[firstIndex].startDate
+            let endPeriod = Calendar.current.date(byAdding: .minute, value: minutes, to: startEpoch)!
+            let lastIndex = activities.lastIndex(where: {$0.startDate < endPeriod} )!
+            let endEpoch = activities[lastIndex].endDate
+            let epoch: Epoch = Epoch(start: startEpoch, end: endEpoch, records: Array(activities[firstIndex...lastIndex]))
+            epochs.append(epoch)
+            firstIndex = lastIndex + 1
+        }
+
+        return epochs
+    }
+    
+    
+    static func getEpochsFromActivitiesByTimeInterval(start: Date, end: Date, activities: [Records], minutes: Int) -> [Epoch]{
+        var epochs: [Epoch] = []
+        var firstIndex = 0
+        while firstIndex <= activities.indices.last! {
+            let startEpoch: Date = firstIndex == 0 ? start : activities[firstIndex].startDate
             let endPeriod = Calendar.current.date(byAdding: .minute, value: minutes, to: startEpoch)!
             let lastIndex = activities.lastIndex(where: {$0.startDate < endPeriod} )!
             let endEpoch = activities.indices.contains(lastIndex + 1) ? activities[lastIndex + 1].startDate : end
