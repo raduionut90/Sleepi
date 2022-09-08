@@ -21,6 +21,7 @@
 		171AB5E828BCEAE7000DB5C4 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 171AB5E728BCEAE7000DB5C4 /* StoreKit.framework */; };
 		172553A928ACB39C0055C441 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 172553A828ACB39C0055C441 /* Constants.swift */; };
 		174E5F2B28720D6F00D423A0 /* Records.swift in Sources */ = {isa = PBXBuildFile; fileRef = 174E5F2A28720D6F00D423A0 /* Records.swift */; };
+		17902D6A28C8A4EC0054BC4D /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17902D6928C8A4EC0054BC4D /* LoadingView.swift */; };
 		17A4C3C7283511F5005D92F7 /* SleepManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17A4C3C6283511F5005D92F7 /* SleepManager.swift */; };
 		17D6FAF428AF6AEC00F46F2F /* Epoch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17D6FAF328AF6AEC00F46F2F /* Epoch.swift */; };
 		17EA8C8C28282B6800545BDD /* LineChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17EA8C8B28282B6800545BDD /* LineChartView.swift */; };
@@ -57,6 +58,7 @@
 		172553A828ACB39C0055C441 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		172D18272853302900A0FD42 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		174E5F2A28720D6F00D423A0 /* Records.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Records.swift; sourceTree = "<group>"; };
+		17902D6928C8A4EC0054BC4D /* LoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingView.swift; sourceTree = "<group>"; };
 		17A4C3C6283511F5005D92F7 /* SleepManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepManager.swift; sourceTree = "<group>"; };
 		17C8516F284A86B500E93C26 /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = Platforms/WatchOS.platform/Developer/SDKs/WatchOS8.5.sdk/System/Library/Frameworks/HealthKit.framework; sourceTree = DEVELOPER_DIR; };
 		17D6FAF328AF6AEC00F46F2F /* Epoch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Epoch.swift; sourceTree = "<group>"; };
@@ -155,6 +157,7 @@
 			isa = PBXGroup;
 			children = (
 				17EA8C8B28282B6800545BDD /* LineChartView.swift */,
+				17902D6928C8A4EC0054BC4D /* LoadingView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -239,6 +242,7 @@
 				17111E602874461A004169C9 /* Utils.swift in Sources */,
 				170A4ADC283FBF87009FB756 /* SleepPoint.swift in Sources */,
 				171535362815D7F200B1A499 /* Sleep.swift in Sources */,
+				17902D6A28C8A4EC0054BC4D /* LoadingView.swift in Sources */,
 				171535332815C1EA00B1A499 /* HealthStore.swift in Sources */,
 				174E5F2B28720D6F00D423A0 /* Records.swift in Sources */,
 				17D6FAF428AF6AEC00F46F2F /* Epoch.swift in Sources */,
@@ -375,7 +379,7 @@
 				CODE_SIGN_ENTITLEMENTS = Sleepi/Sleepi.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 7;
 				DEVELOPMENT_ASSET_PATHS = "\"Sleepi/Preview Content\"";
 				DEVELOPMENT_TEAM = X78UPLLN5Z;
 				ENABLE_PREVIEWS = YES;
@@ -413,7 +417,7 @@
 				CODE_SIGN_ENTITLEMENTS = Sleepi/Sleepi.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 7;
 				DEVELOPMENT_ASSET_PATHS = "\"Sleepi/Preview Content\"";
 				DEVELOPMENT_TEAM = X78UPLLN5Z;
 				ENABLE_PREVIEWS = YES;

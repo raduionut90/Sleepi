@@ -91,17 +91,31 @@ class HealthStore {
     
     func saveSleep(startTime: Date, endTime: Date) async throws  {
         let sleepType = HKObjectType.categoryType(forIdentifier: HKCategoryTypeIdentifier.sleepAnalysis)!
-        
+        let bundleVersion = (Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String)!
+        print(bundleVersion)
+        let metadata = ["SleepiAlghorithm" : bundleVersion]
         // we create new object we want to push in Health app
-        let object = HKCategorySample(type: sleepType, value: HKCategoryValueSleepAnalysis.asleep.rawValue, start: startTime, end: endTime)
-        
+        let object = HKCategorySample(type: sleepType, value: HKCategoryValueSleepAnalysis.asleep.rawValue, start: startTime, end: endTime, metadata: metadata)
+//        object.metadata[HKMetadataKeyAlgorithmVersion] = 1.1
+
         // we now push the object to HealthStore
         
         if let healthStore = healthStore {
             
             let res: ()? = try? await healthStore.save(object)
             guard res != nil else {
-                logger.error("ERROR: Sleep has not been saved")
+                logger.error("ERROR: Sleep \(startTime.formatted()) - \(endTime.formatted()) has not been saved")
+                throw HKError(.errorDatabaseInaccessible)
+            }
+        }
+    }
+    
+    func deleteSleep(sleep: HKObject) async throws  {
+        if let healthStore = healthStore {
+            
+            let res: ()? = try? await healthStore.delete(sleep)
+            guard res != nil else {
+                logger.error("ERROR: Sleep \(sleep) has not been deleted")
                 throw HKError(.errorDatabaseInaccessible)
             }
         }
@@ -127,12 +141,12 @@ class HealthStore {
                     
                     for item in result {
                         if let sample = item as? HKCategorySample {
-                            //                            print(sample.sourceRevision.source)
-                            //                            print("\(sample.startDate.formatted());\(sample.endDate.formatted());\(sample.sourceRevision.source)")
+//                            logger.log(sample.sourceRevision.source)
+                            logger.log(";\(sample.sourceRevision.source.bundleIdentifier);\(sample.startDate.formatted());\(sample.endDate.formatted())")
                             
                             if sample.sourceRevision.source.bundleIdentifier == Bundle.main.bundleIdentifier {
                                 sleeps.append(sample)
-                                //                                print("\(sleep.startDate.formatted());\(sleep.endDate.formatted())")
+//                                print("\(sleep.startDate.formatted());\(sleep.endDate.formatted())")
                             }
                         }
                     }

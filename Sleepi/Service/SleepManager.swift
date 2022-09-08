@@ -33,8 +33,7 @@ class SleepManager: ObservableObject {
         return heartRatesAllDay.map( { $0.quantity.doubleValue(for: HKUnit(from: "count/min")) } ).reduce(0, +) / Double(heartRatesAllDay.count)
     }
     
-    func refreshSleeps(date: Date) {
-        Task.init {
+    func refreshSleeps(date: Date) async throws {
             if let healthStore = healthStore {
                 let authorized: Bool = try await healthStore.requestAuthorization()
                 if authorized {
@@ -61,7 +60,6 @@ class SleepManager: ObservableObject {
                     self.updateEpochsClasificationX()
                 }
             }
-        }
 //
 //        print("sleeps refreshSleeps: \(nightSleeps.count)")
 //        print("naps refreshSleeps: \(naps.count)")
@@ -80,9 +78,9 @@ class SleepManager: ObservableObject {
             for epoch in sleep.epochs {
                 logger.log(";\(epoch.startDate.formatted());\(epoch.endDate.formatted());\(epoch.sumActivity);\(epoch.meanHR)")
 
-                if epoch.sumActivity == 0 && epoch.meanHR <= hrQuartiles.median {
+                if epoch.sumActivity < 0.02 && epoch.meanHR < hrQuartiles.median {
                     epoch.sleepClasification = SleepStage.DeepSleep
-                } else if epoch.meanHR > hrQuartiles.thirdQuartile && epoch.sumActivity > activityQuartiles.thirdQuartile {
+                } else if epoch.meanHR >= hrQuartiles.median && epoch.sumActivity > 0.2 {
                     epoch.sleepClasification = SleepStage.RemSleep
                 } else {
                     epoch.sleepClasification = SleepStage.LightSleep
