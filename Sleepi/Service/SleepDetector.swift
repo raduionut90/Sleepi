@@ -132,14 +132,17 @@ class SleepDetector: ObservableObject {
 
             }
 
-//            if epoch.records.contains(where: {$0.startDate.formatted() == "08/09/2022, 4:23"}){
-//                logger.log("")
-//            }
+            if epoch.records.contains(where: {$0.startDate.formatted() == "08/09/2022, 1:22"}){
+                logger.log("")
+            }
             let lastEpoch = epochs.indices.contains(index - 1) ? epochs[index - 1] : nil
             let lastEpochLowActMeanHr = lowActivityEpochs.last(where: { !$0.meanHR.isNaN }).map {$0.meanHR}
             let isNotActivityGap = (lastEpoch != nil ? epoch.startDate.timeIntervalSinceReferenceDate - lastEpoch!.endDate.timeIntervalSinceReferenceDate < 600 : true)
             
-            if epoch.sumActivity < 0.3 && isNotActivityGap && epoch.meanHR < hrQuartile.thirdQuartile && !epoch.isContainingGapOrStep() {
+            if epoch.sumActivity <= 0.2 &&
+                isNotActivityGap
+                && !epoch.isContainingGapOrStep() &&
+                !(lastEpoch?.isContainingGapOrStep() ?? false) {
 
                 if startDate == nil {
                     startDate = lastEpoch != nil ? lastEpoch!.records.last!.endDate : epoch.startDate
@@ -147,10 +150,12 @@ class SleepDetector: ObservableObject {
                 lowActivityEpochs.append(epoch)
                 counter = 0
             }
-            else if epoch.sumActivity < 0.85 &&
-                        counter <= 2 &&
-                        ( (lastEpochLowActMeanHr != nil && !epoch.meanHR.isNaN) ? epoch.meanHR <= (lastEpochLowActMeanHr! + 5) : true) &&
-                        !epoch.isContainingGapOrStep() {
+            else if startDate != nil &&
+                        epoch.sumActivity <= 0.7 &&
+                        counter < 2 &&
+                        ( (lastEpochLowActMeanHr != nil && !epoch.meanHR.isNaN) ? epoch.meanHR <= (lastEpochLowActMeanHr! + 3) : true) &&
+                        !epoch.isContainingGapOrStep() &&
+                        !(lastEpoch?.isContainingGapOrStep() ?? false) {
                 
                 if startDate == nil {
                     startDate = lastEpoch != nil ? lastEpoch!.records.last!.endDate : epoch.startDate
@@ -159,8 +164,8 @@ class SleepDetector: ObservableObject {
                 counter += 1
             }
             else {
-                
                 stopSleep(&startDate, &lowActivityEpochs, &tmpSleeps, epoch)
+                counter = 0
             }
             
             if epoch == epochs.last && startDate != nil && epoch.endDate.timeIntervalSinceReferenceDate - startDate!.timeIntervalSinceReferenceDate > Constants.MINI_SLEEP_DURATION {
@@ -231,22 +236,14 @@ class SleepDetector: ObservableObject {
             let sumActivity = sleep.epochs.map {$0.sumActivity}.reduce(0, +)
             let percent = 3600.0 * Double(sumActivity) / sleep.getDuration()
             
-            if percent < 5 && sleep.heartRateAverage < hrQuartile.median {
+            if percent < 7 && sleep.heartRateAverage < hrQuartile.median {
                 logger.log(";\(sleep.startDate.formatted());\(sleep.endDate.formatted());percent<;\(percent);\(sumActivity);\(sleep.getDuration());\(sleep.heartRateAverage);\(hrQuartile.firstQuartile);\(hrQuartile.median);\(hrQuartile.thirdQuartile)")
                 result.append(sleep)
             }
-//            else if percent < 5 && sleep.heartRateAverage < hrQuartile.firstQuartile {
-//                result.append(sleep)
-//                logger.log(";\(sleep.startDate.formatted());\(sleep.endDate.formatted());5percent;\(percent);\(sleep.heartRateAverage);\(hrQuartile.firstQuartile);\(hrQuartile.median);\(hrQuartile.thirdQuartile)")
-//            }
             else{
                 logger.log(";\(sleep.startDate.formatted());\(sleep.endDate.formatted());percent>;\(percent);\(sleep.heartRateAverage);\(hrQuartile.firstQuartile);\(hrQuartile.median);\(hrQuartile.thirdQuartile)")
 
             }
-//            else if percent < 6 && sleep.heartRateAverage < hrQuartile.median {
-//                result.append(sleep)
-//                logger.log(";\(sleep.startDate.formatted());\(sleep.endDate.formatted());5percent;\(percent);\(sleep.heartRateAverage);\(hrQuartile.firstQuartile);\(hrQuartile.median);\(hrQuartile.thirdQuartile)")
-//            }
         }
         return result
     }
