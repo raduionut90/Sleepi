@@ -66,7 +66,7 @@ class Utils {
         return (result[0], result[1], result[2]);
     }
     
-    static func getEpochs(activities: [Records], minutes: Int) -> [Epoch]{
+    static func getEpochs(activities: [Record], minutes: Int) -> [Epoch]{
         var epochs: [Epoch] = []
         var firstIndex = 0
         while firstIndex <= activities.indices.last! {
@@ -83,7 +83,7 @@ class Utils {
     }
     
     
-    static func getEpochsFromActivitiesByTimeInterval(start: Date, end: Date, activities: [Records], minutes: Int) -> [Epoch]{
+    static func getEpochsFromActivitiesByTimeInterval(start: Date, end: Date, activities: [Record], minutes: Int) -> [Epoch]{
         var epochs: [Epoch] = []
         var firstIndex = 0
         while firstIndex <= activities.indices.last! {
@@ -110,19 +110,19 @@ class Utils {
     
     static func getActivitiesFromRawData(
             heartRates: [HKQuantitySample],
-            activeEnergy: [HKQuantitySample]
-    ) -> [Records] {
-        var allRecords: [Records] = []
-        var allHr: [Records] = []
-        var allActiveEnergies: [Records] = []
+            activeEnergy: [HKQuantitySample]) -> [Record] {
+                
+        var allRecords: [Record] = []
+        var allHr: [Record] = []
+        var allActiveEnergies: [Record] = []
 
         for actEnergy in activeEnergy {
-            let record = Records(startDate: actEnergy.startDate, endDate: actEnergy.endDate, actEng: actEnergy.quantity.doubleValue(for: .kilocalorie()))
+            let record = Record(startDate: actEnergy.startDate, endDate: actEnergy.endDate, actEng: actEnergy.quantity.doubleValue(for: .kilocalorie()))
             allActiveEnergies.append(record)
         }
         
         for heartRate in heartRates {
-            let record = Records(startDate: heartRate.startDate, endDate: heartRate.endDate, hr: heartRate.quantity.doubleValue(for: HKUnit(from: "count/min")))
+            let record = Record(startDate: heartRate.startDate, endDate: heartRate.endDate, hr: heartRate.quantity.doubleValue(for: HKUnit(from: "count/min")))
                 allHr.append(record)
         }
         
@@ -132,42 +132,37 @@ class Utils {
         allRecords = allRecords.sorted { a,b in
             a.startDate < b.startDate
         }
-        for (index, record) in allRecords.enumerated() {
-            if index - 1 > 0 && record.startDate.timeIntervalSinceReferenceDate - allRecords[index - 1].endDate.timeIntervalSinceReferenceDate > 600 {
-                record.firstAfterGap = true
-            }
-        }
         
         return allRecords
     }
     
-    static func processActivities(_ activities: inout [Records]) {
-        for (index, activity) in activities.filter({$0.actEng != 0}).enumerated() {
-            var prev1: Double = 0.0
-            var prev2: Double = 0.0
-            var next1: Double = 0.0
-            var next2: Double = 0.0
-            
-            if index - 2 >= 0 {
-                prev2 = (activities[index - 2].actEng ?? 0) * (1/25)
-            }
-            if index - 1 >= 0 {
-                prev1 = (activities[index - 1].actEng ?? 0) * (1/5)
-            }
-            let current = activity.actEng ?? 0
-            if index + 1 < activities.count {
-                next1 = (activities[index + 1].actEng ?? 0) * (1/5)
-            }
-            if index + 2 < activities.count {
-                next2 = (activities[index + 2].actEng ?? 0) * (1/25)
-            }
-            
-            let sum = prev2 + prev1 + current + next1 + next2
-            activity.actEng = sum
-//            print("\(activity.startDate.formatted());"
-//                  + "\(activity.hr ?? 0);"
-//                  + "\(sum);"
-//            )
-        }
-    }
+//    static func processActivities(_ activities: inout [Records]) {
+//        for (index, activity) in activities.filter({$0.actEng != 0}).enumerated() {
+//            var prev1: Double = 0.0
+//            var prev2: Double = 0.0
+//            var next1: Double = 0.0
+//            var next2: Double = 0.0
+//
+//            if index - 2 >= 0 {
+//                prev2 = (activities[index - 2].actEng ?? 0) * (1/25)
+//            }
+//            if index - 1 >= 0 {
+//                prev1 = (activities[index - 1].actEng ?? 0) * (1/5)
+//            }
+//            let current = activity.actEng ?? 0
+//            if index + 1 < activities.count {
+//                next1 = (activities[index + 1].actEng ?? 0) * (1/5)
+//            }
+//            if index + 2 < activities.count {
+//                next2 = (activities[index + 2].actEng ?? 0) * (1/25)
+//            }
+//
+//            let sum = prev2 + prev1 + current + next1 + next2
+//            activity.actEng = sum
+////            print("\(activity.startDate.formatted());"
+////                  + "\(activity.hr ?? 0);"
+////                  + "\(sum);"
+////            )
+//        }
+//    }
 }

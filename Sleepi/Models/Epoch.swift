@@ -17,14 +17,14 @@ class Epoch: Equatable, Comparable {
     }
     
     let id = UUID()
-    let records: [Records]
+    let records: [Record]
     let startDate: Date
     var endDate: Date
     var meanHR: Double
     let sumActivity: Double
     var sleepClasification: SleepStage?
     
-    init(start: Date, end: Date, records: [Records]){
+    init(start: Date, end: Date, records: [Record]){
         self.records = records
         self.meanHR = records.compactMap( {$0.hr }).reduce(0, +) / Double(records.compactMap( {$0.hr }).count)
         self.sumActivity = records.compactMap( {$0.actEng} ).reduce(0, +)
@@ -32,4 +32,7 @@ class Epoch: Equatable, Comparable {
         self.endDate = end
     }
     
+    func isContainingGapOrStep() -> Bool {
+        return self.records.contains(where: {$0.firstAfterGap || $0.step})
+    }
 }

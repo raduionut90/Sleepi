@@ -6,17 +6,11 @@
 //
 
 import Foundation
-import os
-
-class Records: Equatable, Hashable {
+ 
+class Record: Equatable, Hashable {
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
     }
-    
-    private static let logger = Logger(
-        subsystem: Bundle.main.bundleIdentifier!,
-        category: String(describing: Records.self)
-    )
     
     internal init(startDate: Date, endDate: Date, hr: Double? = nil, actEng: Double? = nil, hrv: Double? = nil, rhr: Double? = nil, respRate: Double? = nil) {
         self.startDate = startDate
@@ -28,7 +22,7 @@ class Records: Equatable, Hashable {
         self.respRate = respRate
     }
     
-    static func == (lhs: Records, rhs: Records) -> Bool {
+    static func == (lhs: Record, rhs: Record) -> Bool {
         lhs.id == rhs.id
     }
     
@@ -40,7 +34,6 @@ class Records: Equatable, Hashable {
     var hrv: Double?
     var rhr: Double?
     var respRate: Double?
-    var firstAfterGap: Bool?
-    
-
+    var firstAfterGap: Bool = false
+    var step: Bool = false
 }

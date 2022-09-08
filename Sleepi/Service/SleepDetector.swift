@@ -40,6 +40,20 @@ class SleepDetector: ObservableObject {
         }
     }
     
+    fileprivate func processActivities(_ activities: [Record], _ steps: [HKQuantitySample]) {
+        for (index, activity) in activities.enumerated() {
+            let step: HKQuantitySample? = steps.first(where: { (activity.startDate...activity.endDate).contains($0.startDate) ||
+                (activity.startDate...activity.endDate).contains($0.endDate)
+            })
+            if step != nil {
+                activity.step = true
+            }
+            if index - 1 > 0 && activity.startDate.timeIntervalSinceReferenceDate - activities[index - 1].endDate.timeIntervalSinceReferenceDate > 600 {
+                activity.firstAfterGap = true
+            }
+        }
+    }
+    
     func performSleepDetection() async throws {
             if let healthStore = healthStore {
                 let authorized: Bool = try await healthStore.requestAuthorization()
@@ -54,11 +68,14 @@ class SleepDetector: ObservableObject {
                         let lastSleepEndDate = sleeps.last?.endDate ?? aDayBefore
                         let heartRates = await healthStore.getSamples(startDate: aDayBefore, endDate: currentDate, type: .heartRate)
                         let activeEnergy = await healthStore.getSamples(startDate: aDayBefore, endDate: currentDate, type: .activeEnergyBurned)
+                        let steps = await healthStore.getSamples(startDate: aDayBefore, endDate: currentDate, type: .stepCount)
+
+                        let activities: [Record] = Utils.getActivitiesFromRawData(heartRates: heartRates, activeEnergy: activeEnergy)
                         
-                        let activities: [Records] = Utils.getActivitiesFromRawData(heartRates: heartRates, activeEnergy: activeEnergy)
+                        processActivities(activities, steps)
                         
                         if !activities.isEmpty {
-                            logger.log("last sleep end \(lastSleepEndDate)")
+                            logger.log("last sleep end; \(lastSleepEndDate)")
 
                             let potentialSleeps = identifySleeps(activities: activities, lastSleepEndDate: lastSleepEndDate)
                             
@@ -66,7 +83,7 @@ class SleepDetector: ObservableObject {
                                 try await healthStore.saveSleep(startTime: sleep.startDate, endTime: sleep.endDate)
                             }
                         } else {
-                            logger.log("no activities \(aDayBefore) - \(currentDate)")
+                            logger.log("no activities; \(aDayBefore) - \(currentDate)")
                         }
                         
                         currentDate = aDayBefore
@@ -80,7 +97,18 @@ class SleepDetector: ObservableObject {
             }        
     }
 
-    private func identifySleeps(activities: [Records], lastSleepEndDate: Date) -> [Sleep] {
+    fileprivate func stopSleep(_ startDate: inout Date?, _ lowActivityEpochs: inout [Epoch], _ tmpSleeps: inout [Sleep], _ epoch: Epoch) {
+        if startDate != nil && !lowActivityEpochs.isEmpty {
+            
+            if (lowActivityEpochs.last!.endDate.timeIntervalSinceReferenceDate) - startDate!.timeIntervalSinceReferenceDate > Constants.MINI_SLEEP_DURATION {
+                tmpSleeps.append(Sleep(startDate: startDate!, endDate: epoch.startDate, epochs: []))
+            }
+            startDate = nil
+            lowActivityEpochs = []
+        }
+    }
+    
+    private func identifySleeps(activities: [Record], lastSleepEndDate: Date) -> [Sleep] {
         var tmpSleeps: [Sleep] = []
         let firstActivityIndex = activities.firstIndex(where: { $0.startDate >= lastSleepEndDate })!
         
@@ -96,46 +124,45 @@ class SleepDetector: ObservableObject {
 
         logger.log(";\(actQuartile.firstQuartile);\(actQuartile.median);\(actQuartile.thirdQuartile)")
         logger.log(";\(hrQuartile.firstQuartile);\(hrQuartile.median);\(hrQuartile.thirdQuartile)")
-        
+        var counter = 0
         for (index, epoch) in epochs.enumerated() {
 //            logger.log(";\(epoch.startDate.formatted());\(epoch.endDate.formatted());\(epoch.sumActivity);\(epoch.meanHR)")
             for record in epoch.records {
-                logger.log(";\(epoch.startDate.formatted());\(epoch.endDate.formatted());\(epoch.sumActivity);\(epoch.meanHR);\(record.startDate.formatted());\(record.endDate.formatted());\(record.actEng ?? 0);\(record.hr ?? 999)")
+                logger.log(";\(epoch.startDate.formatted());\(epoch.endDate.formatted());\(epoch.sumActivity);\(epoch.meanHR);\(record.startDate.formatted());\(record.endDate.formatted());\(record.actEng ?? 0);\(record.hr ?? 999);\(epoch.isContainingGapOrStep())")
 
             }
-            
-//            if epoch.records.contains(where: {$0.startDate.formatted() == "05/09/2022, 21:57"}){
+
+//            if epoch.records.contains(where: {$0.startDate.formatted() == "08/09/2022, 4:23"}){
 //                logger.log("")
 //            }
-            var counter = 0
             let lastEpoch = epochs.indices.contains(index - 1) ? epochs[index - 1] : nil
-            if epoch.sumActivity < 0.3 && epochs.indices.contains(index - 1) && epoch.startDate.timeIntervalSinceReferenceDate - epochs[index - 1].endDate.timeIntervalSinceReferenceDate < 600 {
-                if epochs.indices.contains(index - 1)  {
-                    if startDate == nil {
-                        startDate = epochs[index - 1].records.last!.endDate
-//                        startDate = epoch.startDate
-                    }
-                    lowActivityEpochs.append(epoch)
-                } else if !epochs.indices.contains(index - 1) {
-                    startDate = epoch.startDate
-                    lowActivityEpochs.append(epoch)
+            let lastEpochLowActMeanHr = lowActivityEpochs.last(where: { !$0.meanHR.isNaN }).map {$0.meanHR}
+            let isNotActivityGap = (lastEpoch != nil ? epoch.startDate.timeIntervalSinceReferenceDate - lastEpoch!.endDate.timeIntervalSinceReferenceDate < 600 : true)
+            
+            if epoch.sumActivity < 0.3 && isNotActivityGap && epoch.meanHR < hrQuartile.thirdQuartile && !epoch.isContainingGapOrStep() {
+
+                if startDate == nil {
+                    startDate = lastEpoch != nil ? lastEpoch!.records.last!.endDate : epoch.startDate
                 }
+                lowActivityEpochs.append(epoch)
                 counter = 0
             }
-            else if epoch.sumActivity < 0.5 && counter <= 1 && startDate != nil {
+            else if epoch.sumActivity < 0.85 &&
+                        counter <= 2 &&
+                        ( (lastEpochLowActMeanHr != nil && !epoch.meanHR.isNaN) ? epoch.meanHR <= (lastEpochLowActMeanHr! + 5) : true) &&
+                        !epoch.isContainingGapOrStep() {
+                
+                if startDate == nil {
+                    startDate = lastEpoch != nil ? lastEpoch!.records.last!.endDate : epoch.startDate
+                }
                 lowActivityEpochs.append(epoch)
                 counter += 1
             }
             else {
-                if startDate != nil && !lowActivityEpochs.isEmpty {
-                    
-                    if (lowActivityEpochs.last!.endDate.timeIntervalSinceReferenceDate) - startDate!.timeIntervalSinceReferenceDate > Constants.MINI_SLEEP_DURATION {
-                        tmpSleeps.append(Sleep(startDate: startDate!, endDate: epoch.startDate, epochs: []))
-                    }
-                    startDate = nil
-                    lowActivityEpochs = []
-                }
+                
+                stopSleep(&startDate, &lowActivityEpochs, &tmpSleeps, epoch)
             }
+            
             if epoch == epochs.last && startDate != nil && epoch.endDate.timeIntervalSinceReferenceDate - startDate!.timeIntervalSinceReferenceDate > Constants.MINI_SLEEP_DURATION {
                 tmpSleeps.append(Sleep(startDate: startDate!, endDate: epoch.startDate, epochs: []))
             }
