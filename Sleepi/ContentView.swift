@@ -224,6 +224,9 @@ struct ContentView: View {
             .onAppCameToForeground {
                 print("onAppCameToForeground")
                 Task.init {
+                    if isFirstTimeRunning() {
+                        try await sleepDetector.whenFirstimeRunning()
+                    }
                     try await sleepDetector.performSleepDetection()
                     try await sleepManager.refreshSleeps(date: currentDate)
                 }

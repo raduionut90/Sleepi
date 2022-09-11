@@ -48,22 +48,17 @@ class Utils {
     }
     
     static func getQuartiles(values: [Double]) -> (firstQuartile: Double, median: Double, thirdQuartile: Double) {
-        var result: [Double] = [];
 
-        let sortedValues = values.filter({ !$0.isNaN }).sorted(by: <)
-        if sortedValues.count < 3 {
+        let filteredValues = values.filter {!$0.isNaN}.filter {$0 != 0}
+        if filteredValues.count < 3 {
             return (0.0, 0.0, 0.0)
         }
-        for quartileType in 1...3 {
-            let length = sortedValues.count + 1
-            let quartileSize: Double = (Double(length) * (Double(quartileType) * 25.0 / 100.0)) - 1.0
-            if quartileSize.truncatingRemainder(dividingBy: 1) == 0 {
-                result.append(sortedValues[Int(quartileSize)])
-            } else {
-                result.append((sortedValues[Int(quartileSize)] + sortedValues[Int(quartileSize) + 1]) / 2)
-            }
-        }
-        return (result[0], result[1], result[2]);
+        let dif = filteredValues.max()! - filteredValues.min()!
+        let q1 = 0.25 * dif + filteredValues.min()!
+        let med = 0.50 * dif + filteredValues.min()!
+        let q3 = 0.75 * dif + filteredValues.min()!
+
+        return (q1, med, q3);
     }
     
     static func getEpochs(activities: [Record], minutes: Int) -> [Epoch]{
@@ -79,32 +74,6 @@ class Utils {
             firstIndex = lastIndex + 1
         }
 
-        return epochs
-    }
-    
-    
-    static func getEpochsFromActivitiesByTimeInterval(start: Date, end: Date, activities: [Record], minutes: Int) -> [Epoch]{
-        var epochs: [Epoch] = []
-        var firstIndex = 0
-        while firstIndex <= activities.indices.last! {
-            let startEpoch: Date = firstIndex == 0 ? start : activities[firstIndex].startDate
-            let endPeriod = Calendar.current.date(byAdding: .minute, value: minutes, to: startEpoch)!
-            let lastIndex = activities.lastIndex(where: {$0.startDate < endPeriod} )!
-            let endEpoch = activities.indices.contains(lastIndex + 1) ? activities[lastIndex + 1].startDate : end
-            let epoch: Epoch = Epoch(start: startEpoch, end: endEpoch, records: Array(activities[firstIndex...lastIndex]))
-            epochs.append(epoch)
-//            if lastIndex == activities.indices.last {
-//                break
-//            }
-            firstIndex = lastIndex + 1
-        }
-//        let recordsCount = epochs.flatMap({$0.records})
-//        if recordsCount.count != activities.count {
-//            print("ERROR-COUNTER \(epochs.map {$0.records}.count) - \(activities.count)")
-//        }
-//        if end != activities.last?.endDate {
-//            print("")
-//        }
         return epochs
     }
     
@@ -136,33 +105,4 @@ class Utils {
         return allRecords
     }
     
-//    static func processActivities(_ activities: inout [Records]) {
-//        for (index, activity) in activities.filter({$0.actEng != 0}).enumerated() {
-//            var prev1: Double = 0.0
-//            var prev2: Double = 0.0
-//            var next1: Double = 0.0
-//            var next2: Double = 0.0
-//
-//            if index - 2 >= 0 {
-//                prev2 = (activities[index - 2].actEng ?? 0) * (1/25)
-//            }
-//            if index - 1 >= 0 {
-//                prev1 = (activities[index - 1].actEng ?? 0) * (1/5)
-//            }
-//            let current = activity.actEng ?? 0
-//            if index + 1 < activities.count {
-//                next1 = (activities[index + 1].actEng ?? 0) * (1/5)
-//            }
-//            if index + 2 < activities.count {
-//                next2 = (activities[index + 2].actEng ?? 0) * (1/25)
-//            }
-//
-//            let sum = prev2 + prev1 + current + next1 + next2
-//            activity.actEng = sum
-////            print("\(activity.startDate.formatted());"
-////                  + "\(activity.hr ?? 0);"
-////                  + "\(sum);"
-////            )
-//        }
-//    }
 }

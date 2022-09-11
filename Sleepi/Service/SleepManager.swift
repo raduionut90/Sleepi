@@ -78,9 +78,9 @@ class SleepManager: ObservableObject {
             for epoch in sleep.epochs {
                 logger.log(";\(epoch.startDate.formatted());\(epoch.endDate.formatted());\(epoch.sumActivity);\(epoch.meanHR)")
 
-                if epoch.sumActivity < 0.02 && epoch.meanHR < hrQuartiles.median {
+                if epoch.sumActivity < 0.02 && epoch.meanHR < hrQuartiles.firstQuartile {
                     epoch.sleepClasification = SleepStage.DeepSleep
-                } else if epoch.meanHR >= hrQuartiles.median && epoch.sumActivity > 0.2 {
+                } else if epoch.meanHR >= hrQuartiles.thirdQuartile && epoch.sumActivity > 0.2 {
                     epoch.sleepClasification = SleepStage.RemSleep
                 } else {
                     epoch.sleepClasification = SleepStage.LightSleep

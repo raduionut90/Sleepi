@@ -48,7 +48,7 @@ class SleepDetector: ObservableObject {
             if step != nil {
                 activity.step = true
             }
-            if index - 1 > 0 && activity.startDate.timeIntervalSinceReferenceDate - activities[index - 1].endDate.timeIntervalSinceReferenceDate > 600 {
+            if index - 1 > 0 && activity.startDate.timeIntervalSinceReferenceDate - activities[index - 1].endDate.timeIntervalSinceReferenceDate > 900 {
                 activity.firstAfterGap = true
             }
         }
@@ -59,36 +59,50 @@ class SleepDetector: ObservableObject {
                 let authorized: Bool = try await healthStore.requestAuthorization()
                 if authorized {
                     
-                    var currentDate = Date()
-                    var aDayBefore = Calendar.current.date(byAdding: .hour, value: -24, to: currentDate)!
-                    var sleeps: [HKCategorySample] = []
+                    let currentDate = Date()
+//                    var twoWeekAgo = Calendar.current.date(byAdding: .day, value: -14, to: currentDate)!
+                    var startDate: Date = Calendar.current.date(byAdding: .day, value: -14, to: currentDate)!
+                    var endDate: Date = Calendar.current.date(byAdding: .hour, value: 24, to: startDate)!
+                    let sleeps: [HKCategorySample] = await healthStore.getSleeps(startTime: startDate, endTime: currentDate)
                     
-                    while sleeps.isEmpty {
-                        sleeps = await healthStore.getSleeps(startTime: aDayBefore, endTime: currentDate)
-                        let lastSleepEndDate = sleeps.last?.endDate ?? aDayBefore
-                        let heartRates = await healthStore.getSamples(startDate: aDayBefore, endDate: currentDate, type: .heartRate)
-                        let activeEnergy = await healthStore.getSamples(startDate: aDayBefore, endDate: currentDate, type: .activeEnergyBurned)
-                        let steps = await healthStore.getSamples(startDate: aDayBefore, endDate: currentDate, type: .stepCount)
+                    if !sleeps.isEmpty {
+                        startDate = sleeps.last!.startDate > Calendar.current.date(byAdding: .hour, value: -24, to: currentDate)! ?
+                                Calendar.current.date(byAdding: .hour, value: -24, to: currentDate)! : sleeps.last!.startDate
+                        endDate = Calendar.current.date(byAdding: .hour, value: 24, to: startDate)! >= currentDate ? currentDate : Calendar.current.date(byAdding: .hour, value: 24, to: startDate)!
+                    }
+                    
+                    while true {
+     
+                        let heartRates = await healthStore.getSamples(startDate: startDate, endDate: endDate, type: .heartRate)
+                        let activeEnergy = await healthStore.getSamples(startDate: startDate, endDate: endDate, type: .activeEnergyBurned)
+                        let steps = await healthStore.getSamples(startDate: startDate, endDate: endDate, type: .stepCount)
 
                         let activities: [Record] = Utils.getActivitiesFromRawData(heartRates: heartRates, activeEnergy: activeEnergy)
                         
                         processActivities(activities, steps)
                         
                         if !activities.isEmpty {
-                            logger.log("last sleep end; \(lastSleepEndDate)")
 
-                            let potentialSleeps = identifySleeps(activities: activities, lastSleepEndDate: lastSleepEndDate)
+                            var potentialSleeps = identifySleeps(activities: activities)
+                            logger.log(";zip;")
+                            logger.log(";zip;adayBefore;\(startDate.formatted());\(endDate.formatted())")
                             
+                            if !sleeps.isEmpty {
+                                potentialSleeps = potentialSleeps.filter({$0.startDate > sleeps.last!.endDate})
+                            }
                             for sleep in potentialSleeps {
+
                                 try await healthStore.saveSleep(startTime: sleep.startDate, endTime: sleep.endDate)
+                                logger.log(";zip;saved;\(sleep.startDate.formatted());\(sleep.endDate.formatted())")
                             }
                         } else {
-                            logger.log("no activities; \(aDayBefore) - \(currentDate)")
+                            logger.log("no activities; \(startDate) - \(endDate)")
                         }
                         
-                        currentDate = aDayBefore
-                        aDayBefore = Calendar.current.date(byAdding: .day, value: -1, to: aDayBefore)!
-                        if aDayBefore < Calendar.current.date(byAdding: .day, value: -14, to: Date())! {
+
+                        startDate = endDate
+                        endDate = Calendar.current.date(byAdding: .hour, value: 24, to: endDate)!
+                        if endDate > currentDate {
                             break
                         }
                     }
@@ -108,15 +122,13 @@ class SleepDetector: ObservableObject {
         }
     }
     
-    private func identifySleeps(activities: [Record], lastSleepEndDate: Date) -> [Sleep] {
+    private func identifySleeps(activities: [Record]) -> [Sleep] {
         var tmpSleeps: [Sleep] = []
-        let firstActivityIndex = activities.firstIndex(where: { $0.startDate >= lastSleepEndDate })!
         
         var startDate: Date?
         var lowActivityEpochs: [Epoch] = []
 
-        let relevantActivities = Array(activities[firstActivityIndex...])
-        let epochs = Utils.getEpochs(activities: relevantActivities, minutes: 3)
+        let epochs = Utils.getEpochs(activities: activities, minutes: 3)
         let allEpochs = Utils.getEpochs(activities: activities, minutes: 3)
 
         let actQuartile = Utils.getQuartiles(values: allEpochs.compactMap({$0.sumActivity}) )
@@ -132,16 +144,14 @@ class SleepDetector: ObservableObject {
 
             }
 
-            if epoch.records.contains(where: {$0.startDate.formatted() == "08/09/2022, 1:22"}){
-                logger.log("")
+            if epoch.records.contains(where: {$0.startDate.formatted() == "11/09/2022, 1:58"}){
+                logger.log("xx")
             }
             let lastEpoch = epochs.indices.contains(index - 1) ? epochs[index - 1] : nil
             let lastEpochLowActMeanHr = lowActivityEpochs.last(where: { !$0.meanHR.isNaN }).map {$0.meanHR}
-            let isNotActivityGap = (lastEpoch != nil ? epoch.startDate.timeIntervalSinceReferenceDate - lastEpoch!.endDate.timeIntervalSinceReferenceDate < 600 : true)
             
             if epoch.sumActivity <= 0.2 &&
-                isNotActivityGap
-                && !epoch.isContainingGapOrStep() &&
+                !epoch.isContainingGapOrStep() &&
                 !(lastEpoch?.isContainingGapOrStep() ?? false) {
 
                 if startDate == nil {
@@ -151,9 +161,9 @@ class SleepDetector: ObservableObject {
                 counter = 0
             }
             else if startDate != nil &&
-                        epoch.sumActivity <= 0.7 &&
+                        epoch.sumActivity <= 2 &&
                         counter < 2 &&
-                        ( (lastEpochLowActMeanHr != nil && !epoch.meanHR.isNaN) ? epoch.meanHR <= (lastEpochLowActMeanHr! + 3) : true) &&
+                        ( (lastEpochLowActMeanHr != nil && !epoch.meanHR.isNaN) ? epoch.meanHR <= (lastEpochLowActMeanHr! + 10) : true) &&
                         !epoch.isContainingGapOrStep() &&
                         !(lastEpoch?.isContainingGapOrStep() ?? false) {
                 
@@ -169,7 +179,7 @@ class SleepDetector: ObservableObject {
             }
             
             if epoch == epochs.last && startDate != nil && epoch.endDate.timeIntervalSinceReferenceDate - startDate!.timeIntervalSinceReferenceDate > Constants.MINI_SLEEP_DURATION {
-                tmpSleeps.append(Sleep(startDate: startDate!, endDate: epoch.startDate, epochs: []))
+                tmpSleeps.append(Sleep(startDate: startDate!, endDate: epoch.endDate, epochs: []))
             }
         }
         let sleeps: [Sleep] = proccesPotentialSleeps(potentialSleeps: tmpSleeps, epochs: epochs, actQuartile: actQuartile, hrQuartile: hrQuartile)
@@ -198,29 +208,11 @@ class SleepDetector: ObservableObject {
         return sleeps
     }
     
-    private func filterSleepByHr(sleeps: [Sleep], epochs: [Epoch]) -> [Sleep] {
-        var result: [Sleep] = []
-        for sleep in sleeps {
-
-            let lastEpochs = epochs.reversed().filter({!$0.meanHR.isNaN}).first(where: {$0.startDate < sleep.startDate})
-            let nextEpochs = epochs.filter({!$0.meanHR.isNaN}).first(where: {$0.startDate > sleep.endDate})
-            // 95% from max
-            let maxHr = max(lastEpochs?.meanHR ?? 0, nextEpochs?.meanHR ?? 0)
-            if sleep.heartRateAverage < maxHr {
-                result.append(sleep)
-            } else {
-                logger.log("Sleep: \(sleep.startDate.formatted()) - \(sleep.endDate.formatted()) ignored due to HR \(sleep.heartRateAverage), maxHR: \(maxHr)")
-            }
-
-        }
-        return result
-    }
-    
     private func getSleepEpochs(sleeps: [Sleep], epochs: [Epoch]) -> [Sleep] {
         var result: [Sleep] = []
         for sleep in sleeps {
-            let firstEpoch = epochs.firstIndex {$0.startDate >= sleep.startDate}!
-            let lastEpoch = (epochs.firstIndex {$0.endDate >= sleep.endDate})!
+            let firstEpoch: Int = epochs.firstIndex {$0.startDate >= sleep.startDate}!
+            let lastEpoch: Int = (epochs.firstIndex {$0.endDate >= sleep.endDate}) ?? epochs.indices.last!
             if firstEpoch < lastEpoch {
                 let sleepEpochs = Array(epochs[firstEpoch...lastEpoch])
                 let newSleep = Sleep(startDate: sleep.startDate, endDate: sleep.endDate, epochs: sleepEpochs)
