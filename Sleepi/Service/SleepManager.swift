@@ -47,7 +47,7 @@ class SleepManager: ObservableObject {
                         let heartRates = await healthStore.getSamples(startDate: rawSleep.startDate, endDate: rawSleep.endDate, type: .heartRate)
                         let activeEnergys = await healthStore.getSamples(startDate: rawSleep.startDate, endDate: rawSleep.endDate, type: .activeEnergyBurned)
                         let activities: [Record] = Utils.getActivitiesFromRawData(heartRates: heartRates, activeEnergy: activeEnergys)
-                        let epochs = Utils.getEpochs(activities: activities, minutes: 5)
+                        let epochs = Utils.getEpochs(activities: activities, minutes: 10)
 
                         let sleep: Sleep = Sleep(startDate: rawSleep.startDate, endDate: rawSleep.endDate, epochs: epochs)
                         tmpSleeps.append(sleep)
@@ -78,9 +78,9 @@ class SleepManager: ObservableObject {
             for epoch in sleep.epochs {
                 logger.log(";\(epoch.startDate.formatted());\(epoch.endDate.formatted());\(epoch.sumActivity);\(epoch.meanHR)")
 
-                if epoch.sumActivity < 0.02 && epoch.meanHR < hrQuartiles.firstQuartile {
+                if epoch.sumActivity < 0.01 && epoch.meanHR < hrQuartiles.firstQuartile {
                     epoch.sleepClasification = SleepStage.DeepSleep
-                } else if epoch.meanHR >= hrQuartiles.thirdQuartile && epoch.sumActivity > 0.2 {
+                } else if (epoch.meanHR >= hrQuartiles.thirdQuartile || epoch.meanHR.isNaN) && epoch.sumActivity > 0.2 {
                     epoch.sleepClasification = SleepStage.RemSleep
                 } else {
                     epoch.sleepClasification = SleepStage.LightSleep
