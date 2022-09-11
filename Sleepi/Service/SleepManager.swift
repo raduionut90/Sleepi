@@ -47,7 +47,7 @@ class SleepManager: ObservableObject {
                         let heartRates = await healthStore.getSamples(startDate: rawSleep.startDate, endDate: rawSleep.endDate, type: .heartRate)
                         let activeEnergys = await healthStore.getSamples(startDate: rawSleep.startDate, endDate: rawSleep.endDate, type: .activeEnergyBurned)
                         let activities: [Record] = Utils.getActivitiesFromRawData(heartRates: heartRates, activeEnergy: activeEnergys)
-                        let epochs = Utils.getEpochs(activities: activities, minutes: 7)
+                        let epochs = Utils.getEpochs(activities: activities, minutes: 3)
 
                         let sleep: Sleep = Sleep(startDate: rawSleep.startDate, endDate: rawSleep.endDate, epochs: epochs)
                         tmpSleeps.append(sleep)
@@ -75,43 +75,36 @@ class SleepManager: ObservableObject {
             logger.log(";\(activityQuartiles.firstQuartile);\(activityQuartiles.median);\(activityQuartiles.thirdQuartile)")
             logger.log(";\(hrQuartiles.firstQuartile);\(hrQuartiles.median);\(hrQuartiles.thirdQuartile)")
             
-            for epoch in sleep.epochs {
+            for (index, epoch) in sleep.epochs.enumerated() {
                 logger.log(";\(epoch.startDate.formatted());\(epoch.endDate.formatted());\(epoch.sumActivity);\(epoch.meanHR)")
-
-                if epoch.sumActivity < 0.01 && epoch.meanHR < hrQuartiles.firstQuartile {
-                    epoch.sleepClasification = SleepStage.DeepSleep
-                } else if (epoch.meanHR >= hrQuartiles.thirdQuartile || epoch.meanHR.isNaN) && epoch.sumActivity > 0.2 {
-                    epoch.sleepClasification = SleepStage.RemSleep
+                let lastEpoch = sleep.epochs.indices.contains(index - 1) ? sleep.epochs[index - 1] : nil
+                
+                if lastEpoch != nil && !lastEpoch!.meanHR.isNaN {
+                    if (epoch.meanHR < lastEpoch!.meanHR - 5 || epoch.meanHR < hrQuartiles.firstQuartile ) && epoch.sumActivity < 0.05 {
+                        epoch.sleepClasification = SleepStage.DeepSleep
+                    } else if ((epoch.meanHR > lastEpoch!.meanHR + 7 || (epoch.meanHR >= hrQuartiles.thirdQuartile || epoch.meanHR.isNaN)) && epoch.sumActivity > 0.20) || epoch.sumActivity > 0.5 {
+                        epoch.sleepClasification = SleepStage.RemSleep
+                    } else if ((lastEpoch!.meanHR - 1)...(lastEpoch!.meanHR + 1)).contains(epoch.meanHR) && (lastEpoch!.sumActivity - 0.05 ... lastEpoch!.sumActivity + 0.05).contains(epoch.sumActivity) {
+                        epoch.sleepClasification = lastEpoch!.sleepClasification
+                    } else {
+                        epoch.sleepClasification = SleepStage.LightSleep
+                    }
                 } else {
-                    epoch.sleepClasification = SleepStage.LightSleep
+                    if epoch.sumActivity < 0.01 && epoch.meanHR < hrQuartiles.firstQuartile {
+                        epoch.sleepClasification = SleepStage.DeepSleep
+                    } else if (epoch.meanHR >= hrQuartiles.thirdQuartile || epoch.meanHR.isNaN) && epoch.sumActivity > 0.2 {
+                        epoch.sleepClasification = SleepStage.RemSleep
+                    } else {
+                        epoch.sleepClasification = SleepStage.LightSleep
+                    }
                 }
-            }
-        }
-        
+                
 
-    }
-    
-    private func updateEpochsClasification() {
-        let allSleepsEpochs = self.nightSleeps.flatMap {$0.epochs}
-        
-        let activityQuartiles = Utils.getQuartiles(values: allSleepsEpochs.map {$0.sumActivity} )
-        let hrQuartiles = Utils.getQuartiles(values: allSleepsEpochs.map {$0.meanHR} )
-        
-        for epoch in allSleepsEpochs {
-            logger.log(";\(epoch.startDate.formatted());\(epoch.endDate.formatted());\(epoch.sumActivity);\(epoch.meanHR)")
-
-            let maxHr = epoch.records.compactMap({ $0.hr }).max() ?? epoch.meanHR
-            let minHr = epoch.records.compactMap({ $0.hr }).min() ?? epoch.meanHR
-            if epoch.sumActivity == 0 && minHr <= hrQuartiles.thirdQuartile {
-                epoch.sleepClasification = SleepStage.DeepSleep
-            } else if maxHr >= hrQuartiles.thirdQuartile && epoch.sumActivity > activityQuartiles.median {
-                epoch.sleepClasification = SleepStage.RemSleep
-            } else {
-                epoch.sleepClasification = SleepStage.LightSleep
             }
         }
     }
     
+
     private func sleepFilter(sleeps: [Sleep], date: Date) -> (nightSleep: [Sleep], naps: [Sleep]) {
         var nightSleep: [Sleep] = []
         var naps: [Sleep] = []

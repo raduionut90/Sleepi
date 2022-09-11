@@ -54,7 +54,7 @@ class Utils {
             return (0.0, 0.0, 0.0)
         }
         let dif = filteredValues.max()! - filteredValues.min()!
-        let q1 = 0.35 * dif + filteredValues.min()!
+        let q1 = 0.20 * dif + filteredValues.min()!
         let med = 0.40 * dif + filteredValues.min()!
         let q3 = 0.7 * dif + filteredValues.min()!
 
