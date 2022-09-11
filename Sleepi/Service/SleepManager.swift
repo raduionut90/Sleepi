@@ -47,7 +47,7 @@ class SleepManager: ObservableObject {
                         let heartRates = await healthStore.getSamples(startDate: rawSleep.startDate, endDate: rawSleep.endDate, type: .heartRate)
                         let activeEnergys = await healthStore.getSamples(startDate: rawSleep.startDate, endDate: rawSleep.endDate, type: .activeEnergyBurned)
                         let activities: [Record] = Utils.getActivitiesFromRawData(heartRates: heartRates, activeEnergy: activeEnergys)
-                        let epochs = Utils.getEpochs(activities: activities, minutes: 10)
+                        let epochs = Utils.getEpochs(activities: activities, minutes: 7)
 
                         let sleep: Sleep = Sleep(startDate: rawSleep.startDate, endDate: rawSleep.endDate, epochs: epochs)
                         tmpSleeps.append(sleep)
