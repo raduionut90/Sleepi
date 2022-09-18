@@ -174,7 +174,12 @@ class SleepDetector: ObservableObject {
                 counter += 1
             }
             else {
-                stopSleep(&startDate, &lowActivityEpochs, &tmpSleeps, epoch)
+                if counter == 2 {
+                    let removedEpoch = lowActivityEpochs.removeLast()
+                    stopSleep(&startDate, &lowActivityEpochs, &tmpSleeps, removedEpoch)
+                } else {
+                    stopSleep(&startDate, &lowActivityEpochs, &tmpSleeps, epoch)
+                }
                 counter = 0
             }
             
@@ -228,7 +233,7 @@ class SleepDetector: ObservableObject {
             let sumActivity = sleep.epochs.map {$0.sumActivity}.reduce(0, +)
             let percent = 3600.0 * Double(sumActivity) / sleep.getDuration()
             
-            if percent < 7 && sleep.heartRateAverage < hrQuartile.median {
+            if percent < 10 && sleep.heartRateAverage < hrQuartile.thirdQuartile {
                 logger.log(";\(sleep.startDate.formatted());\(sleep.endDate.formatted());percent<;\(percent);\(sumActivity);\(sleep.getDuration());\(sleep.heartRateAverage);\(hrQuartile.firstQuartile);\(hrQuartile.median);\(hrQuartile.thirdQuartile)")
                 result.append(sleep)
             }
