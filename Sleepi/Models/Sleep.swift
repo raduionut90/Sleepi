@@ -41,17 +41,17 @@ struct Sleep: Hashable, Identifiable, Equatable {
         for (index, epoch) in epochs.enumerated() {
             switch stage {
             case .DeepSleep:
-                if epoch.sleepClasification == .DeepSleep {
+                if epoch.stage == .DeepSleep {
                     let timeInterval = epochs.indices.contains(index + 1) ? epochs[index + 1].startDate.timeIntervalSinceReferenceDate - epoch.startDate.timeIntervalSinceReferenceDate : self.endDate.timeIntervalSinceReferenceDate - epoch.startDate.timeIntervalSinceReferenceDate
                     result.append(timeInterval)
                 }
             case .LightSleep:
-                if epoch.sleepClasification == .LightSleep {
+                if epoch.stage == .LightSleep {
                     let timeInterval = epochs.indices.contains(index + 1) ? epochs[index + 1].startDate.timeIntervalSinceReferenceDate - epoch.startDate.timeIntervalSinceReferenceDate : self.endDate.timeIntervalSinceReferenceDate - epoch.startDate.timeIntervalSinceReferenceDate
                     result.append(timeInterval)
                 }
             case .RemSleep:
-                if epoch.sleepClasification == .RemSleep {
+                if epoch.stage == .RemSleep {
                     let timeInterval = epochs.indices.contains(index + 1) ? epochs[index + 1].startDate.timeIntervalSinceReferenceDate - epoch.startDate.timeIntervalSinceReferenceDate : self.endDate.timeIntervalSinceReferenceDate - epoch.startDate.timeIntervalSinceReferenceDate
                     result.append(timeInterval)                }
             case .Awake:

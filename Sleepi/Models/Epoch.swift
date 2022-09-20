@@ -7,7 +7,7 @@
 
 import Foundation
 
-class Epoch: Equatable, Comparable {
+class Epoch: Equatable, Comparable, Identifiable {
     static func < (lhs: Epoch, rhs: Epoch) -> Bool {
         lhs.id == rhs.id
     }
@@ -22,14 +22,15 @@ class Epoch: Equatable, Comparable {
     var endDate: Date
     var meanHR: Double
     let sumActivity: Double
-    var sleepClasification: SleepStage?
+    var stage: SleepStage?
     
-    init(start: Date, end: Date, records: [Record]){
+    init(start: Date, end: Date, records: [Record], stage: SleepStage?){
         self.records = records
         self.meanHR = records.compactMap( {$0.hr }).reduce(0, +) / Double(records.compactMap( {$0.hr }).count)
         self.sumActivity = records.compactMap( {$0.actEng} ).reduce(0, +)
         self.startDate = start
         self.endDate = end
+        self.stage = stage
     }
     
     func isContainingGapOrStep() -> Bool {

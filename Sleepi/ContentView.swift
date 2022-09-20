@@ -99,7 +99,8 @@ struct ContentView: View {
                         
                         
                         VStack {
-                            LineChartView(sleeps: sleepManager.nightSleeps, timeInBed: sleepManager.getInBedTime(), sleepsHrAverage: sleepManager.nsHeartRateAverage)
+//                            LineChartView(sleeps: sleepManager.nightSleeps, timeInBed: sleepManager.getInBedTime(), sleepsHrAverage: sleepManager.nsHeartRateAverage)
+                            SleepChart()
                         }
                         
                         if !sleepManager.nightSleeps.isEmpty {
@@ -202,7 +203,7 @@ struct ContentView: View {
             .onAppear(){
                 Task.init {
                     if isFirstTimeRunning() {
-                        try? await sleepDetector.whenFirstimeRunning()
+//                        try? await sleepDetector.whenFirstimeRunning()
                     }
                     try? await sleepDetector.performSleepDetection()
                     try? await sleepManager.refreshSleeps(date: currentDate)

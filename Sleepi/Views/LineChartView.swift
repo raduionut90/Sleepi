@@ -48,7 +48,7 @@ struct LineChartView: View {
         for (index, epoch) in sleep.epochs.enumerated() {
             let interval: Double = sleep.epochs.indices.contains(index + 1) ? sleep.epochs[index + 1].startDate.timeIntervalSinceReferenceDate - epoch.startDate.timeIntervalSinceReferenceDate : sleep.endDate.timeIntervalSinceReferenceDate - epoch.startDate.timeIntervalSinceReferenceDate
             
-            let newOffsetY = epoch.sleepClasification!.rawValue
+            let newOffsetY = epoch.stage!.rawValue
             if offsetY != newOffsetY{
                 offsetY = newOffsetY
                 path.addLine(to: CGPoint(x: offsetX, y: offsetY)) // vertical line

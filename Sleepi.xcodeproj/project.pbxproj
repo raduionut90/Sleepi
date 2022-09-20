@@ -20,6 +20,9 @@
 		171535362815D7F200B1A499 /* Sleep.swift in Sources */ = {isa = PBXBuildFile; fileRef = 171535352815D7F200B1A499 /* Sleep.swift */; };
 		171AB5E828BCEAE7000DB5C4 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 171AB5E728BCEAE7000DB5C4 /* StoreKit.framework */; };
 		172553A928ACB39C0055C441 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 172553A828ACB39C0055C441 /* Constants.swift */; };
+		173A249628D86AAC0077EBBC /* SleepChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 173A249528D86AAC0077EBBC /* SleepChart.swift */; };
+		1742CC6B28D7AB6000979473 /* HorizontalBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1742CC6A28D7AB6000979473 /* HorizontalBar.swift */; };
+		1742CC6D28D7AC2F00979473 /* VerticalLine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1742CC6C28D7AC2F00979473 /* VerticalLine.swift */; };
 		174E5F2B28720D6F00D423A0 /* Record.swift in Sources */ = {isa = PBXBuildFile; fileRef = 174E5F2A28720D6F00D423A0 /* Record.swift */; };
 		17902D6A28C8A4EC0054BC4D /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17902D6928C8A4EC0054BC4D /* LoadingView.swift */; };
 		17A4C3C7283511F5005D92F7 /* SleepManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17A4C3C6283511F5005D92F7 /* SleepManager.swift */; };
@@ -57,6 +60,9 @@
 		171AB5E728BCEAE7000DB5C4 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		172553A828ACB39C0055C441 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		172D18272853302900A0FD42 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		173A249528D86AAC0077EBBC /* SleepChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepChart.swift; sourceTree = "<group>"; };
+		1742CC6A28D7AB6000979473 /* HorizontalBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HorizontalBar.swift; sourceTree = "<group>"; };
+		1742CC6C28D7AC2F00979473 /* VerticalLine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerticalLine.swift; sourceTree = "<group>"; };
 		174E5F2A28720D6F00D423A0 /* Record.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Record.swift; sourceTree = "<group>"; };
 		17902D6928C8A4EC0054BC4D /* LoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingView.swift; sourceTree = "<group>"; };
 		17A4C3C6283511F5005D92F7 /* SleepManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepManager.swift; sourceTree = "<group>"; };
@@ -158,6 +164,9 @@
 			children = (
 				17EA8C8B28282B6800545BDD /* LineChartView.swift */,
 				17902D6928C8A4EC0054BC4D /* LoadingView.swift */,
+				1742CC6A28D7AB6000979473 /* HorizontalBar.swift */,
+				1742CC6C28D7AC2F00979473 /* VerticalLine.swift */,
+				173A249528D86AAC0077EBBC /* SleepChart.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -240,8 +249,11 @@
 				171535232815C02F00B1A499 /* ContentView.swift in Sources */,
 				17A4C3C7283511F5005D92F7 /* SleepManager.swift in Sources */,
 				17111E602874461A004169C9 /* Utils.swift in Sources */,
+				1742CC6B28D7AB6000979473 /* HorizontalBar.swift in Sources */,
 				170A4ADC283FBF87009FB756 /* SleepPoint.swift in Sources */,
 				171535362815D7F200B1A499 /* Sleep.swift in Sources */,
+				1742CC6D28D7AC2F00979473 /* VerticalLine.swift in Sources */,
+				173A249628D86AAC0077EBBC /* SleepChart.swift in Sources */,
 				17902D6A28C8A4EC0054BC4D /* LoadingView.swift in Sources */,
 				171535332815C1EA00B1A499 /* HealthStore.swift in Sources */,
 				174E5F2B28720D6F00D423A0 /* Record.swift in Sources */,
@@ -393,8 +405,6 @@
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -431,8 +441,6 @@
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

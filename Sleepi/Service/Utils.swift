@@ -12,7 +12,7 @@ class Utils {
     
     static var dateTimeformatter: DateFormatter = {
         let formatter = DateFormatter()
-        formatter.dateFormat = "E, dd MMM yyyy, HH:mm"
+        formatter.dateFormat = "dd MMM yyyy, HH:mm"
         return formatter
     }()
     
@@ -69,7 +69,7 @@ class Utils {
             let endPeriod = Calendar.current.date(byAdding: .minute, value: minutes, to: startEpoch)!
             let lastIndex = activities.lastIndex(where: {$0.startDate < endPeriod} )!
             let endEpoch = activities[lastIndex].endDate
-            let epoch: Epoch = Epoch(start: startEpoch, end: endEpoch, records: Array(activities[firstIndex...lastIndex]))
+            let epoch: Epoch = Epoch(start: startEpoch, end: endEpoch, records: Array(activities[firstIndex...lastIndex]), stage: nil)
             epochs.append(epoch)
             firstIndex = lastIndex + 1
         }

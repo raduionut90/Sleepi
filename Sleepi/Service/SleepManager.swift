@@ -81,21 +81,21 @@ class SleepManager: ObservableObject {
                 
                 if lastEpoch != nil && !lastEpoch!.meanHR.isNaN {
                     if (epoch.meanHR < lastEpoch!.meanHR - 5 || epoch.meanHR < hrQuartiles.firstQuartile ) && epoch.sumActivity < 0.05 {
-                        epoch.sleepClasification = SleepStage.DeepSleep
+                        epoch.stage = SleepStage.DeepSleep
                     } else if ((epoch.meanHR > lastEpoch!.meanHR + 7 || (epoch.meanHR >= hrQuartiles.thirdQuartile || epoch.meanHR.isNaN)) && epoch.sumActivity > 0.20) || epoch.sumActivity > 0.5 {
-                        epoch.sleepClasification = SleepStage.RemSleep
+                        epoch.stage = SleepStage.RemSleep
                     } else if ((lastEpoch!.meanHR - 1)...(lastEpoch!.meanHR + 1)).contains(epoch.meanHR) && (lastEpoch!.sumActivity - 0.05 ... lastEpoch!.sumActivity + 0.05).contains(epoch.sumActivity) {
-                        epoch.sleepClasification = lastEpoch!.sleepClasification
+                        epoch.stage = lastEpoch!.stage
                     } else {
-                        epoch.sleepClasification = SleepStage.LightSleep
+                        epoch.stage = SleepStage.LightSleep
                     }
                 } else {
                     if epoch.sumActivity < 0.01 && epoch.meanHR < hrQuartiles.firstQuartile {
-                        epoch.sleepClasification = SleepStage.DeepSleep
+                        epoch.stage = SleepStage.DeepSleep
                     } else if (epoch.meanHR >= hrQuartiles.thirdQuartile || epoch.meanHR.isNaN) && epoch.sumActivity > 0.2 {
-                        epoch.sleepClasification = SleepStage.RemSleep
+                        epoch.stage = SleepStage.RemSleep
                     } else {
-                        epoch.sleepClasification = SleepStage.LightSleep
+                        epoch.stage = SleepStage.LightSleep
                     }
                 }
                 
