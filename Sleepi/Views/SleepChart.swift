@@ -13,40 +13,43 @@ struct SleepChart: View {
     @State var chartWidth: Double = 0.0
     @State var chartLineDate: Date = Date()
     let timeInBed: Double
-
-    let sleeps: [Sleep] = [
-        Sleep(startDate: Calendar.current.date(byAdding: .hour, value: -10, to: Date())!,
-              endDate: Calendar.current.date(byAdding: .hour, value: -7, to: Date())!,
-              epochs: [
-                Epoch(start: Calendar.current.date(byAdding: .hour, value: -10, to: Date())!, end: Calendar.current.date(byAdding: .hour, value: -9, to: Date())!, records: [], stage: .DeepSleep),
-                Epoch(start: Calendar.current.date(byAdding: .hour, value: -9, to: Date())!, end: Calendar.current.date(byAdding: .hour, value: -8, to: Date())!, records: [], stage: .RemSleep)
-                ,
-                Epoch(start: Calendar.current.date(byAdding: .hour, value: -8, to: Date())!, end: Calendar.current.date(byAdding: .hour, value: -7, to: Date())!, records: [], stage: .LightSleep)
-              ] ),
-        Sleep(startDate: Calendar.current.date(byAdding: .hour, value: -6, to: Date())!,
-              endDate: Calendar.current.date(byAdding: .hour, value: -3, to: Date())!,
-              epochs: [
-                Epoch(start: Calendar.current.date(byAdding: .hour, value: -6, to: Date())!, end: Calendar.current.date(byAdding: .hour, value: -5, to: Date())!, records: [], stage: .DeepSleep),
-                Epoch(start: Calendar.current.date(byAdding: .hour, value: -5, to: Date())!, end: Calendar.current.date(byAdding: .hour, value: -4, to: Date())!, records: [], stage: .LightSleep)
-                ,
-                Epoch(start: Calendar.current.date(byAdding: .hour, value: -4, to: Date())!, end: Calendar.current.date(byAdding: .hour, value: -3, to: Date())!, records: [], stage: .RemSleep)
-              ] )
-    ]
+    let sleeps: [Sleep]
     var epochs: [Epoch] = []
     
-    init() {
+    init(sleeps: [Sleep]) {
+        self.sleeps = sleeps
         for (index, sleep) in sleeps.enumerated() {
             epochs.append(contentsOf: sleep.epochs)
             if sleeps.indices.contains(index + 1) {
                 epochs.append(Epoch(start: sleep.endDate, end: sleeps[index + 1].startDate, records: [], stage: .Awake))
             }
         }
+        
         if sleeps.isEmpty {
             self.timeInBed = 0.0
         } else {
             self.timeInBed = sleeps.last!.endDate.timeIntervalSinceReferenceDate - sleeps.first!.startDate.timeIntervalSinceReferenceDate
         }
+        self.epochs = processEpochs(epochs: epochs)
 
+    }
+    
+    private func processEpochs(epochs: [Epoch]) -> [Epoch] {
+        var result: [Epoch] = []
+        for (index, epoch) in epochs.enumerated(){
+            if epochs.indices.contains(index + 1) {
+                epoch.endDate = epochs[index + 1].startDate
+            }
+            if result.isEmpty {
+                result.append(epoch)
+            } else {
+                if result.last!.stage != epoch.stage {
+                    result.last!.endDate = epoch.startDate
+                    result.append(epoch)
+                }
+            }
+        }
+        return result
     }
     
     private func setChartLineDate(){
@@ -97,15 +100,18 @@ struct SleepChart: View {
                             VStack {
                                 GeometryReader { geo in
                                     setChartWidth(geo)
-                                    ForEach(epochs) { epoch in
-                                        let interval = epoch.endDate.timeIntervalSinceReferenceDate - epoch.startDate.timeIntervalSinceReferenceDate
-                                        let offset = interval / timeInBed * chartWidth
+                                    ForEach(epochs.enumerated()) { index, epoch in
+                                        let interval: Double = epoch.endDate.timeIntervalSinceReferenceDate - epoch.startDate.timeIntervalSinceReferenceDate
+                                        let offset: Double = interval / timeInBed * chartWidth
                                         
-                                        let startPoint = (epoch.startDate.timeIntervalSinceReferenceDate - sleeps.first!.startDate.timeIntervalSinceReferenceDate) /
+                                        let startPoint: Double = (epoch.startDate.timeIntervalSinceReferenceDate - sleeps.first!.startDate.timeIntervalSinceReferenceDate) /
                                         timeInBed * chartWidth
                                         
                                         let color: Color = getColor(stage: epoch.stage!)
                                         HorizontalBar(x: startPoint, y: epoch.stage!.rawValue, width: offset, height: 20).fill(color)
+//                                        if epochs.indices.contains(index - 1) {
+//                                            VerticalLine(startPoint: CGPoint(x: startPoint, y: epochs[index - 1].stage!.rawValue), x: startPoint, y: epoch.stage!.rawValue)
+//                                        }
                                     }
                                     
                                 }
@@ -189,6 +195,23 @@ struct SleepChart: View {
 
 struct SleepChart_Previews: PreviewProvider {
     static var previews: some View {
-        SleepChart()
+        SleepChart(sleeps: [
+            Sleep(startDate: Calendar.current.date(byAdding: .hour, value: -10, to: Date())!,
+                  endDate: Calendar.current.date(byAdding: .hour, value: -7, to: Date())!,
+                  epochs: [
+                    Epoch(start: Calendar.current.date(byAdding: .hour, value: -10, to: Date())!, end: Calendar.current.date(byAdding: .hour, value: -9, to: Date())!, records: [], stage: .DeepSleep),
+                    Epoch(start: Calendar.current.date(byAdding: .hour, value: -9, to: Date())!, end: Calendar.current.date(byAdding: .hour, value: -8, to: Date())!, records: [], stage: .RemSleep)
+                    ,
+                    Epoch(start: Calendar.current.date(byAdding: .hour, value: -8, to: Date())!, end: Calendar.current.date(byAdding: .hour, value: -7, to: Date())!, records: [], stage: .LightSleep)
+                  ] ),
+            Sleep(startDate: Calendar.current.date(byAdding: .hour, value: -6, to: Date())!,
+                  endDate: Calendar.current.date(byAdding: .hour, value: -3, to: Date())!,
+                  epochs: [
+                    Epoch(start: Calendar.current.date(byAdding: .hour, value: -6, to: Date())!, end: Calendar.current.date(byAdding: .hour, value: -5, to: Date())!, records: [], stage: .DeepSleep),
+                    Epoch(start: Calendar.current.date(byAdding: .hour, value: -5, to: Date())!, end: Calendar.current.date(byAdding: .hour, value: -4, to: Date())!, records: [], stage: .LightSleep)
+                    ,
+                    Epoch(start: Calendar.current.date(byAdding: .hour, value: -4, to: Date())!, end: Calendar.current.date(byAdding: .hour, value: -3, to: Date())!, records: [], stage: .RemSleep)
+                  ] )
+        ])
     }
 }

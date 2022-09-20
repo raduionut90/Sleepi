@@ -100,7 +100,7 @@ struct ContentView: View {
                         
                         VStack {
 //                            LineChartView(sleeps: sleepManager.nightSleeps, timeInBed: sleepManager.getInBedTime(), sleepsHrAverage: sleepManager.nsHeartRateAverage)
-                            SleepChart()
+                            SleepChart(sleeps: sleepManager.nightSleeps)
                         }
                         
                         if !sleepManager.nightSleeps.isEmpty {
