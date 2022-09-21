@@ -18,19 +18,15 @@ private let logger = Logger(
 class SleepManager: ObservableObject {
     
     private var healthStore: HealthStore?
-    @Published var nsHeartRateAverage: Double = 0.0
+//    @Published var nsHeartRateAverage: Double = 0.0
     @Published var nightSleeps: [Sleep] = []
     @Published var naps: [Sleep] = []
+    @Published var heartRates: [Record] = []
 
     init(date: Date){
         if HKHealthStore.isHealthDataAvailable() {
             self.healthStore = HealthStore()
         }
-    }
-    
-    fileprivate func getHeartRateAveragePerDay(_ healthStore: HealthStore, _ startDate: Date, _ endDate: Date) async -> Double{
-        let heartRatesAllDay = await healthStore.getSamples(startDate: startDate, endDate: endDate, type: .heartRate)
-        return heartRatesAllDay.map( { $0.quantity.doubleValue(for: HKUnit(from: "count/min")) } ).reduce(0, +) / Double(heartRatesAllDay.count)
     }
     
     func refreshSleeps(date: Date) async throws {
@@ -54,10 +50,15 @@ class SleepManager: ObservableObject {
                         print("")
                     }
                     let sleeps = self.sleepFilter(sleeps: tmpSleeps, date: date)
-                    self.nsHeartRateAverage = getNightSleepsHeartRateAverage(sleeps: sleeps.nightSleep)
+//                    self.nsHeartRateAverage = getNightSleepsHeartRateAverage(sleeps: sleeps.nightSleep)
                     self.nightSleeps = sleeps.nightSleep
                     self.naps = sleeps.naps
                     self.updateEpochsClasificationX()
+                    if !nightSleeps.isEmpty{
+                        let rawheartRates = await healthStore.getSamples(startDate: nightSleeps.first!.startDate, endDate: nightSleeps.last!.endDate, type: .heartRate)
+                        self.heartRates = Utils.getActivitiesFromRawData(heartRates: rawheartRates, activeEnergy: [])
+                    }
+
                 }
             }
 //
@@ -82,7 +83,7 @@ class SleepManager: ObservableObject {
                 if lastEpoch != nil && !lastEpoch!.meanHR.isNaN {
                     if (epoch.meanHR < lastEpoch!.meanHR - 5 || epoch.meanHR < hrQuartiles.firstQuartile ) && epoch.sumActivity < 0.05 {
                         epoch.stage = SleepStage.DeepSleep
-                    } else if ((epoch.meanHR > lastEpoch!.meanHR + 7 || (epoch.meanHR >= hrQuartiles.thirdQuartile || epoch.meanHR.isNaN)) && epoch.sumActivity > 0.20) || epoch.sumActivity > 0.5 {
+                    } else if ((epoch.meanHR > lastEpoch!.meanHR + 7 || (epoch.meanHR >= hrQuartiles.thirdQuartile))) || epoch.sumActivity > 0.5 {
                         epoch.stage = SleepStage.RemSleep
                     } else if ((lastEpoch!.meanHR - 1)...(lastEpoch!.meanHR + 1)).contains(epoch.meanHR) && (lastEpoch!.sumActivity - 0.05 ... lastEpoch!.sumActivity + 0.05).contains(epoch.sumActivity) {
                         epoch.stage = lastEpoch!.stage
@@ -138,7 +139,7 @@ class SleepManager: ObservableObject {
                 }).reduce(0, +)
         }
         return self.nightSleeps.map({
-            $0.getStageSleepDuration(allSleepsHrAverage: self.nsHeartRateAverage, stage: stage)
+            $0.getStageSleepDuration(stage: stage)
         }).reduce(0, +)
     }
     

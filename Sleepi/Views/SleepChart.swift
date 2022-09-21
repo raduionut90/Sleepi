@@ -14,10 +14,12 @@ struct SleepChart: View {
     @State var chartLineDate: Date = Date()
     let timeInBed: Double
     let sleeps: [Sleep]
+    let heartRates: [Record]
     var epochs: [Epoch] = []
     
-    init(sleeps: [Sleep]) {
+    init(sleeps: [Sleep], heartRates: [Record]) {
         self.sleeps = sleeps
+        self.heartRates = heartRates
         for (index, sleep) in sleeps.enumerated() {
             epochs.append(contentsOf: sleep.epochs)
             if sleeps.indices.contains(index + 1) {
@@ -31,7 +33,6 @@ struct SleepChart: View {
             self.timeInBed = sleeps.last!.endDate.timeIntervalSinceReferenceDate - sleeps.first!.startDate.timeIntervalSinceReferenceDate
         }
         self.epochs = processEpochs(epochs: epochs)
-
     }
     
     private func processEpochs(epochs: [Epoch]) -> [Epoch] {
@@ -39,13 +40,17 @@ struct SleepChart: View {
         for (index, epoch) in epochs.enumerated(){
             if epochs.indices.contains(index + 1) {
                 epoch.endDate = epochs[index + 1].startDate
+            } else {
+                epoch.endDate = sleeps.last!.endDate
             }
             if result.isEmpty {
                 result.append(epoch)
             } else {
-                if result.last!.stage != epoch.stage {
+                if result.last!.stage != epoch.stage && epoch != epochs.last {
                     result.last!.endDate = epoch.startDate
                     result.append(epoch)
+                } else if epoch == epochs.last {
+                    result.last!.endDate = epoch.endDate
                 }
             }
         }
@@ -98,9 +103,18 @@ struct SleepChart: View {
                     ZStack {
                         if !epochs.isEmpty {
                             VStack {
+                                if chartWidth > 0 && !heartRates.isEmpty {
+                                    HeartRatesChart(records: heartRates, chartWidth: chartWidth, timeInBed: timeInBed)
+                                        .stroke(.red, lineWidth: 0.3)
+                                }
+                            }
+                            .rotationEffect(.degrees(180), anchor: .center)
+                            .padding(.leading, 5)
+                            .padding(.trailing, 5)
+                            VStack {
                                 GeometryReader { geo in
                                     setChartWidth(geo)
-                                    ForEach(epochs.enumerated()) { index, epoch in
+                                    ForEach(Array(zip(epochs.indices, epochs)), id: \.0) { index, epoch in
                                         let interval: Double = epoch.endDate.timeIntervalSinceReferenceDate - epoch.startDate.timeIntervalSinceReferenceDate
                                         let offset: Double = interval / timeInBed * chartWidth
                                         
@@ -109,9 +123,12 @@ struct SleepChart: View {
                                         
                                         let color: Color = getColor(stage: epoch.stage!)
                                         HorizontalBar(x: startPoint, y: epoch.stage!.rawValue, width: offset, height: 20).fill(color)
-//                                        if epochs.indices.contains(index - 1) {
-//                                            VerticalLine(startPoint: CGPoint(x: startPoint, y: epochs[index - 1].stage!.rawValue), x: startPoint, y: epoch.stage!.rawValue)
-//                                        }
+                                        if epochs.indices.contains(index - 1) {
+                                            let y = epochs[index - 1].stage!.rawValue + 10
+                                            let newY = epoch.stage!.rawValue + 10
+                                            VerticalLine(startPoint: CGPoint(x: startPoint, y: y), x: startPoint, y: newY)
+                                                .stroke(.gray, lineWidth: 0.2)
+                                        }
                                     }
                                     
                                 }
@@ -128,6 +145,8 @@ struct SleepChart: View {
                                     }.stroke(.gray)
                                 }
                             }
+                            .padding(.leading, 5)
+                            .padding(.trailing, 5)
                             .frame(minHeight: 150, maxHeight: 150)
                         } else {
                             Spacer()
@@ -212,6 +231,7 @@ struct SleepChart_Previews: PreviewProvider {
                     ,
                     Epoch(start: Calendar.current.date(byAdding: .hour, value: -4, to: Date())!, end: Calendar.current.date(byAdding: .hour, value: -3, to: Date())!, records: [], stage: .RemSleep)
                   ] )
-        ])
+        ],
+       heartRates: [])
     }
 }

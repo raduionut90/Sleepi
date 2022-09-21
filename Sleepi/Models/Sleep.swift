@@ -31,7 +31,7 @@ struct Sleep: Hashable, Identifiable, Equatable {
         return self.endDate.timeIntervalSinceReferenceDate - self.startDate.timeIntervalSinceReferenceDate
     }
     
-    func getStageSleepDuration(allSleepsHrAverage: Double, stage: SleepStage) -> Double {
+    func getStageSleepDuration(stage: SleepStage) -> Double {
         var result: [TimeInterval] = []
         
 //        if stage == .LightSleep {

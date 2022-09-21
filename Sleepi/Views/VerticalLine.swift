@@ -16,7 +16,6 @@ struct VerticalLine: Shape {
             path.move(to: startPoint)
             path.addLine(to: CGPoint(x: x, y: y))
         }
-        .stroke(.red, lineWidth: 2) as! Path
     }
 }
 

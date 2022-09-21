@@ -99,8 +99,9 @@ struct ContentView: View {
                         
                         
                         VStack {
-//                            LineChartView(sleeps: sleepManager.nightSleeps, timeInBed: sleepManager.getInBedTime(), sleepsHrAverage: sleepManager.nsHeartRateAverage)
-                            SleepChart(sleeps: sleepManager.nightSleeps)
+                            if !sleepManager.nightSleeps.isEmpty {
+                                SleepChart(sleeps: sleepManager.nightSleeps, heartRates: sleepManager.heartRates)
+                            }
                         }
                         
                         if !sleepManager.nightSleeps.isEmpty {
@@ -180,7 +181,7 @@ struct ContentView: View {
                             }
                         }
                     }
-                    .padding()
+                    .padding(10)
                     .foregroundColor(Color("TextColorPrim"))
                     .background(Color("BackgroundSec"))
                     .cornerRadius(16)
@@ -216,17 +217,12 @@ struct ContentView: View {
                     loading = false
                 }
             })
-//            .onChange(of: sleepDetector.loading, perform: { _ in
-//                Task.init {
-//                    try await sleepManager.refreshSleeps(date: currentDate)
-//                    loading = false
-//                }
-//            })
+
             .onAppCameToForeground {
                 print("onAppCameToForeground")
                 Task.init {
                     if isFirstTimeRunning() {
-                        try await sleepDetector.whenFirstimeRunning()
+//                        try await sleepDetector.whenFirstimeRunning()
                     }
                     try await sleepDetector.performSleepDetection()
                     try await sleepManager.refreshSleeps(date: currentDate)
