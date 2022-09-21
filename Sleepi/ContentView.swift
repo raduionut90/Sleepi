@@ -97,9 +97,8 @@ struct ContentView: View {
                             }
                         }
                         
-                        
-                        VStack {
-                            if !sleepManager.nightSleeps.isEmpty {
+                        if !sleepManager.nightSleeps.isEmpty {
+                            VStack {
                                 SleepChart(sleeps: sleepManager.nightSleeps)
                             }
                         }
@@ -204,7 +203,7 @@ struct ContentView: View {
             .onAppear(){
                 Task.init {
                     if isFirstTimeRunning() {
-//                        try? await sleepDetector.whenFirstimeRunning()
+                        try? await sleepDetector.whenFirstimeRunning()
                     }
                     try? await sleepDetector.performSleepDetection()
                     try? await sleepManager.refreshSleeps(date: currentDate)
@@ -222,7 +221,7 @@ struct ContentView: View {
                 print("onAppCameToForeground")
                 Task.init {
                     if isFirstTimeRunning() {
-//                        try await sleepDetector.whenFirstimeRunning()
+                        try await sleepDetector.whenFirstimeRunning()
                     }
                     try await sleepDetector.performSleepDetection()
                     try await sleepManager.refreshSleeps(date: currentDate)
