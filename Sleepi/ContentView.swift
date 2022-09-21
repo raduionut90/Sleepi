@@ -100,7 +100,7 @@ struct ContentView: View {
                         
                         VStack {
                             if !sleepManager.nightSleeps.isEmpty {
-                                SleepChart(sleeps: sleepManager.nightSleeps, heartRates: sleepManager.heartRates)
+                                SleepChart(sleeps: sleepManager.nightSleeps)
                             }
                         }
                         

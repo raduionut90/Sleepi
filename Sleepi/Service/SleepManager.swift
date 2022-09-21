@@ -21,7 +21,6 @@ class SleepManager: ObservableObject {
 //    @Published var nsHeartRateAverage: Double = 0.0
     @Published var nightSleeps: [Sleep] = []
     @Published var naps: [Sleep] = []
-    @Published var heartRates: [Record] = []
 
     init(date: Date){
         if HKHealthStore.isHealthDataAvailable() {
@@ -50,14 +49,9 @@ class SleepManager: ObservableObject {
                         print("")
                     }
                     let sleeps = self.sleepFilter(sleeps: tmpSleeps, date: date)
-//                    self.nsHeartRateAverage = getNightSleepsHeartRateAverage(sleeps: sleeps.nightSleep)
                     self.nightSleeps = sleeps.nightSleep
                     self.naps = sleeps.naps
                     self.updateEpochsClasificationX()
-                    if !nightSleeps.isEmpty{
-                        let rawheartRates = await healthStore.getSamples(startDate: nightSleeps.first!.startDate, endDate: nightSleeps.last!.endDate, type: .heartRate)
-                        self.heartRates = Utils.getActivitiesFromRawData(heartRates: rawheartRates, activeEnergy: [])
-                    }
 
                 }
             }

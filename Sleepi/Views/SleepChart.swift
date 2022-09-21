@@ -14,12 +14,10 @@ struct SleepChart: View {
     @State var chartLineDate: Date = Date()
     let timeInBed: Double
     let sleeps: [Sleep]
-    let heartRates: [Record]
     var epochs: [Epoch] = []
     
-    init(sleeps: [Sleep], heartRates: [Record]) {
+    init(sleeps: [Sleep]) {
         self.sleeps = sleeps
-        self.heartRates = heartRates
         for (index, sleep) in sleeps.enumerated() {
             epochs.append(contentsOf: sleep.epochs)
             if sleeps.indices.contains(index + 1) {
@@ -102,15 +100,6 @@ struct SleepChart: View {
                 HStack {
                     ZStack {
                         if !epochs.isEmpty {
-                            VStack {
-                                if chartWidth > 0 && !heartRates.isEmpty {
-                                    HeartRatesChart(records: heartRates, chartWidth: chartWidth, timeInBed: timeInBed)
-                                        .stroke(.red, lineWidth: 0.3)
-                                }
-                            }
-                            .rotationEffect(.degrees(180), anchor: .center)
-                            .padding(.leading, 5)
-                            .padding(.trailing, 5)
                             VStack {
                                 GeometryReader { geo in
                                     setChartWidth(geo)
@@ -231,7 +220,6 @@ struct SleepChart_Previews: PreviewProvider {
                     ,
                     Epoch(start: Calendar.current.date(byAdding: .hour, value: -4, to: Date())!, end: Calendar.current.date(byAdding: .hour, value: -3, to: Date())!, records: [], stage: .RemSleep)
                   ] )
-        ],
-       heartRates: [])
+        ])
     }
 }
