@@ -17,9 +17,11 @@ private let logger = Logger(
 struct ContentView: View {
     @State var currentDate: Date = Date()
     @State var loading: Bool = true
+    @State var disableNextDayButton: Bool = true
     @AppStorage("bundleCompileDate") private var bundleCompileDate: Double = Date().timeIntervalSinceReferenceDate
     @StateObject var sleepManager: SleepManager = SleepManager(date: Date())
     @StateObject var sleepDetector: SleepDetector = SleepDetector()
+
     
     private func addingDays(nr: Int) -> Void {
         var dateComponent = DateComponents()
@@ -64,7 +66,7 @@ struct ContentView: View {
                                     .font(.title3)
                                 Spacer()
                                 
-                                if (Calendar.current.compare(Date(), to: currentDate, toGranularity: .day) == .orderedDescending) {
+                                if !disableNextDayButton {
                                     Button(action: {
                                         addingDays(nr: 1)
                                     }) {
@@ -211,6 +213,11 @@ struct ContentView: View {
                 }
             }
             .onChange(of: currentDate, perform: { value in
+                if (Calendar.current.compare(Date(), to: value, toGranularity: .day) == .orderedDescending) {
+                    self.disableNextDayButton = false
+                } else {
+                    self.disableNextDayButton = true
+                }
                 Task.init {
                     try await sleepManager.refreshSleeps(date: value)
                     loading = false
