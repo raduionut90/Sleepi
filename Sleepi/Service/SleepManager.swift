@@ -75,17 +75,20 @@ class SleepManager: ObservableObject {
                 let lastEpoch = sleep.epochs.indices.contains(index - 1) ? sleep.epochs[index - 1] : nil
                 
                 if lastEpoch != nil && !lastEpoch!.meanHR.isNaN {
-                    if (epoch.meanHR < lastEpoch!.meanHR - 5 || epoch.meanHR < hrQuartiles.firstQuartile ) && epoch.sumActivity < 0.05 {
+                    if (epoch.meanHR < lastEpoch!.meanHR - 5 || epoch.meanHR < hrQuartiles.firstQuartile ) && epoch.sumActivity == 0 {
                         epoch.stage = SleepStage.DeepSleep
-                    } else if ((epoch.meanHR > lastEpoch!.meanHR + 7 || (epoch.meanHR >= hrQuartiles.thirdQuartile))) || epoch.sumActivity > 0.5 {
+                    } else if ((epoch.meanHR > lastEpoch!.meanHR + 5 || epoch.meanHR >= hrQuartiles.thirdQuartile) ) || (epoch.sumActivity > 0.1 && epoch.meanHR.isNaN ){
                         epoch.stage = SleepStage.RemSleep
-                    } else if ((lastEpoch!.meanHR - 1)...(lastEpoch!.meanHR + 1)).contains(epoch.meanHR) && (lastEpoch!.sumActivity - 0.05 ... lastEpoch!.sumActivity + 0.05).contains(epoch.sumActivity) {
+                    } else if (((lastEpoch!.meanHR - 2)...(lastEpoch!.meanHR + 2)).contains(epoch.meanHR) ||
+                               lastEpoch!.meanHR.isNaN && epoch.meanHR.isNaN) &&
+                                ((lastEpoch!.sumActivity - 0.05 ... lastEpoch!.sumActivity + 0.05).contains(epoch.sumActivity) ||
+                                lastEpoch!.sumActivity.isNaN && epoch.sumActivity.isNaN)  {
                         epoch.stage = lastEpoch!.stage
                     } else {
                         epoch.stage = SleepStage.LightSleep
                     }
                 } else {
-                    if epoch.sumActivity < 0.01 && epoch.meanHR < hrQuartiles.firstQuartile {
+                    if epoch.sumActivity == 0 && (epoch.meanHR < hrQuartiles.firstQuartile || epoch.meanHR.isNaN) {
                         epoch.stage = SleepStage.DeepSleep
                     } else if (epoch.meanHR >= hrQuartiles.thirdQuartile || epoch.meanHR.isNaN) && epoch.sumActivity > 0.2 {
                         epoch.stage = SleepStage.RemSleep

@@ -112,13 +112,18 @@ struct ContentView: View {
                                     .fill(Color(UIColor(named: "AppAwakeSleep")!))
                                     .frame(width: 10, height: 10)
                                 VStack(alignment: .leading) {
-                                    Text("Awake \(String(times)) times")
+                                    Text("Awake")
                                     Text("Reference: 1 time")
                                         .font(.caption2)
                                         .foregroundColor(Color("TextColorSec"))
                                 }
                                 Spacer()
-                                Text(Utils.timeForrmatedAbr.string(from: sleepManager.getSleepStageDuration(stage: .Awake))!)
+                                VStack {
+                                    Text(Utils.timeForrmatedAbr.string(from: sleepManager.getSleepStageDuration(stage: .Awake))!)
+                                    Text("\(String(times)) times")
+                                        .font(.caption2)
+                                        .foregroundColor(Color("TextColorSec"))
+                                }
                             }
                             HStack {
                                 let percent = sleepManager.getSleepStageDuration(stage: .RemSleep) / sleepManager.getSleepDuration(type: .NightSleep) * 100
@@ -126,13 +131,18 @@ struct ContentView: View {
                                     .fill(Color(UIColor(named: "AppRemSleep")!))
                                     .frame(width: 10, height: 10)
                                 VStack(alignment: .leading) {
-                                    Text("Rem \(String(format: "%.0f", percent)) %")
+                                    Text("Rem")
                                     Text("Reference: 10-30%")
                                         .font(.caption2)
                                         .foregroundColor(Color("TextColorSec"))
                                 }
                                 Spacer()
-                                Text(Utils.timeForrmatedAbr.string(from: sleepManager.getSleepStageDuration(stage: .RemSleep))!)
+                                VStack {
+                                    Text(Utils.timeForrmatedAbr.string(from: sleepManager.getSleepStageDuration(stage: .RemSleep))!)
+                                    Text("\(String(format: "%.0f", percent)) %")
+                                        .font(.caption2)
+                                        .foregroundColor(Color("TextColorSec"))
+                                }
                             }
                             HStack {
                                 let percent = sleepManager.getSleepStageDuration(stage: .LightSleep) / sleepManager.getSleepDuration(type: .NightSleep) * 100
@@ -141,13 +151,18 @@ struct ContentView: View {
                                     .frame(width: 10, height: 10)
                                 VStack(alignment: .leading) {
                                     
-                                    Text("Light \(String(format: "%.0f", percent)) %")
+                                    Text("Light ")
                                     Text("Reference: 40-60%")
                                         .font(.caption2)
                                         .foregroundColor(Color("TextColorSec"))
                                 }
                                 Spacer()
-                                Text(Utils.timeForrmatedAbr.string(from: sleepManager.getSleepStageDuration(stage: .LightSleep))!)
+                                VStack {
+                                    Text(Utils.timeForrmatedAbr.string(from: sleepManager.getSleepStageDuration(stage: .LightSleep))!)
+                                    Text("\(String(format: "%.0f", percent)) %")
+                                        .font(.caption2)
+                                        .foregroundColor(Color("TextColorSec"))
+                                }
                                 
                             }
                             HStack {
@@ -156,13 +171,18 @@ struct ContentView: View {
                                     .fill(Color(UIColor(named: "AppDeepSleep")!))
                                     .frame(width: 10, height: 10)
                                 VStack(alignment: .leading) {
-                                    Text("Deep \(String(format: "%.0f", percent)) %")
+                                    Text("Deep")
                                     Text("Reference: 20-60%")
                                         .font(.caption2)
                                         .foregroundColor(Color("TextColorSec"))
                                 }
                                 Spacer()
-                                Text(Utils.timeForrmatedAbr.string(from: sleepManager.getSleepStageDuration(stage: .DeepSleep))!)
+                                VStack {
+                                    Text(Utils.timeForrmatedAbr.string(from: sleepManager.getSleepStageDuration(stage: .DeepSleep))!)
+                                    Text(" \(String(format: "%.0f", percent)) %")
+                                        .font(.caption2)
+                                        .foregroundColor(Color("TextColorSec"))
+                                }
                                 
                             }
                             ForEach(sleepManager.naps) { nap in
