@@ -149,7 +149,7 @@ class SleepDetector: ObservableObject {
 //            }
             let lastEpoch = epochs.indices.contains(index - 1) ? epochs[index - 1] : nil
             
-            if epoch.sumActivity <= 0.15 &&
+            if epoch.sumActivity <= 0.2 &&
                 !epoch.isContainingGapOrStep() &&
                 !(lastEpoch?.isContainingGapOrStep() ?? false) {
 
@@ -161,8 +161,7 @@ class SleepDetector: ObservableObject {
             }
             
             else if startDate != nil &&
-                        epoch.sumActivity <= 1.5 &&
-                        counter < 2 &&
+                        ((epoch.sumActivity <= 0.5 && counter < 2) || (epoch.sumActivity <= 1.5 && counter < 1)) &&
                         !epoch.isContainingGapOrStep() &&
                         !(lastEpoch?.isContainingGapOrStep() ?? false) {
                 
@@ -173,13 +172,6 @@ class SleepDetector: ObservableObject {
                 counter += 1
             }
             else {
-//                var removedEpoch: Epoch? = nil
-//                if counter > 0 {
-//                    for _ in (0..<counter) {
-//                        removedEpoch = lowActivityEpochs.removeLast()
-//                    }
-//                }
-
                 stopSleep(&startDate, &lowActivityEpochs, &tmpSleeps, epoch)
                 counter = 0
             }
