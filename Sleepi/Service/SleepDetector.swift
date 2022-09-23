@@ -138,7 +138,7 @@ class SleepDetector: ObservableObject {
         logger.log(";\(hrQuartile.firstQuartile);\(hrQuartile.median);\(hrQuartile.thirdQuartile)")
         var counter = 0
         for (index, epoch) in epochs.enumerated() {
-            logger.log(";\(epoch.startDate.formatted());\(epoch.endDate.formatted());\(epoch.sumActivity);\(epoch.meanHR);\(epoch.isContainingGapOrStep())")
+            logger.log(";\(epoch.startDate.formatted(), privacy: .public);\(epoch.endDate.formatted(), privacy: .public);\(epoch.sumActivity);\(epoch.meanHR);\(epoch.isContainingGapOrStep())")
 //            for record in epoch.records {
 //                logger.log(";\(epoch.startDate.formatted());\(epoch.endDate.formatted());\(epoch.sumActivity);\(epoch.meanHR);\(record.startDate.formatted());\(record.endDate.formatted());\(record.actEng ?? 0);\(record.hr ?? 999);\(epoch.isContainingGapOrStep())")
 //
@@ -161,7 +161,7 @@ class SleepDetector: ObservableObject {
             }
             
             else if startDate != nil &&
-                        ((epoch.sumActivity <= 0.5 && counter < 2) || (epoch.sumActivity <= 1.5 && counter < 1)) &&
+                        ((epoch.sumActivity <= 0.5 && counter < 2) || (epoch.sumActivity <= 1 && counter < 1)) &&
                         !epoch.isContainingGapOrStep() &&
                         !(lastEpoch?.isContainingGapOrStep() ?? false) {
                 
@@ -172,7 +172,13 @@ class SleepDetector: ObservableObject {
                 counter += 1
             }
             else {
-                stopSleep(&startDate, &lowActivityEpochs, &tmpSleeps, epoch)
+                var removedEpoch: Epoch? = nil
+                if counter > 0 && !lowActivityEpochs.isEmpty {
+                    for _ in (0..<counter) {
+                        removedEpoch = lowActivityEpochs.removeLast()
+                    }
+                }
+                stopSleep(&startDate, &lowActivityEpochs, &tmpSleeps, removedEpoch != nil ? removedEpoch! : epoch)
                 counter = 0
             }
             
@@ -190,7 +196,7 @@ class SleepDetector: ObservableObject {
         logger.log(";sleep count: \(sleeps.count)")
         for result in sleeps {
             let meanActivity = result.epochs.filter({!$0.sumActivity.isNaN }).map {$0.sumActivity}.reduce(0, +)
-            logger.log("\(result.startDate.formatted());\(result.endDate.formatted());\(meanActivity);\(result.heartRateAverage)")
+            logger.log("\(result.startDate.formatted(), privacy: .public);\(result.endDate.formatted(), privacy: .public);\(meanActivity);\(result.heartRateAverage)")
         }
         return sleeps
     }
