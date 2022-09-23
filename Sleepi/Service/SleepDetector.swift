@@ -46,10 +46,13 @@ class SleepDetector: ObservableObject {
                 (activity.startDate...activity.endDate).contains($0.endDate)
             })
             if step != nil {
-                activity.step = true
+                activity.walking = true
             }
             if index - 1 > 0 && activity.startDate.timeIntervalSinceReferenceDate - activities[index - 1].endDate.timeIntervalSinceReferenceDate > 900 {
-                activity.firstAfterGap = true
+                if activities.indices.contains(index - 1) {
+                    activities[index - 1].charging = true
+                }
+                activity.charging = true
             }
         }
     }
@@ -114,7 +117,7 @@ class SleepDetector: ObservableObject {
     fileprivate func stopSleep(_ startDate: inout Date?, _ lowActivityEpochs: inout [Epoch], _ tmpSleeps: inout [Sleep], _ epoch: Epoch) {
         if startDate != nil && !lowActivityEpochs.isEmpty {
             
-            if (lowActivityEpochs.last!.endDate.timeIntervalSinceReferenceDate) - startDate!.timeIntervalSinceReferenceDate > Constants.SLEEP_DURATION {
+            if epoch.startDate.timeIntervalSinceReferenceDate - startDate!.timeIntervalSinceReferenceDate > Constants.SLEEP_DURATION {
                 tmpSleeps.append(Sleep(startDate: startDate!, endDate: epoch.startDate, epochs: []))
             }
             startDate = nil
@@ -138,20 +141,19 @@ class SleepDetector: ObservableObject {
         logger.log(";\(hrQuartile.firstQuartile);\(hrQuartile.median);\(hrQuartile.thirdQuartile)")
         var counter = 0
         for (index, epoch) in epochs.enumerated() {
-            logger.log(";\(epoch.startDate.formatted(), privacy: .public);\(epoch.endDate.formatted(), privacy: .public);\(epoch.sumActivity);\(epoch.meanHR);\(epoch.isContainingGapOrStep())")
+            logger.log(";\(epoch.startDate.formatted(), privacy: .public);\(epoch.endDate.formatted(), privacy: .public);\(epoch.sumActivity);\(epoch.meanHR);\(epoch.isChargingOrWalking())")
 //            for record in epoch.records {
 //                logger.log(";\(epoch.startDate.formatted());\(epoch.endDate.formatted());\(epoch.sumActivity);\(epoch.meanHR);\(record.startDate.formatted());\(record.endDate.formatted());\(record.actEng ?? 0);\(record.hr ?? 999);\(epoch.isContainingGapOrStep())")
 //
 //            }
 
-//            if epoch.records.contains(where: {$0.startDate.formatted() == "11/09/2022, 1:58"}){
-//                logger.log("xx")
-//            }
+            if epoch.records.contains(where: {$0.startDate.formatted() == "20.09.2022, 8:11"}){
+                logger.log("x")
+            }
             let lastEpoch = epochs.indices.contains(index - 1) ? epochs[index - 1] : nil
             
-            if epoch.sumActivity <= 0.2 &&
-                !epoch.isContainingGapOrStep() &&
-                !(lastEpoch?.isContainingGapOrStep() ?? false) {
+            if epoch.sumActivity <= 0.1 &&
+                !epoch.isChargingOrWalking() {
 
                 if startDate == nil {
                     startDate = lastEpoch != nil ? lastEpoch!.records.last!.endDate : epoch.startDate
@@ -161,13 +163,9 @@ class SleepDetector: ObservableObject {
             }
             
             else if startDate != nil &&
-                        ((epoch.sumActivity <= 0.5 && counter < 2) || (epoch.sumActivity <= 1 && counter < 1)) &&
-                        !epoch.isContainingGapOrStep() &&
-                        !(lastEpoch?.isContainingGapOrStep() ?? false) {
+                        ((epoch.sumActivity <= 0.7 && counter <= 5) || (epoch.sumActivity <= 1 && counter < 1)) &&
+                        !epoch.isChargingOrWalking() {
                 
-                if startDate == nil {
-                    startDate = lastEpoch != nil ? lastEpoch!.records.last!.endDate : epoch.startDate
-                }
                 lowActivityEpochs.append(epoch)
                 counter += 1
             }

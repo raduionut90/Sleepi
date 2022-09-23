@@ -34,6 +34,6 @@ class Record: Equatable, Hashable {
     var hrv: Double?
     var rhr: Double?
     var respRate: Double?
-    var firstAfterGap: Bool = false
-    var step: Bool = false
+    var charging: Bool = false
+    var walking: Bool = false
 }

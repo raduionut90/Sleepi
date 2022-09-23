@@ -33,7 +33,7 @@ class Epoch: Equatable, Comparable, Identifiable {
         self.stage = stage
     }
     
-    func isContainingGapOrStep() -> Bool {
-        return self.records.contains(where: {$0.firstAfterGap || $0.step})
+    func isChargingOrWalking() -> Bool {
+        return self.records.contains(where: {$0.charging || $0.walking})
     }
 }
