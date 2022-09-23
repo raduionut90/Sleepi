@@ -152,7 +152,7 @@ class SleepDetector: ObservableObject {
             }
             let lastEpoch = epochs.indices.contains(index - 1) ? epochs[index - 1] : nil
             
-            if epoch.sumActivity <= 0.1 &&
+            if epoch.sumActivity <= 0.05 &&
                 !epoch.isChargingOrWalking() {
 
                 if startDate == nil {
@@ -163,7 +163,7 @@ class SleepDetector: ObservableObject {
             }
             
             else if startDate != nil &&
-                        ((epoch.sumActivity <= 0.7 && counter <= 5) || (epoch.sumActivity <= 1 && counter < 1)) &&
+                        ((epoch.sumActivity <= 0.5 && counter <= 5) || (epoch.sumActivity <= 1 && counter < 1)) &&
                         !epoch.isChargingOrWalking() {
                 
                 lowActivityEpochs.append(epoch)
