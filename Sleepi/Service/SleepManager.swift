@@ -18,7 +18,6 @@ private let logger = Logger(
 class SleepManager: ObservableObject {
     
     private var healthStore: HealthStore?
-//    @Published var nsHeartRateAverage: Double = 0.0
     @Published var nightSleeps: [Sleep] = []
     @Published var naps: [Sleep] = []
 

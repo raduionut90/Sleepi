@@ -18,7 +18,7 @@ class Epoch: Equatable, Comparable, Identifiable {
     
     let id = UUID()
     let records: [Record]
-    let startDate: Date
+    var startDate: Date
     var endDate: Date
     var meanHR: Double
     let sumActivity: Double

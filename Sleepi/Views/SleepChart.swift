@@ -30,10 +30,10 @@ struct SleepChart: View {
         } else {
             self.timeInBed = sleeps.last!.endDate.timeIntervalSinceReferenceDate - sleeps.first!.startDate.timeIntervalSinceReferenceDate
         }
-        self.epochs = processEpochs(epochs: epochs)
+        self.epochs = processEpochs(epochs: epochs, startDate: sleeps.first!.startDate, endDate: sleeps.last!.endDate)
     }
     
-    private func processEpochs(epochs: [Epoch]) -> [Epoch] {
+    private func processEpochs(epochs: [Epoch], startDate: Date, endDate: Date) -> [Epoch] {
         var result: [Epoch] = []
         for (index, epoch) in epochs.enumerated(){
             if epochs.indices.contains(index + 1) {
@@ -52,6 +52,8 @@ struct SleepChart: View {
                 }
             }
         }
+        result.first!.startDate = startDate
+        result.last!.endDate = endDate
         return result
     }
     
