@@ -227,7 +227,16 @@ class SleepDetector: ObservableObject {
 //            if activeEnergy.startDate.formatted() == "05/10/2022, 13:59" {
 //                logger.log("x")
 //            }
-
+            let prev = filteredActiveEnergies.indices.contains(filteredActiveEnergies.firstIndex(of: activeEnergy)! - 1) ? filteredActiveEnergies[filteredActiveEnergies.firstIndex(of: activeEnergy)! - 1] : nil
+            let next = filteredActiveEnergies.indices.contains(filteredActiveEnergies.firstIndex(of: activeEnergy)! + 1) ? filteredActiveEnergies[filteredActiveEnergies.firstIndex(of: activeEnergy)! + 1] : nil
+            
+            if activeEnergy.quantity.doubleValue(for: .kilocalorie()) < 0.25 && prev != nil && next != nil {
+                if activeEnergy.startDate.timeIntervalSinceReferenceDate - prev!.endDate.timeIntervalSinceReferenceDate > 300 &&
+                    next!.startDate.timeIntervalSinceReferenceDate - activeEnergy.endDate.timeIntervalSinceReferenceDate > 300{
+                    continue
+                }
+            }
+            
             if startDate != nil &&
                 activeEnergy.startDate.timeIntervalSinceReferenceDate - startDate!.timeIntervalSinceReferenceDate > 900 {
                 tmpSleeps.append(Sleep(startDate: startDate!, endDate: activeEnergy.startDate, epochs: []))
