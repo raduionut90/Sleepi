@@ -128,8 +128,6 @@ class SleepDetector: ObservableObject {
                                 try await healthStore.saveSleep(startTime: sleep.startDate, endTime: sleep.endDate)
                                 logger.log(";zip;saved;\(sleep.startDate.formatted());\(sleep.endDate.formatted())")
                             }
-
-                            
                         } else {
                             logger.log("no activities; \(startDate) - \(endDate)")
                         }
@@ -160,6 +158,10 @@ class SleepDetector: ObservableObject {
                 continue
             }
             var startDate: Date? = sleep.startDate
+//            print("slpdur: \(sleep.startDate.formatted());\(sleep.endDate.formatted());\(sleep.getDuration())")
+
+            let threshold = sleep.getDuration() < 3600 ? 0.02 : 0.05
+
             for activity in activities {
                 logger.log(";getSleepsFromInBedTime;\(activity.startDate.formatted(), privacy: .public);\(activity.endDate.formatted(), privacy: .public);\(activity.quantity)")
                 
@@ -170,16 +172,16 @@ class SleepDetector: ObservableObject {
                 let kcal = activity.quantityType == HKSampleType.quantityType(forIdentifier: .activeEnergyBurned) ? activity.quantity.doubleValue(for: .kilocalorie()) : 0
                 let step = activity.quantityType == HKSampleType.quantityType(forIdentifier: .stepCount) ? activity.quantity.doubleValue(for: .count()) : 0
 
-                let threshold = sleep.getDuration() < 3600 ? 0.05 : 0.2
                 
-                if threshold == 0.05 {
-                    print("x")
-                }
+//                if threshold != 0.2 {
+//                    print("x")
+//                }
+                
                 if (kcal > threshold || step > 0)  {
                     if startDate != nil {
                         if activity.startDate.timeIntervalSinceReferenceDate - startDate!.timeIntervalSinceReferenceDate > 300 {
                             // ignore awake < 2 min
-                            if !result.isEmpty && startDate!.timeIntervalSinceReferenceDate - result.last!.endDate.timeIntervalSinceReferenceDate < 120 {
+                            if !result.isEmpty && startDate!.timeIntervalSinceReferenceDate - result.last!.endDate.timeIntervalSinceReferenceDate < 180 {
                                 let removed = result.removeLast()
                                 result.append(Sleep(startDate: removed.startDate, endDate: activity.startDate, epochs: []))
                             } else {
@@ -191,7 +193,7 @@ class SleepDetector: ObservableObject {
                 }
                 if activity.hashValue == activities.last!.hashValue && startDate != nil {
                     // ignore awake < 2 min
-                    if !result.isEmpty && startDate!.timeIntervalSinceReferenceDate - result.last!.endDate.timeIntervalSinceReferenceDate < 120 {
+                    if !result.isEmpty && startDate!.timeIntervalSinceReferenceDate - result.last!.endDate.timeIntervalSinceReferenceDate < 180 {
                         let removed = result.removeLast()
                         result.append(Sleep(startDate: removed.startDate, endDate: sleep.endDate, epochs: []))
                     } else {
@@ -227,15 +229,16 @@ class SleepDetector: ObservableObject {
 //            if activeEnergy.startDate.formatted() == "05/10/2022, 13:59" {
 //                logger.log("x")
 //            }
-            let prev = filteredActiveEnergies.indices.contains(filteredActiveEnergies.firstIndex(of: activeEnergy)! - 1) ? filteredActiveEnergies[filteredActiveEnergies.firstIndex(of: activeEnergy)! - 1] : nil
-            let next = filteredActiveEnergies.indices.contains(filteredActiveEnergies.firstIndex(of: activeEnergy)! + 1) ? filteredActiveEnergies[filteredActiveEnergies.firstIndex(of: activeEnergy)! + 1] : nil
             
-            if activeEnergy.quantity.doubleValue(for: .kilocalorie()) < 0.25 && prev != nil && next != nil {
-                if activeEnergy.startDate.timeIntervalSinceReferenceDate - prev!.endDate.timeIntervalSinceReferenceDate > 300 &&
-                    next!.startDate.timeIntervalSinceReferenceDate - activeEnergy.endDate.timeIntervalSinceReferenceDate > 300{
-                    continue
-                }
-            }
+//            let prev = filteredActiveEnergies.indices.contains(filteredActiveEnergies.firstIndex(of: activeEnergy)! - 1) ? filteredActiveEnergies[filteredActiveEnergies.firstIndex(of: activeEnergy)! - 1] : nil
+//            let next = filteredActiveEnergies.indices.contains(filteredActiveEnergies.firstIndex(of: activeEnergy)! + 1) ? filteredActiveEnergies[filteredActiveEnergies.firstIndex(of: activeEnergy)! + 1] : nil
+            
+//            if activeEnergy.quantity.doubleValue(for: .kilocalorie()) < 0.25 && prev != nil && next != nil {
+//                if activeEnergy.startDate.timeIntervalSinceReferenceDate - prev!.endDate.timeIntervalSinceReferenceDate > 300 &&
+//                    next!.startDate.timeIntervalSinceReferenceDate - activeEnergy.endDate.timeIntervalSinceReferenceDate > 300{
+//                    continue
+//                }
+//            }
             
             if startDate != nil &&
                 activeEnergy.startDate.timeIntervalSinceReferenceDate - startDate!.timeIntervalSinceReferenceDate > 900 {
@@ -245,6 +248,7 @@ class SleepDetector: ObservableObject {
         }
         return tmpSleeps
     }
+    
     private func addEpochs(potentialSleeps: [Sleep], epochs: [Epoch]) -> [Sleep] {
 
         let sleeps = getSleepEpochs(sleeps: potentialSleeps, epochs: epochs)
