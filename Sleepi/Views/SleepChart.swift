@@ -52,8 +52,11 @@ struct SleepChart: View {
                 }
             }
         }
-        result.first!.startDate = startDate
-        result.last!.endDate = endDate
+        if !result.isEmpty {
+            result.first!.startDate = startDate
+            result.last!.endDate = endDate
+        }
+
         return result
     }
     

@@ -64,6 +64,9 @@ class Utils {
     static func getEpochs(activities: [Record], minutes: Int) -> [Epoch]{
         var epochs: [Epoch] = []
         var firstIndex = 0
+        if activities.isEmpty {
+            return epochs
+        }
         while firstIndex <= activities.indices.last! {
             let startEpoch: Date = activities[firstIndex].startDate
             let endPeriod = Calendar.current.date(byAdding: .minute, value: minutes, to: startEpoch)!

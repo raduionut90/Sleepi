@@ -77,7 +77,8 @@ class HealthStore {
                     
                     if let result = tmpResult as? [HKQuantitySample] {
                         let desiredSources = result.filter {
-                            $0.sourceRevision.source.bundleIdentifier.starts(with: "com.apple.health")
+                            $0.sourceRevision.source.bundleIdentifier.starts(with: "com.apple.health") ||
+                            $0.sourceRevision.source.bundleIdentifier.starts(with: "test.boaz.HealthKitImporter") //simulator
                         }
                         continuation.resume(returning: desiredSources)
                     }
