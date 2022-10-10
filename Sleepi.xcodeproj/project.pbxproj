@@ -28,7 +28,6 @@
 		17902D6A28C8A4EC0054BC4D /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17902D6928C8A4EC0054BC4D /* LoadingView.swift */; };
 		17A4C3C7283511F5005D92F7 /* SleepManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17A4C3C6283511F5005D92F7 /* SleepManager.swift */; };
 		17D6FAF428AF6AEC00F46F2F /* Epoch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17D6FAF328AF6AEC00F46F2F /* Epoch.swift */; };
-		17EA8C8C28282B6800545BDD /* LineChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17EA8C8B28282B6800545BDD /* LineChartView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -70,7 +69,6 @@
 		17A4C3C6283511F5005D92F7 /* SleepManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepManager.swift; sourceTree = "<group>"; };
 		17C8516F284A86B500E93C26 /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = Platforms/WatchOS.platform/Developer/SDKs/WatchOS8.5.sdk/System/Library/Frameworks/HealthKit.framework; sourceTree = DEVELOPER_DIR; };
 		17D6FAF328AF6AEC00F46F2F /* Epoch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Epoch.swift; sourceTree = "<group>"; };
-		17EA8C8B28282B6800545BDD /* LineChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LineChartView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -164,7 +162,6 @@
 		17EA8C85281974BA00545BDD /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				17EA8C8B28282B6800545BDD /* LineChartView.swift */,
 				17902D6928C8A4EC0054BC4D /* LoadingView.swift */,
 				1742CC6A28D7AB6000979473 /* HorizontalBar.swift */,
 				1742CC6C28D7AC2F00979473 /* VerticalLine.swift */,
@@ -262,7 +259,6 @@
 				171535332815C1EA00B1A499 /* HealthStore.swift in Sources */,
 				174E5F2B28720D6F00D423A0 /* Record.swift in Sources */,
 				17D6FAF428AF6AEC00F46F2F /* Epoch.swift in Sources */,
-				17EA8C8C28282B6800545BDD /* LineChartView.swift in Sources */,
 				170F2D8828342AA800D00A7C /* SleepStage.swift in Sources */,
 				171535212815C02F00B1A499 /* SleepiApp.swift in Sources */,
 				17111E5D28744427004169C9 /* SleepDetector.swift in Sources */,

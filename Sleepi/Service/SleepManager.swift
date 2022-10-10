@@ -70,7 +70,12 @@ class SleepManager: ObservableObject {
             logger.log(";\(hrQuartiles.firstQuartile);\(hrQuartiles.median);\(hrQuartiles.thirdQuartile)")
             
             for (index, epoch) in sleep.epochs.enumerated() {
-                logger.log(";\(epoch.startDate.formatted());\(epoch.endDate.formatted());\(epoch.sumActivity);\(epoch.meanHR)")
+                for record in epoch.records {
+                    if record.hr != nil {
+                        logger.log(";hrR;\(record.startDate.formatted());\(record.endDate.formatted());\(record.hr ?? 0)")
+                    }
+                }
+//                logger.log(";\(epoch.startDate.formatted());\(epoch.endDate.formatted());\(epoch.sumActivity);\(epoch.meanHR)")
                 let lastEpoch = sleep.epochs.indices.contains(index - 1) ? sleep.epochs[index - 1] : nil
                 
                 if lastEpoch != nil && !lastEpoch!.meanHR.isNaN {
