@@ -8,6 +8,9 @@
 import Foundation
 
 struct Sleep: Hashable, Identifiable, Equatable {
+    static func == (lhs: Sleep, rhs: Sleep) -> Bool {
+        lhs.id == rhs.id
+    }
     
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)

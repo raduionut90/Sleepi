@@ -61,20 +61,22 @@ class Utils {
         return (q1, med, q3);
     }
     
-    static func getEpochs(activities: [Record], minutes: Int) -> [Epoch]{
+    static func getEpochs(activities: [Record]) -> [Epoch]{
         var epochs: [Epoch] = []
-        var firstIndex = 0
+
         if activities.isEmpty {
             return epochs
         }
-        while firstIndex <= activities.indices.last! {
-            let startEpoch: Date = activities[firstIndex].startDate
-            let endPeriod = Calendar.current.date(byAdding: .minute, value: minutes, to: startEpoch)!
-            let lastIndex = activities.lastIndex(where: {$0.startDate < endPeriod} )!
-            let endEpoch = activities[lastIndex].endDate
-            let epoch: Epoch = Epoch(start: startEpoch, end: endEpoch, records: Array(activities[firstIndex...lastIndex]), stage: nil)
+        
+        let hrActivities = activities.filter { $0.hr != nil }
+        for (index, activity) in hrActivities.enumerated() {
+            let startDate: Date = hrActivities.indices.contains(index - 1) ? hrActivities[index - 1].startDate : activities.first!.startDate
+
+            let epoch = Epoch(start: startDate,
+                              end: activity.startDate,
+                              records: activities.filter( { (index == 0 ? $0.startDate >= startDate : $0.startDate > startDate) && $0.startDate <= activity.startDate } ),
+                              stage: nil)
             epochs.append(epoch)
-            firstIndex = lastIndex + 1
         }
 
         return epochs

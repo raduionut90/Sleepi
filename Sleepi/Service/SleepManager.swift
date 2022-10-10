@@ -41,7 +41,7 @@ class SleepManager: ObservableObject {
                         let heartRates = await healthStore.getSamples(startDate: rawSleep.startDate, endDate: rawSleep.endDate, type: .heartRate)
                         let activeEnergys = await healthStore.getSamples(startDate: rawSleep.startDate, endDate: rawSleep.endDate, type: .activeEnergyBurned)
                         let activities: [Record] = Utils.getActivitiesFromRawData(heartRates: heartRates, activeEnergy: activeEnergys)
-                        let epochs = Utils.getEpochs(activities: activities, minutes: 3)
+                        let epochs = Utils.getEpochs(activities: activities)
 
                         let sleep: Sleep = Sleep(startDate: rawSleep.startDate, endDate: rawSleep.endDate, epochs: epochs)
                         tmpSleeps.append(sleep)
@@ -70,12 +70,8 @@ class SleepManager: ObservableObject {
             logger.log(";\(hrQuartiles.firstQuartile);\(hrQuartiles.median);\(hrQuartiles.thirdQuartile)")
             
             for (index, epoch) in sleep.epochs.enumerated() {
-                for record in epoch.records {
-                    if record.hr != nil {
-                        logger.log(";hrR;\(record.startDate.formatted());\(record.endDate.formatted());\(record.hr ?? 0)")
-                    }
-                }
-//                logger.log(";\(epoch.startDate.formatted());\(epoch.endDate.formatted());\(epoch.sumActivity);\(epoch.meanHR)")
+
+                logger.log(";\(epoch.startDate.formatted());\(epoch.endDate.formatted());\(epoch.sumActivity);\(epoch.meanHR)")
                 let lastEpoch = sleep.epochs.indices.contains(index - 1) ? sleep.epochs[index - 1] : nil
                 
                 if lastEpoch != nil && !lastEpoch!.meanHR.isNaN {
