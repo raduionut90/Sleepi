@@ -112,7 +112,6 @@ class SleepDetector: ObservableObject {
                     inBedSleeps.removeAll(where: {$0.id == sleep.id})
                 }
             }
-            
             return inBedSleeps
         }
         return potentialSleeps
@@ -129,7 +128,6 @@ class SleepDetector: ObservableObject {
                 logger.debug(";timeGap:;\(timeGap.start.formatted(), privacy: .public);\(timeGap.end.formatted(), privacy: .public)")
             }
         }
-
         if !shortSleeps.isEmpty {
             let inBedSleeps: [Sleep] = getInBedSleeps(shortSleeps)
             let processedSleeps: [Sleep] = getSleepsFromInBedTime(inBedSleeps: inBedSleeps, activeEnergy: activeEnergy, steps: steps) 
@@ -229,13 +227,20 @@ class SleepDetector: ObservableObject {
             logger.debug(";lastEndDateExistingSleep:;\(lastEndDateExistingSleep!.formatted())")
         }
         
-        for activeEnergy in activities.filter({$0.quantity.doubleValue(for: .kilocalorie()) > 0.1}) {
+        for activeEnergy in activities {
             logger.log(";\(activeEnergy.startDate.formatted(), privacy: .public);\(activeEnergy.endDate.formatted(), privacy: .public);\(activeEnergy.quantity.doubleValue(for: .kilocalorie()))")
             
-            let isTimeGap: (Bool)? = timeGaps?.first(where: { $0.contains(activeEnergy.startDate) }) != nil
-//            if activeEnergy.startDate.formatted() == "11.10.2022, 6:48" {
-//                logger.log("xx")
-//            }
+            let isTimeGap: Bool? = timeGaps?.first(where: { $0.contains(activeEnergy.startDate) }) != nil
+            
+            if activeEnergy.startDate.formatted() == "11.10.2022, 17:24" {
+                if timeGaps != nil {
+                    for timegap in timeGaps! {
+                        logger.log(";\(timegap.start);\(timegap.end);")
+                    }
+                }
+                logger.log(";\(activeEnergy.startDate);\(activeEnergy.endDate);")
+            }
+            
             
             if startDate != nil &&
                     !(isTimeGap ?? false) &&
