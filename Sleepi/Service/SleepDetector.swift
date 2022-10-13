@@ -130,12 +130,26 @@ class SleepDetector: ObservableObject {
         }
         if !shortSleeps.isEmpty {
             let inBedSleeps: [Sleep] = getInBedSleeps(shortSleeps)
-            let processedSleeps: [Sleep] = getSleepsFromInBedTime(inBedSleeps: inBedSleeps, activeEnergy: activeEnergy, steps: steps) 
-            return processedSleeps
+            let processedSleeps: [Sleep] = getSleepsFromInBedTime(inBedSleeps: inBedSleeps, activeEnergy: activeEnergy, steps: steps)
+ 
+            var finalSleeps: [Sleep] = checkSleepActivities(processedSleeps, heartRates, activeEnergy)
+            
+            return finalSleeps
         }
         return nil
     }
-    
+    private func checkSleepActivities(_ sleeps: [Sleep], _ heartRates: [HKQuantitySample], _ activeEnergy: [HKQuantitySample]) -> [Sleep] {
+        var activities: [HKQuantitySample] = []
+        activities.append(contentsOf: activeEnergy)
+        activities.append(contentsOf: heartRates)
+        var finalSleeps: [Sleep] = []
+        for sleep in sleeps {
+            if activities.contains(where: {$0.startDate > sleep.startDate && $0.startDate < sleep.endDate}) {
+                finalSleeps.append(sleep)
+            }
+        }
+        return finalSleeps
+    }
     fileprivate func getTimeGaps(_ heartRates: [HKQuantitySample], _ activeEnergy: [HKQuantitySample]) -> [DateInterval]? {
         var all: [HKQuantitySample] = []
         all.append(contentsOf: heartRates)
@@ -185,9 +199,9 @@ class SleepDetector: ObservableObject {
                 
                 if (kcal > threshold || step > 0)  {
                     if startDate != nil {
-                        if activity.startDate.timeIntervalSinceReferenceDate - startDate!.timeIntervalSinceReferenceDate > 300 {
+                        if activity.startDate.timeIntervalSinceReferenceDate - startDate!.timeIntervalSinceReferenceDate > 420 {
                             // ignore awake < 2 min
-                            if !result.isEmpty && startDate!.timeIntervalSinceReferenceDate - result.last!.endDate.timeIntervalSinceReferenceDate < 180 {
+                            if !result.isEmpty && startDate!.timeIntervalSinceReferenceDate - result.last!.endDate.timeIntervalSinceReferenceDate < 180 && kcal < 1 {
                                 let removed = result.removeLast()
                                 result.append(Sleep(startDate: removed.startDate, endDate: activity.startDate, epochs: []))
                             } else {
@@ -232,7 +246,8 @@ class SleepDetector: ObservableObject {
             
             let isTimeGap: Bool? = timeGaps?.first(where: { $0.contains(activeEnergy.startDate) }) != nil
             
-            if activeEnergy.startDate.formatted() == "11.10.2022, 17:24" {
+            //for debugging
+            if activeEnergy.startDate.formatted() == "12/10/2022, 22:09" {
                 if timeGaps != nil {
                     for timegap in timeGaps! {
                         logger.log(";\(timegap.start);\(timegap.end);")
@@ -244,7 +259,7 @@ class SleepDetector: ObservableObject {
             
             if startDate != nil &&
                     !(isTimeGap ?? false) &&
-                    activeEnergy.startDate.timeIntervalSinceReferenceDate - startDate!.timeIntervalSinceReferenceDate > 900 {
+                    activeEnergy.startDate.timeIntervalSinceReferenceDate - startDate!.timeIntervalSinceReferenceDate > 480 {
                 result.append(Sleep(startDate: startDate!, endDate: activeEnergy.startDate, epochs: []))
             }
             startDate = activeEnergy.endDate
