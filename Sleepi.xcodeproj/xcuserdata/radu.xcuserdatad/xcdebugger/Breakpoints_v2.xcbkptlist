@@ -206,8 +206,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "277"
             endingLineNumber = "277"
-            landmarkName = "getStartDate(_:)"
-            landmarkType = "7">
+            landmarkName = "SleepDetector"
+            landmarkType = "3">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -935,8 +935,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "175"
             endingLineNumber = "175"
-            landmarkName = "SleepDetector"
-            landmarkType = "3">
+            landmarkName = "getSleepsFromInBedTime(inBedSleeps:activeEnergy:steps:)"
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -1431,8 +1431,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "235"
             endingLineNumber = "235"
-            landmarkName = "SleepDetector"
-            landmarkType = "3">
+            landmarkName = "identifyShortSleeps(activeEnergies:lastEndDateExistingSleep:timeGaps:)"
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy

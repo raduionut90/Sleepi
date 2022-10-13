@@ -18,7 +18,6 @@
 		171535312815C04200B1A499 /* HealthKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 171535302815C04200B1A499 /* HealthKit.framework */; };
 		171535332815C1EA00B1A499 /* HealthStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 171535322815C1EA00B1A499 /* HealthStore.swift */; };
 		171535362815D7F200B1A499 /* Sleep.swift in Sources */ = {isa = PBXBuildFile; fileRef = 171535352815D7F200B1A499 /* Sleep.swift */; };
-		171AB5E828BCEAE7000DB5C4 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 171AB5E728BCEAE7000DB5C4 /* StoreKit.framework */; };
 		172553A928ACB39C0055C441 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 172553A828ACB39C0055C441 /* Constants.swift */; };
 		173A249628D86AAC0077EBBC /* SleepChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 173A249528D86AAC0077EBBC /* SleepChart.swift */; };
 		173A249828DAF22F0077EBBC /* HeartRatesChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 173A249728DAF22F0077EBBC /* HeartRatesChart.swift */; };
@@ -57,7 +56,6 @@
 		171535302815C04200B1A499 /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = System/Library/Frameworks/HealthKit.framework; sourceTree = SDKROOT; };
 		171535322815C1EA00B1A499 /* HealthStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthStore.swift; sourceTree = "<group>"; };
 		171535352815D7F200B1A499 /* Sleep.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sleep.swift; sourceTree = "<group>"; };
-		171AB5E728BCEAE7000DB5C4 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		172553A828ACB39C0055C441 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		172D18272853302900A0FD42 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		173A249528D86AAC0077EBBC /* SleepChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepChart.swift; sourceTree = "<group>"; };
@@ -67,7 +65,6 @@
 		174E5F2A28720D6F00D423A0 /* Record.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Record.swift; sourceTree = "<group>"; };
 		17902D6928C8A4EC0054BC4D /* LoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingView.swift; sourceTree = "<group>"; };
 		17A4C3C6283511F5005D92F7 /* SleepManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepManager.swift; sourceTree = "<group>"; };
-		17C8516F284A86B500E93C26 /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = Platforms/WatchOS.platform/Developer/SDKs/WatchOS8.5.sdk/System/Library/Frameworks/HealthKit.framework; sourceTree = DEVELOPER_DIR; };
 		17D6FAF328AF6AEC00F46F2F /* Epoch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Epoch.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -77,7 +74,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				171535312815C04200B1A499 /* HealthKit.framework in Frameworks */,
-				171AB5E828BCEAE7000DB5C4 /* StoreKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -129,8 +125,6 @@
 		1715352F2815C04200B1A499 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				171AB5E728BCEAE7000DB5C4 /* StoreKit.framework */,
-				17C8516F284A86B500E93C26 /* HealthKit.framework */,
 				171535302815C04200B1A499 /* HealthKit.framework */,
 			);
 			name = Frameworks;
