@@ -132,7 +132,7 @@ class SleepDetector: ObservableObject {
             let inBedSleeps: [Sleep] = getInBedSleeps(shortSleeps)
             let processedSleeps: [Sleep] = getSleepsFromInBedTime(inBedSleeps: inBedSleeps, activeEnergy: activeEnergy, steps: steps)
  
-            var finalSleeps: [Sleep] = checkSleepActivities(processedSleeps, heartRates, activeEnergy)
+            let finalSleeps: [Sleep] = checkSleepActivities(processedSleeps, heartRates, activeEnergy)
             
             return finalSleeps
         }
