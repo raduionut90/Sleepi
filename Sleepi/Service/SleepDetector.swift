@@ -54,6 +54,8 @@ class SleepDetector: ObservableObject {
                         startDate = sleeps.last!.startDate > Calendar.current.date(byAdding: .hour, value: -24, to: currentDate)! ?
                                 Calendar.current.date(byAdding: .hour, value: -24, to: currentDate)! : sleeps.last!.startDate
                         endDate = Calendar.current.date(byAdding: .hour, value: 24, to: startDate)! >= currentDate ? currentDate : Calendar.current.date(byAdding: .hour, value: 24, to: startDate)!
+                    } else {
+                        return
                     }
                     var lastEndDateExistingSleep: Date? = nil
                     
