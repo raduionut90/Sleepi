@@ -97,7 +97,7 @@ class SleepDetector: ObservableObject {
         var lastIndexUsed: Int = 0
         for (index, sleep) in potentialSleeps.enumerated() {
             if potentialSleeps.indices.contains(index - 1){
-                if sleep.startDate.timeIntervalSinceReferenceDate - potentialSleeps[index - 1].endDate.timeIntervalSinceReferenceDate > 10800 {
+                if sleep.startDate.timeIntervalSinceReferenceDate - potentialSleeps[index - 1].endDate.timeIntervalSinceReferenceDate > 1800 {
                     inBedSleeps.append(Sleep(startDate: potentialSleeps[lastIndexUsed].startDate, endDate: potentialSleeps[index - 1].endDate, epochs: []))
                     lastIndexUsed = index
                 }
@@ -122,20 +122,32 @@ class SleepDetector: ObservableObject {
     fileprivate func processActivities(_ activeEnergy: [HKQuantitySample], _ heartRates: [HKQuantitySample], _ lastEndDateExistingSleep: Date?, _ startDate: Date, _ endDate: Date, _ steps: [HKQuantitySample], _ healthStore: HealthStore) async throws -> [Sleep]? {
         
         let timeGaps = getTimeGaps(heartRates, activeEnergy)
-
-        let shortSleeps = identifyShortSleeps(activeEnergies: activeEnergy, lastEndDateExistingSleep: lastEndDateExistingSleep, timeGaps: timeGaps)
-        
         if timeGaps != nil {
             for timeGap in timeGaps! {
                 logger.debug(";timeGap:;\(timeGap.start.formatted(), privacy: .public);\(timeGap.end.formatted(), privacy: .public)")
             }
         }
+        
+        let shortSleeps = identifyShortSleeps(activeEnergies: activeEnergy, lastEndDateExistingSleep: lastEndDateExistingSleep, timeGaps: timeGaps)
+        for sleep in shortSleeps {
+            logger.debug(";identifyShortSleeps;\(sleep.startDate.formatted(), privacy: .public);\(sleep.endDate.formatted(), privacy: .public)")
+        }
+
         if !shortSleeps.isEmpty {
             let inBedSleeps: [Sleep] = getInBedSleeps(shortSleeps)
-            let processedSleeps: [Sleep] = getSleepsFromInBedTime(inBedSleeps: inBedSleeps, activeEnergy: activeEnergy, steps: steps)
- 
-            let finalSleeps: [Sleep] = checkSleepActivities(processedSleeps, heartRates, activeEnergy)
+            for sleep in inBedSleeps {
+                logger.debug(";getInBedSleeps;\(sleep.startDate.formatted(), privacy: .public);\(sleep.endDate.formatted(), privacy: .public)")
+            }
             
+            let processedSleeps: [Sleep] = getSleepsFromInBedTime(inBedSleeps: inBedSleeps, activeEnergy: activeEnergy, steps: steps)
+            for sleep in processedSleeps {
+                logger.debug(";getSleepsFromInBedTime;\(sleep.startDate.formatted(), privacy: .public);\(sleep.endDate.formatted(), privacy: .public)")
+            }
+            
+            let finalSleeps: [Sleep] = checkSleepActivities(processedSleeps, heartRates, activeEnergy)
+            for sleep in finalSleeps {
+                logger.debug(";checkSleepActivities;\(sleep.startDate.formatted(), privacy: .public);\(sleep.endDate.formatted(), privacy: .public)")
+            }
             return finalSleeps
         }
         return nil
@@ -224,9 +236,6 @@ class SleepDetector: ObservableObject {
                 }
             }
             
-        }
-        for sleep in result {
-            logger.debug(";inBedSleep;\(sleep.startDate.formatted(), privacy: .public);\(sleep.endDate.formatted(), privacy: .public)")
         }
         return result
     }
