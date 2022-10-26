@@ -44,12 +44,13 @@ struct SleepChart: View {
             if result.isEmpty {
                 result.append(epoch)
             } else {
-                if result.last!.stage != epoch.stage && epoch != epochs.last {
+                if result.last!.stage != epoch.stage {
                     result.last!.endDate = epoch.startDate
                     result.append(epoch)
-                } else if epoch == epochs.last {
-                    result.last!.endDate = epoch.endDate
                 }
+//                else if epoch == epochs.last {
+//                    result.last!.endDate = epoch.endDate
+//                }
             }
         }
         if !result.isEmpty {

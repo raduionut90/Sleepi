@@ -224,9 +224,9 @@ struct ContentView: View {
             .navigationViewStyle(StackNavigationViewStyle())
             .onAppear(){
                 Task.init {
-//                    if isFirstTimeRunning() {
-//                        try? await sleepDetector.whenFirstimeRunning()
-//                    }
+                    if isFirstTimeRunning() {
+                        try? await sleepDetector.whenFirstimeRunning()
+                    }
                     try? await sleepDetector.performSleepDetection()
                     try? await sleepManager.refreshSleeps(date: currentDate)
                     loading = false
