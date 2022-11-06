@@ -69,6 +69,17 @@ class Utils {
         }
         
         let hrActivities = activities.filter { $0.hr != nil }
+        if hrActivities.isEmpty {
+            for (index, activity) in activities.enumerated() {
+                let startDate: Date = activities.indices.contains(index - 1) ? activities[index - 1].startDate : activities.first!.startDate
+
+                let epoch = Epoch(start: startDate,
+                                  end: activity.startDate,
+                                  records: activities.filter( { (index == 0 ? $0.startDate >= startDate : $0.startDate > startDate) && $0.startDate <= activity.startDate } ),
+                                  stage: nil)
+                epochs.append(epoch)
+            }
+        }
         for (index, activity) in hrActivities.enumerated() {
             let startDate: Date = hrActivities.indices.contains(index - 1) ? hrActivities[index - 1].startDate : activities.first!.startDate
 

@@ -48,35 +48,34 @@ struct ContentView: View {
     
     var body: some View {
         LoadingView(isShowing: .constant(loading)) {
-            ScrollView(.vertical, showsIndicators: false){
+            ScrollView {
                 VStack {
                     Group {
-                        VStack {
-                            HStack{
+                        HStack{
+                            Button(action: {
+                                addingDays(nr: -1)
+                            }) {
+                                Text("<")
+                                    .font(.title)
+                                    .foregroundColor(.gray)
+                            }
+                            
+                            Spacer()
+                            Text(Utils.dateFormatter.string(from: currentDate))
+                                .font(.title3)
+                            Spacer()
+                            
+                            if !disableNextDayButton {
                                 Button(action: {
-                                    addingDays(nr: -1)
+                                    addingDays(nr: 1)
                                 }) {
-                                    Text("<")
+                                    Text(">")
                                         .font(.title)
                                         .foregroundColor(.gray)
                                 }
-                                
-                                Spacer()
-                                Text(Utils.dateFormatter.string(from: currentDate))
-                                    .font(.title3)
-                                Spacer()
-                                
-                                if !disableNextDayButton {
-                                    Button(action: {
-                                        addingDays(nr: 1)
-                                    }) {
-                                        Text(">")
-                                            .font(.title)
-                                            .foregroundColor(.gray)
-                                    }
-                                }
                             }
                         }
+        
                         HStack() {
                             VStack {
                                 Text("Night Sleep")
@@ -224,9 +223,9 @@ struct ContentView: View {
             .navigationViewStyle(StackNavigationViewStyle())
             .onAppear(){
                 Task.init {
-//                    if isFirstTimeRunning() {
-//                        try? await sleepDetector.whenFirstimeRunning()
-//                    }
+                    if isFirstTimeRunning() {
+                        try? await sleepDetector.whenFirstimeRunning()
+                    }
                     try? await sleepDetector.performSleepDetection()
                     try? await sleepManager.refreshSleeps(date: currentDate)
                     loading = false
@@ -243,19 +242,22 @@ struct ContentView: View {
                     loading = false
                 }
             })
-
             .onAppCameToForeground {
                 print("onAppCameToForeground")
                 Task.init {
-//                    if isFirstTimeRunning() {
-//                        try await sleepDetector.whenFirstimeRunning()
-//                    }
                     try await sleepDetector.performSleepDetection()
                     try await sleepManager.refreshSleeps(date: currentDate)
                 }
             }
             .onAppWentToBackground {
                 print("onAppWentToBackground")
+            }
+            .refreshable {
+                Task {
+                    try? await sleepDetector.performSleepDetection()
+                    try? await sleepManager.refreshSleeps(date: currentDate)
+                }
+
             }
         }
     }
@@ -282,13 +284,9 @@ struct ContentView_Previews: PreviewProvider {
             ContentView()
                 .previewInterfaceOrientation(.portrait)
             ContentView()
-                .previewInterfaceOrientation(.landscapeLeft)
-            ContentView()
-                .previewInterfaceOrientation(.portraitUpsideDown)
+                .previewInterfaceOrientation(.portrait)
                 .preferredColorScheme(.dark)
-            ContentView()
-                .previewInterfaceOrientation(.landscapeLeft)
-                .preferredColorScheme(.dark)
+
         }
     }
 }
