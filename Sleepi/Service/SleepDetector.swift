@@ -18,11 +18,14 @@ private let logger = Logger(
 class SleepDetector: ObservableObject {
 
     private var healthStore: HealthStore?
+    private var firstSleepDetectedDate: Date? = nil
+    
     init(){
         if HKHealthStore.isHealthDataAvailable() {
             self.healthStore = HealthStore()
         }
     }
+    
     
     func whenFirstimeRunning() async throws {
         if let healthStore = healthStore {
@@ -31,6 +34,10 @@ class SleepDetector: ObservableObject {
                 logger.log("firstTimeRunning true")
                 let startDate = Calendar.current.date(byAdding: .day, value: -15, to: Date())!
                 let sleeps = await healthStore.getSleeps(startTime: startDate, endTime: Date())
+                
+                if !sleeps.isEmpty {
+                    firstSleepDetectedDate = sleeps.first?.startDate ?? nil
+                }
                 
                 for sleep in sleeps {
                     try await healthStore.deleteSleep(sleep: sleep)
@@ -50,17 +57,21 @@ class SleepDetector: ObservableObject {
                     var endDate: Date = Calendar.current.date(byAdding: .hour, value: 24, to: startDate)!
                     let sleeps: [HKCategorySample] = await healthStore.getSleeps(startTime: startDate, endTime: currentDate)
                     
-//                    if !sleeps.isEmpty {
+//                    if firstSleepDetectedDate != nil {
+//                        startDate = firstSleepDetectedDate!
+//                        endDate = Calendar.current.date(byAdding: .hour, value: 24, to: startDate)!
+//                    } else if !sleeps.isEmpty {
 //                        startDate = sleeps.last!.startDate > Calendar.current.date(byAdding: .hour, value: -24, to: currentDate)! ?
 //                                Calendar.current.date(byAdding: .hour, value: -24, to: currentDate)! : sleeps.last!.startDate
 //                        endDate = Calendar.current.date(byAdding: .hour, value: 24, to: startDate)! >= currentDate ? currentDate : Calendar.current.date(byAdding: .hour, value: 24, to: startDate)!
 //                    } else {
-//                        return
+//                        startDate = Calendar.current.date(byAdding: .hour, value: -24, to: currentDate)!
+//                        endDate = currentDate
 //                    }
+                    
                     var lastEndDateExistingSleep: Date? = nil
                     
                     while true {
-     
                         let heartRates = await healthStore.getSamples(startDate: startDate, endDate: endDate, type: .heartRate)
                         let activeEnergy = await healthStore.getSamples(startDate: startDate, endDate: endDate, type: .activeEnergyBurned)
                         let steps = await healthStore.getSamples(startDate: startDate, endDate: endDate, type: .stepCount)
@@ -83,7 +94,7 @@ class SleepDetector: ObservableObject {
                         
                         startDate = Calendar.current.date(byAdding: .hour, value: -2, to: endDate)!
                         endDate = Calendar.current.date(byAdding: .hour, value: 24, to: endDate)!
-                        if endDate > currentDate {
+                        if startDate >= currentDate {
                             break
                         }
                     }

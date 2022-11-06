@@ -34,7 +34,7 @@ struct LoadingView<Content>: View where Content: View {
                         .stroke(.gray, lineWidth: 0.1)
                 )
                 .clipped()
-                .shadow(color: Color.gray, radius: 10, x: 0, y: 0)
+                .shadow(color: Color.gray, radius: 3, x: 0, y: 0)
 
                 .opacity(self.isShowing ? 1 : 0)
             }
