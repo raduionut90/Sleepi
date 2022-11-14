@@ -25,6 +25,13 @@
 		1742CC6D28D7AC2F00979473 /* VerticalLine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1742CC6C28D7AC2F00979473 /* VerticalLine.swift */; };
 		174E5F2B28720D6F00D423A0 /* Record.swift in Sources */ = {isa = PBXBuildFile; fileRef = 174E5F2A28720D6F00D423A0 /* Record.swift */; };
 		17902D6A28C8A4EC0054BC4D /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17902D6928C8A4EC0054BC4D /* LoadingView.swift */; };
+		1799D80F29228376008B5054 /* DateBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1799D80E29228376008B5054 /* DateBar.swift */; };
+		1799D81129228C09008B5054 /* StatsBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1799D81029228C09008B5054 /* StatsBar.swift */; };
+		1799D81429228CAC008B5054 /* AwakeStatistics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1799D81329228CAC008B5054 /* AwakeStatistics.swift */; };
+		1799D81629228D07008B5054 /* RemStatistics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1799D81529228D07008B5054 /* RemStatistics.swift */; };
+		1799D81829228DE7008B5054 /* LightSleepStatistics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1799D81729228DE7008B5054 /* LightSleepStatistics.swift */; };
+		1799D81A29228E10008B5054 /* DeepSleepStatistics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1799D81929228E10008B5054 /* DeepSleepStatistics.swift */; };
+		1799D81C29228ECF008B5054 /* NapStatistics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1799D81B29228ECF008B5054 /* NapStatistics.swift */; };
 		17A4C3C7283511F5005D92F7 /* SleepManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17A4C3C6283511F5005D92F7 /* SleepManager.swift */; };
 		17D6FAF428AF6AEC00F46F2F /* Epoch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17D6FAF328AF6AEC00F46F2F /* Epoch.swift */; };
 /* End PBXBuildFile section */
@@ -64,6 +71,13 @@
 		1742CC6C28D7AC2F00979473 /* VerticalLine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerticalLine.swift; sourceTree = "<group>"; };
 		174E5F2A28720D6F00D423A0 /* Record.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Record.swift; sourceTree = "<group>"; };
 		17902D6928C8A4EC0054BC4D /* LoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingView.swift; sourceTree = "<group>"; };
+		1799D80E29228376008B5054 /* DateBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateBar.swift; sourceTree = "<group>"; };
+		1799D81029228C09008B5054 /* StatsBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsBar.swift; sourceTree = "<group>"; };
+		1799D81329228CAC008B5054 /* AwakeStatistics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AwakeStatistics.swift; sourceTree = "<group>"; };
+		1799D81529228D07008B5054 /* RemStatistics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemStatistics.swift; sourceTree = "<group>"; };
+		1799D81729228DE7008B5054 /* LightSleepStatistics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LightSleepStatistics.swift; sourceTree = "<group>"; };
+		1799D81929228E10008B5054 /* DeepSleepStatistics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeepSleepStatistics.swift; sourceTree = "<group>"; };
+		1799D81B29228ECF008B5054 /* NapStatistics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NapStatistics.swift; sourceTree = "<group>"; };
 		17A4C3C6283511F5005D92F7 /* SleepManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepManager.swift; sourceTree = "<group>"; };
 		17D6FAF328AF6AEC00F46F2F /* Epoch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Epoch.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -142,6 +156,28 @@
 			path = Models;
 			sourceTree = "<group>";
 		};
+		1799D80D2922835D008B5054 /* Componets */ = {
+			isa = PBXGroup;
+			children = (
+				1799D81229228C96008B5054 /* Stats */,
+				1799D80E29228376008B5054 /* DateBar.swift */,
+				1799D81029228C09008B5054 /* StatsBar.swift */,
+			);
+			path = Componets;
+			sourceTree = "<group>";
+		};
+		1799D81229228C96008B5054 /* Stats */ = {
+			isa = PBXGroup;
+			children = (
+				1799D81329228CAC008B5054 /* AwakeStatistics.swift */,
+				1799D81529228D07008B5054 /* RemStatistics.swift */,
+				1799D81729228DE7008B5054 /* LightSleepStatistics.swift */,
+				1799D81929228E10008B5054 /* DeepSleepStatistics.swift */,
+				1799D81B29228ECF008B5054 /* NapStatistics.swift */,
+			);
+			path = Stats;
+			sourceTree = "<group>";
+		};
 		17A4C3C5283511DA005D92F7 /* Service */ = {
 			isa = PBXGroup;
 			children = (
@@ -156,6 +192,7 @@
 		17EA8C85281974BA00545BDD /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				1799D80D2922835D008B5054 /* Componets */,
 				17902D6928C8A4EC0054BC4D /* LoadingView.swift */,
 				1742CC6A28D7AB6000979473 /* HorizontalBar.swift */,
 				1742CC6C28D7AC2F00979473 /* VerticalLine.swift */,
@@ -241,18 +278,25 @@
 			buildActionMask = 2147483647;
 			files = (
 				171535232815C02F00B1A499 /* ContentView.swift in Sources */,
+				1799D80F29228376008B5054 /* DateBar.swift in Sources */,
 				17A4C3C7283511F5005D92F7 /* SleepManager.swift in Sources */,
 				17111E602874461A004169C9 /* Utils.swift in Sources */,
 				1742CC6B28D7AB6000979473 /* HorizontalBar.swift in Sources */,
 				170A4ADC283FBF87009FB756 /* SleepPoint.swift in Sources */,
 				171535362815D7F200B1A499 /* Sleep.swift in Sources */,
 				1742CC6D28D7AC2F00979473 /* VerticalLine.swift in Sources */,
+				1799D81429228CAC008B5054 /* AwakeStatistics.swift in Sources */,
 				173A249828DAF22F0077EBBC /* HeartRatesChart.swift in Sources */,
 				173A249628D86AAC0077EBBC /* SleepChart.swift in Sources */,
+				1799D81129228C09008B5054 /* StatsBar.swift in Sources */,
 				17902D6A28C8A4EC0054BC4D /* LoadingView.swift in Sources */,
 				171535332815C1EA00B1A499 /* HealthStore.swift in Sources */,
 				174E5F2B28720D6F00D423A0 /* Record.swift in Sources */,
 				17D6FAF428AF6AEC00F46F2F /* Epoch.swift in Sources */,
+				1799D81C29228ECF008B5054 /* NapStatistics.swift in Sources */,
+				1799D81629228D07008B5054 /* RemStatistics.swift in Sources */,
+				1799D81829228DE7008B5054 /* LightSleepStatistics.swift in Sources */,
+				1799D81A29228E10008B5054 /* DeepSleepStatistics.swift in Sources */,
 				170F2D8828342AA800D00A7C /* SleepStage.swift in Sources */,
 				171535212815C02F00B1A499 /* SleepiApp.swift in Sources */,
 				17111E5D28744427004169C9 /* SleepDetector.swift in Sources */,

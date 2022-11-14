@@ -21,14 +21,6 @@ struct ContentView: View {
     @AppStorage("bundleCompileDate") private var bundleCompileDate: Double = Date().timeIntervalSinceReferenceDate
     @StateObject var sleepManager: SleepManager = SleepManager(date: Date())
     @StateObject var sleepDetector: SleepDetector = SleepDetector()
-
-    
-    private func addingDays(nr: Int) -> Void {
-        var dateComponent = DateComponents()
-        dateComponent.day = nr
-        let futureDate = Calendar.current.date(byAdding: dateComponent, to: currentDate)
-        self.currentDate = futureDate!
-    }
     
     private func isFirstTimeRunning() -> Bool {
         var compileDate:Double
@@ -51,52 +43,9 @@ struct ContentView: View {
             ScrollView {
                 VStack {
                     Group {
-                        HStack{
-                            Button(action: {
-                                addingDays(nr: -1)
-                            }) {
-                                Text("<")
-                                    .font(.title)
-                                    .foregroundColor(.gray)
-                            }
-                            
-                            Spacer()
-                            Text(Utils.dateFormatter.string(from: currentDate))
-                                .font(.title3)
-                            Spacer()
-                            
-                            if !disableNextDayButton {
-                                Button(action: {
-                                    addingDays(nr: 1)
-                                }) {
-                                    Text(">")
-                                        .font(.title)
-                                        .foregroundColor(.gray)
-                                }
-                            }
-                        }
+                        DateBar(sleepManager: sleepManager, currentDate: $currentDate, disableNextDayButton: $disableNextDayButton)
         
-                        HStack() {
-                            VStack {
-                                Text("Night Sleep")
-                                    .font(.subheadline)
-                                    .fontWeight(.light)
-                                
-                                Text(Utils.timeForrmatedAbr.string(from: sleepManager.getSleepDuration(type: .NightSleep) )! )
-                                    .font(.title2)
-                                    .fontWeight(.medium)
-                            }
-                            Spacer()
-                            VStack {
-                                Text("Nap")
-                                    .font(.subheadline)
-                                    .fontWeight(.light)
-                                
-                                Text(Utils.timeForrmatedAbr.string(from: sleepManager.getSleepDuration(type: .Nap) )! )
-                                    .font(.title2)
-                                    .fontWeight(.medium)
-                            }
-                        }
+                        StatsBar(sleepManager: sleepManager)
                         
                         if !sleepManager.nightSleeps.isEmpty {
                             VStack {
@@ -105,100 +54,11 @@ struct ContentView: View {
                         }
                         
                         if !sleepManager.nightSleeps.isEmpty {
-                            HStack {
-                                let times = sleepManager.nightSleeps.count - 1
-                                Circle()
-                                    .fill(Color(UIColor(named: "AppAwakeSleep")!))
-                                    .frame(width: 10, height: 10)
-                                VStack(alignment: .leading) {
-                                    Text("Awake")
-                                    Text("Reference: 1 time")
-                                        .font(.caption2)
-                                        .foregroundColor(Color("TextColorSec"))
-                                }
-                                Spacer()
-                                VStack {
-                                    Text(Utils.timeForrmatedAbr.string(from: sleepManager.getSleepStageDuration(stage: .Awake))!)
-                                    Text("\(String(times)) times")
-                                        .font(.caption2)
-                                        .foregroundColor(Color("TextColorSec"))
-                                }
-                            }
-                            HStack {
-                                let percent = sleepManager.getSleepStageDuration(stage: .RemSleep) / sleepManager.getSleepDuration(type: .NightSleep) * 100
-                                Circle()
-                                    .fill(Color(UIColor(named: "AppRemSleep")!))
-                                    .frame(width: 10, height: 10)
-                                VStack(alignment: .leading) {
-                                    Text("Rem")
-                                    Text("Reference: 10-30%")
-                                        .font(.caption2)
-                                        .foregroundColor(Color("TextColorSec"))
-                                }
-                                Spacer()
-                                VStack {
-                                    Text(Utils.timeForrmatedAbr.string(from: sleepManager.getSleepStageDuration(stage: .RemSleep))!)
-                                    Text("\(String(format: "%.0f", percent)) %")
-                                        .font(.caption2)
-                                        .foregroundColor(Color("TextColorSec"))
-                                }
-                            }
-                            HStack {
-                                let percent = sleepManager.getSleepStageDuration(stage: .LightSleep) / sleepManager.getSleepDuration(type: .NightSleep) * 100
-                                Circle()
-                                    .fill(Color(UIColor(named: "AppLightSleep")!))
-                                    .frame(width: 10, height: 10)
-                                VStack(alignment: .leading) {
-                                    
-                                    Text("Light ")
-                                    Text("Reference: 40-60%")
-                                        .font(.caption2)
-                                        .foregroundColor(Color("TextColorSec"))
-                                }
-                                Spacer()
-                                VStack {
-                                    Text(Utils.timeForrmatedAbr.string(from: sleepManager.getSleepStageDuration(stage: .LightSleep))!)
-                                    Text("\(String(format: "%.0f", percent)) %")
-                                        .font(.caption2)
-                                        .foregroundColor(Color("TextColorSec"))
-                                }
-                                
-                            }
-                            HStack {
-                                let percent = sleepManager.getSleepStageDuration(stage: .DeepSleep) / sleepManager.getSleepDuration(type: .NightSleep) * 100
-                                Circle()
-                                    .fill(Color(UIColor(named: "AppDeepSleep")!))
-                                    .frame(width: 10, height: 10)
-                                VStack(alignment: .leading) {
-                                    Text("Deep")
-                                    Text("Reference: 20-60%")
-                                        .font(.caption2)
-                                        .foregroundColor(Color("TextColorSec"))
-                                }
-                                Spacer()
-                                VStack {
-                                    Text(Utils.timeForrmatedAbr.string(from: sleepManager.getSleepStageDuration(stage: .DeepSleep))!)
-                                    Text(" \(String(format: "%.0f", percent)) %")
-                                        .font(.caption2)
-                                        .foregroundColor(Color("TextColorSec"))
-                                }
-                                
-                            }
-                            ForEach(sleepManager.naps) { nap in
-                                HStack {
-                                    Circle()
-                                        .fill(Color(UIColor(named: "BackgroundSec")!))
-                                        .frame(width: 10, height: 10)
-                                    VStack(alignment: .leading) {
-                                        Text("Nap")
-                                        Text(Utils.hhmmtimeFormatter.string(from: nap.startDate) + " - " +  Utils.hhmmtimeFormatter.string(from: nap.endDate))
-                                            .font(.caption2)
-                                            .foregroundColor(Color("TextColorSec"))
-                                    }
-                                    Spacer()
-                                    Text(Utils.timeForrmatedAbr.string(from: nap.getDuration() )!)
-                                }
-                            }
+                            AwakeStatistics(sleepManager: sleepManager)
+                            RemStatistics(sleepManager: sleepManager)
+                            LightSleepStatistics(sleepManager: sleepManager)
+                            DeepSleepStatistics(sleepManager: sleepManager)
+                            NapStatistics(sleepManager: sleepManager)
                         }
                     }
                     .padding(10)
@@ -213,10 +73,10 @@ struct ContentView: View {
                 .onEnded { value in
                     if value.translation.width < 0 {
                         if (Calendar.current.compare(Date(), to: currentDate, toGranularity: .day) == .orderedDescending) {
-                            addingDays(nr: 1)
+                            self.currentDate = Calendar.current.date(byAdding: .day, value: 1, to: currentDate)!
                         }
                     } else {
-                        addingDays(nr: -1)
+                        self.currentDate = Calendar.current.date(byAdding: .day, value: -1, to: currentDate)!
                     }
                 }
             )
