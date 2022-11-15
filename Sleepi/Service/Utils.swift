@@ -48,7 +48,7 @@ class Utils {
     }
     
     static func getQuartiles(values: [Double]) -> (firstQuartile: Double, median: Double, thirdQuartile: Double) {
-
+        
         let filteredValues = values.filter {!$0.isNaN}.filter {$0 != 0}
         if filteredValues.count < 3 {
             return (0.0, 0.0, 0.0)
@@ -57,13 +57,13 @@ class Utils {
         let q1 = 0.20 * dif + filteredValues.min()!
         let med = 0.40 * dif + filteredValues.min()!
         let q3 = 0.7 * dif + filteredValues.min()!
-
+        
         return (q1, med, q3);
     }
     
     static func getEpochs(activities: [Record]) -> [Epoch]{
         var epochs: [Epoch] = []
-
+        
         if activities.isEmpty {
             return epochs
         }
@@ -72,7 +72,7 @@ class Utils {
         if hrActivities.isEmpty {
             for (index, activity) in activities.enumerated() {
                 let startDate: Date = activities.indices.contains(index - 1) ? activities[index - 1].startDate : activities.first!.startDate
-
+                
                 let epoch = Epoch(start: startDate,
                                   end: activity.startDate,
                                   records: activities.filter( { (index == 0 ? $0.startDate >= startDate : $0.startDate > startDate) && $0.startDate <= activity.startDate } ),
@@ -82,43 +82,70 @@ class Utils {
         }
         for (index, activity) in hrActivities.enumerated() {
             let startDate: Date = hrActivities.indices.contains(index - 1) ? hrActivities[index - 1].startDate : activities.first!.startDate
-
+            
             let epoch = Epoch(start: startDate,
                               end: activity.startDate,
                               records: activities.filter( { (index == 0 ? $0.startDate >= startDate : $0.startDate > startDate) && $0.startDate <= activity.startDate } ),
                               stage: nil)
             epochs.append(epoch)
         }
-
+        
         return epochs
     }
     
-    static func getActivitiesFromRawData(
-            heartRates: [HKQuantitySample],
-            activeEnergy: [HKQuantitySample]) -> [Record] {
-                
-        var allRecords: [Record] = []
-        var allHr: [Record] = []
-        var allActiveEnergies: [Record] = []
+    static func getActiveEnergy(
+        activeEnergyBurned: [HKQuantitySample],
+        basalEnergyBurned: [HKQuantitySample]) -> [Record] {
 
-        for actEnergy in activeEnergy {
-            let record = Record(startDate: actEnergy.startDate, endDate: actEnergy.endDate, actEng: actEnergy.quantity.doubleValue(for: .kilocalorie()))
-            allActiveEnergies.append(record)
+            var result: [Record] = []
+            
+            for actEnergy in activeEnergyBurned {
+                let record = Record(startDate: actEnergy.startDate, endDate: actEnergy.endDate, actEng: actEnergy.quantity.doubleValue(for: .kilocalorie()))
+                result.append(record)
+            }
+            for actEnergy in basalEnergyBurned {
+                let record = Record(startDate: actEnergy.startDate, endDate: actEnergy.endDate, actEng: actEnergy.quantity.doubleValue(for: .kilocalorie()))
+                result.append(record)
+                if record.endDate.timeIntervalSinceReferenceDate - record.startDate.timeIntervalSinceReferenceDate > 600 {
+                    let v = (record.actEng! * 60)
+                    let x = v /  (record.endDate.timeIntervalSinceReferenceDate - record.startDate.timeIntervalSinceReferenceDate)
+                    print("basal;\(record.startDate.formatted());\(record.endDate.formatted());\(record.actEng ?? 0);\(x)")
+
+                }
+            }
+            result = result.sorted(by: {$0.startDate < $1.startDate})
+            for record in result {
+                print("eng;\(record.startDate.formatted());\(record.endDate.formatted());\(record.actEng ?? 0)")
+            }
+            return result
         }
-        
-        for heartRate in heartRates {
-            let record = Record(startDate: heartRate.startDate, endDate: heartRate.endDate, hr: heartRate.quantity.doubleValue(for: HKUnit(from: "count/min")))
+    
+    static func getActivitiesFromRawData(
+        heartRates: [HKQuantitySample],
+        activeEnergy: [HKQuantitySample]) -> [Record] {
+            
+            var allRecords: [Record] = []
+            var allHr: [Record] = []
+            var allActiveEnergies: [Record] = []
+            
+            for actEnergy in activeEnergy {
+                let record = Record(startDate: actEnergy.startDate, endDate: actEnergy.endDate, actEng: actEnergy.quantity.doubleValue(for: .kilocalorie()))
+                allActiveEnergies.append(record)
+            }
+            
+            for heartRate in heartRates {
+                let record = Record(startDate: heartRate.startDate, endDate: heartRate.endDate, hr: heartRate.quantity.doubleValue(for: HKUnit(from: "count/min")))
                 allHr.append(record)
+            }
+            
+            //        Utils.processActivities(&allActiveEnergies)
+            allRecords.append(contentsOf: allActiveEnergies)
+            allRecords.append(contentsOf: allHr)
+            allRecords = allRecords.sorted { a,b in
+                a.startDate < b.startDate
+            }
+            
+            return allRecords
         }
-        
-//        Utils.processActivities(&allActiveEnergies)
-        allRecords.append(contentsOf: allActiveEnergies)
-        allRecords.append(contentsOf: allHr)
-        allRecords = allRecords.sorted { a,b in
-            a.startDate < b.startDate
-        }
-        
-        return allRecords
-    }
     
 }

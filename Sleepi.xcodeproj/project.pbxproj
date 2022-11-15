@@ -156,14 +156,14 @@
 			path = Models;
 			sourceTree = "<group>";
 		};
-		1799D80D2922835D008B5054 /* Componets */ = {
+		1799D80D2922835D008B5054 /* Components */ = {
 			isa = PBXGroup;
 			children = (
 				1799D81229228C96008B5054 /* Stats */,
 				1799D80E29228376008B5054 /* DateBar.swift */,
 				1799D81029228C09008B5054 /* StatsBar.swift */,
 			);
-			path = Componets;
+			path = Components;
 			sourceTree = "<group>";
 		};
 		1799D81229228C96008B5054 /* Stats */ = {
@@ -192,7 +192,7 @@
 		17EA8C85281974BA00545BDD /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				1799D80D2922835D008B5054 /* Componets */,
+				1799D80D2922835D008B5054 /* Components */,
 				17902D6928C8A4EC0054BC4D /* LoadingView.swift */,
 				1742CC6A28D7AB6000979473 /* HorizontalBar.swift */,
 				1742CC6C28D7AC2F00979473 /* VerticalLine.swift */,
@@ -232,7 +232,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1340;
+				LastSwiftUpdateCheck = 1410;
 				LastUpgradeCheck = 1330;
 				TargetAttributes = {
 					1715351C2815C02F00B1A499 = {
