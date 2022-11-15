@@ -76,7 +76,6 @@ class SleepDetector: ObservableObject {
                         let activeEnergy = await healthStore.getSamples(startDate: startDate, endDate: endDate, type: .activeEnergyBurned)
                         let basalEnergyBurned = await healthStore.getSamples(startDate: startDate, endDate: endDate, type: .basalEnergyBurned)
                         let steps = await healthStore.getSamples(startDate: startDate, endDate: endDate, type: .stepCount)
-                        let actsEng = Utils.getActiveEnergy(activeEnergyBurned: activeEnergy, basalEnergyBurned: basalEnergyBurned)
                         
                         if !activeEnergy.isEmpty && !heartRates.isEmpty && !steps.isEmpty{
                             let lastEndSleep: Date? = lastEndDateExistingSleep != nil ? lastEndDateExistingSleep : sleeps.last?.endDate

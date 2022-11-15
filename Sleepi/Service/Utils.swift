@@ -93,33 +93,6 @@ class Utils {
         return epochs
     }
     
-    static func getActiveEnergy(
-        activeEnergyBurned: [HKQuantitySample],
-        basalEnergyBurned: [HKQuantitySample]) -> [Record] {
-
-            var result: [Record] = []
-            
-            for actEnergy in activeEnergyBurned {
-                let record = Record(startDate: actEnergy.startDate, endDate: actEnergy.endDate, actEng: actEnergy.quantity.doubleValue(for: .kilocalorie()))
-                result.append(record)
-            }
-            for actEnergy in basalEnergyBurned {
-                let record = Record(startDate: actEnergy.startDate, endDate: actEnergy.endDate, actEng: actEnergy.quantity.doubleValue(for: .kilocalorie()))
-                result.append(record)
-                if record.endDate.timeIntervalSinceReferenceDate - record.startDate.timeIntervalSinceReferenceDate > 600 {
-                    let v = (record.actEng! * 60)
-                    let x = v /  (record.endDate.timeIntervalSinceReferenceDate - record.startDate.timeIntervalSinceReferenceDate)
-                    print("basal;\(record.startDate.formatted());\(record.endDate.formatted());\(record.actEng ?? 0);\(x)")
-
-                }
-            }
-            result = result.sorted(by: {$0.startDate < $1.startDate})
-            for record in result {
-                print("eng;\(record.startDate.formatted());\(record.endDate.formatted());\(record.actEng ?? 0)")
-            }
-            return result
-        }
-    
     static func getActivitiesFromRawData(
         heartRates: [HKQuantitySample],
         activeEnergy: [HKQuantitySample]) -> [Record] {
