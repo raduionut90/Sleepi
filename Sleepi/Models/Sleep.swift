@@ -19,48 +19,25 @@ struct Sleep: Hashable, Identifiable, Equatable {
     let id = UUID()
     let startDate: Date
     let endDate: Date
-    var epochs: [Epoch]
-    let heartRateAverage: Double
+    var stage: SleepStage?
+    var epochs: [Epoch]?
 
-    init(startDate: Date, endDate: Date, epochs: [Epoch]) {
+    init(startDate: Date, endDate: Date) {
         self.startDate = startDate
         self.endDate = endDate
+    }
+    
+    init(startDate: Date, endDate: Date, stage: SleepStage) {
+        self.init(startDate: startDate, endDate: endDate)
+        self.stage = stage
+    }
+    
+    init(startDate: Date, endDate: Date, epochs: [Epoch]) {
+        self.init(startDate: startDate, endDate: endDate)
         self.epochs = epochs
-        self.heartRateAverage = Utils.getAverage(values: epochs.map( {$0.meanHR} ))
-//        self.updateEpochEndTime()
     }
     
     func getDuration() -> Double {
         return self.endDate.timeIntervalSinceReferenceDate - self.startDate.timeIntervalSinceReferenceDate
-    }
-    
-    func getStageSleepDuration(stage: SleepStage) -> Double {
-        var result: [TimeInterval] = []
-        
-//        if stage == .LightSleep {
-//            result.append(self.activities.first!.startDate.timeIntervalSinceReferenceDate - self.startDate.timeIntervalSinceReferenceDate)
-//        }
-        
-        for (index, epoch) in epochs.enumerated() {
-            switch stage {
-            case .DeepSleep:
-                if epoch.stage == .DeepSleep {
-                    let timeInterval = epochs.indices.contains(index + 1) ? epochs[index + 1].startDate.timeIntervalSinceReferenceDate - epoch.startDate.timeIntervalSinceReferenceDate : self.endDate.timeIntervalSinceReferenceDate - epoch.startDate.timeIntervalSinceReferenceDate
-                    result.append(timeInterval)
-                }
-            case .LightSleep:
-                if epoch.stage == .LightSleep {
-                    let timeInterval = epochs.indices.contains(index + 1) ? epochs[index + 1].startDate.timeIntervalSinceReferenceDate - epoch.startDate.timeIntervalSinceReferenceDate : self.endDate.timeIntervalSinceReferenceDate - epoch.startDate.timeIntervalSinceReferenceDate
-                    result.append(timeInterval)
-                }
-            case .RemSleep:
-                if epoch.stage == .RemSleep {
-                    let timeInterval = epochs.indices.contains(index + 1) ? epochs[index + 1].startDate.timeIntervalSinceReferenceDate - epoch.startDate.timeIntervalSinceReferenceDate : self.endDate.timeIntervalSinceReferenceDate - epoch.startDate.timeIntervalSinceReferenceDate
-                    result.append(timeInterval)                }
-            case .Awake:
-                ()
-            }
-        }
-        return result.reduce(0, +);
     }
 }

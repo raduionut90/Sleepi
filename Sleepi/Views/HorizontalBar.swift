@@ -21,9 +21,3 @@ struct HorizontalBar: Shape {
         }
     }
 }
-
-struct HorizontalBar_Previews: PreviewProvider {
-    static var previews: some View {
-        HorizontalBar(x: 20, y: 20, width: 100, height: 20)
-    }
-}
