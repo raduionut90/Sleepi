@@ -33,7 +33,6 @@
 		1799D81A29228E10008B5054 /* DeepSleepStatistics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1799D81929228E10008B5054 /* DeepSleepStatistics.swift */; };
 		1799D81C29228ECF008B5054 /* NapStatistics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1799D81B29228ECF008B5054 /* NapStatistics.swift */; };
 		1799D8302924C7DC008B5054 /* SleepStageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1799D82F2924C7DC008B5054 /* SleepStageManager.swift */; };
-		1799D8432924EEA0008B5054 /* Request.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1799D8422924EEA0008B5054 /* Request.swift */; };
 		1799D8452924EECD008B5054 /* DetectionError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1799D8442924EECD008B5054 /* DetectionError.swift */; };
 		1799D8472924EEFE008B5054 /* BaseHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1799D8462924EEFE008B5054 /* BaseHandler.swift */; };
 		1799D8492924F013008B5054 /* StageRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1799D8482924F013008B5054 /* StageRequest.swift */; };
@@ -43,6 +42,7 @@
 		1799D85129250BE8008B5054 /* EpochsToSleepsHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1799D85029250BE8008B5054 /* EpochsToSleepsHandler.swift */; };
 		1799D85429250C6F008B5054 /* EpochsTimeRefactoringHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1799D85329250C6F008B5054 /* EpochsTimeRefactoringHandler.swift */; };
 		1799D85629251BCA008B5054 /* EpochsFilterHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1799D85529251BCA008B5054 /* EpochsFilterHandler.swift */; };
+		1799D85A2925AB74008B5054 /* Request.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1799D8592925AB74008B5054 /* Request.swift */; };
 		17A4C3C7283511F5005D92F7 /* SleepManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17A4C3C6283511F5005D92F7 /* SleepManager.swift */; };
 		17D6FAF428AF6AEC00F46F2F /* Epoch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17D6FAF328AF6AEC00F46F2F /* Epoch.swift */; };
 /* End PBXBuildFile section */
@@ -90,7 +90,6 @@
 		1799D81929228E10008B5054 /* DeepSleepStatistics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeepSleepStatistics.swift; sourceTree = "<group>"; };
 		1799D81B29228ECF008B5054 /* NapStatistics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NapStatistics.swift; sourceTree = "<group>"; };
 		1799D82F2924C7DC008B5054 /* SleepStageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepStageManager.swift; sourceTree = "<group>"; };
-		1799D8422924EEA0008B5054 /* Request.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Request.swift; path = "../../../../../../Library/Mobile Documents/com~apple~CloudDocs/.Trash/Request.swift"; sourceTree = "<group>"; };
 		1799D8442924EECD008B5054 /* DetectionError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DetectionError.swift; sourceTree = "<group>"; };
 		1799D8462924EEFE008B5054 /* BaseHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BaseHandler.swift; sourceTree = "<group>"; };
 		1799D8482924F013008B5054 /* StageRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StageRequest.swift; sourceTree = "<group>"; };
@@ -100,6 +99,7 @@
 		1799D85029250BE8008B5054 /* EpochsToSleepsHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EpochsToSleepsHandler.swift; sourceTree = "<group>"; };
 		1799D85329250C6F008B5054 /* EpochsTimeRefactoringHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EpochsTimeRefactoringHandler.swift; sourceTree = "<group>"; };
 		1799D85529251BCA008B5054 /* EpochsFilterHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EpochsFilterHandler.swift; sourceTree = "<group>"; };
+		1799D8592925AB74008B5054 /* Request.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Request.swift; sourceTree = "<group>"; };
 		17A4C3C6283511F5005D92F7 /* SleepManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepManager.swift; sourceTree = "<group>"; };
 		17D6FAF328AF6AEC00F46F2F /* Epoch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Epoch.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -206,7 +206,7 @@
 				1799D85229250BF4008B5054 /* Handlers */,
 				1799D8462924EEFE008B5054 /* BaseHandler.swift */,
 				1799D8442924EECD008B5054 /* DetectionError.swift */,
-				1799D8422924EEA0008B5054 /* Request.swift */,
+				1799D8592925AB74008B5054 /* Request.swift */,
 				1799D8482924F013008B5054 /* StageRequest.swift */,
 				1799D82F2924C7DC008B5054 /* SleepStageManager.swift */,
 			);
@@ -351,13 +351,13 @@
 				1799D81629228D07008B5054 /* RemStatistics.swift in Sources */,
 				1799D81829228DE7008B5054 /* LightSleepStatistics.swift in Sources */,
 				1799D85429250C6F008B5054 /* EpochsTimeRefactoringHandler.swift in Sources */,
+				1799D85A2925AB74008B5054 /* Request.swift in Sources */,
 				1799D81A29228E10008B5054 /* DeepSleepStatistics.swift in Sources */,
 				1799D8302924C7DC008B5054 /* SleepStageManager.swift in Sources */,
 				170F2D8828342AA800D00A7C /* SleepStage.swift in Sources */,
 				171535212815C02F00B1A499 /* SleepiApp.swift in Sources */,
 				1799D84B2924F962008B5054 /* ClassificationHandler.swift in Sources */,
 				1799D8452924EECD008B5054 /* DetectionError.swift in Sources */,
-				1799D8432924EEA0008B5054 /* Request.swift in Sources */,
 				1799D8472924EEFE008B5054 /* BaseHandler.swift in Sources */,
 				17111E5D28744427004169C9 /* SleepDetector.swift in Sources */,
 				172553A928ACB39C0055C441 /* Constants.swift in Sources */,
@@ -508,7 +508,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2.1;
+				MARKETING_VERSION = 1.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.kantaraweb.Sleepi;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -548,7 +548,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2.1;
+				MARKETING_VERSION = 1.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.kantaraweb.Sleepi;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
