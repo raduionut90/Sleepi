@@ -36,4 +36,8 @@ class Epoch: Equatable, Comparable, Identifiable {
     func isChargingOrWalking() -> Bool {
         return self.records.contains(where: {$0.charging || $0.walking})
     }
+    
+    func getDuration() -> Double {
+        return self.endDate.timeIntervalSinceReferenceDate - self.startDate.timeIntervalSinceReferenceDate
+    }
 }

@@ -47,6 +47,8 @@ class SleepDetector: ObservableObject {
         }
     }
     
+
+    
     func performSleepDetection() async throws {
             if let healthStore = healthStore {
                 let authorized: Bool = try await healthStore.requestAuthorization()
@@ -79,12 +81,11 @@ class SleepDetector: ObservableObject {
                         if !activeEnergy.isEmpty && !heartRates.isEmpty && !steps.isEmpty{
                             let lastEndSleep: Date? = lastEndDateExistingSleep != nil ? lastEndDateExistingSleep : sleeps.last?.endDate
                             
-                            if let identifiedSleeps = try await processActivities(activeEnergy, heartRates, lastEndSleep, startDate, endDate, steps, healthStore) {
+                            if let identifiedSleeps = processActivities(activeEnergy, heartRates, lastEndSleep, startDate, endDate, steps, healthStore) {
+                                let request = StageRequest(sleeps: identifiedSleeps, date: endDate, activeEnergyBurned: activeEnergy, heartRates: heartRates)
                                 
-                                for sleep in identifiedSleeps {
-                                    try await healthStore.saveSleep(startTime: sleep.startDate, endTime: sleep.endDate)
-                                    logger.log(";zip;saved;\(sleep.startDate.formatted());\(sleep.endDate.formatted())")
-                                }
+                                let stageManager = SleepStageManager(request: request)
+                                try await stageManager.executePipeline()
                                 
                                 lastEndDateExistingSleep = identifiedSleeps.last?.endDate ?? nil
                             }
@@ -102,9 +103,7 @@ class SleepDetector: ObservableObject {
             }        
     }
     
-
-    
-    fileprivate func processActivities(_ activeEnergy: [HKQuantitySample], _ heartRates: [HKQuantitySample], _ lastEndDateExistingSleep: Date?, _ startDate: Date, _ endDate: Date, _ steps: [HKQuantitySample], _ healthStore: HealthStore) async throws -> [Sleep]? {
+    private func processActivities(_ activeEnergy: [HKQuantitySample], _ heartRates: [HKQuantitySample], _ lastEndDateExistingSleep: Date?, _ startDate: Date, _ endDate: Date, _ steps: [HKQuantitySample], _ healthStore: HealthStore)  -> [Sleep]? {
         
         let timeGaps = getTimeGaps(heartRates, activeEnergy)
         if timeGaps != nil {
@@ -125,7 +124,6 @@ class SleepDetector: ObservableObject {
             }
             
             let sleepAfterDurationFilter: [Sleep] = getSleepsAfterDurationFilter(inBedSleeps: inBedSleeps)
-            
 //            let processedSleeps: [Sleep] = getSleepsFromInBedTime(inBedSleeps: sleepAfterDurationFilter, activeEnergy: activeEnergy, steps: steps)
 //
 //            for sleep in processedSleeps {
@@ -170,8 +168,8 @@ class SleepDetector: ObservableObject {
             
             if startDate != nil &&
                     !(isTimeGap ?? false) &&
-                    activeEnergy.startDate.timeIntervalSinceReferenceDate - startDate!.timeIntervalSinceReferenceDate > 300 {
-                result.append(Sleep(startDate: startDate!, endDate: activeEnergy.startDate, epochs: []))
+                    activeEnergy.startDate.timeIntervalSinceReferenceDate - startDate!.timeIntervalSinceReferenceDate > 240 {
+                result.append(Sleep(startDate: startDate!, endDate: activeEnergy.startDate))
             }
             startDate = activeEnergy.endDate
         }
@@ -184,12 +182,12 @@ class SleepDetector: ObservableObject {
         var lastIndexUsed: Int = 0
         for (index, sleep) in potentialSleeps.enumerated() {
             if potentialSleeps.indices.contains(index - 1){
-                if sleep.startDate.timeIntervalSinceReferenceDate - potentialSleeps[index - 1].endDate.timeIntervalSinceReferenceDate > 300 {
-                    inBedSleeps.append(Sleep(startDate: potentialSleeps[lastIndexUsed].startDate, endDate: potentialSleeps[index - 1].endDate, epochs: []))
+                if sleep.startDate.timeIntervalSinceReferenceDate - potentialSleeps[index - 1].endDate.timeIntervalSinceReferenceDate > 180 {
+                    inBedSleeps.append(Sleep(startDate: potentialSleeps[lastIndexUsed].startDate, endDate: potentialSleeps[index - 1].endDate))
                     lastIndexUsed = index
                 }
                 if sleep == potentialSleeps.last! {
-                    inBedSleeps.append(Sleep(startDate: potentialSleeps[lastIndexUsed].startDate, endDate: potentialSleeps.last!.endDate, epochs: []))
+                    inBedSleeps.append(Sleep(startDate: potentialSleeps[lastIndexUsed].startDate, endDate: potentialSleeps.last!.endDate))
                 }
             }
         }

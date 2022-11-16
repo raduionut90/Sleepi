@@ -12,7 +12,7 @@ struct AwakeStatistics: View {
 
     var body: some View {
         HStack {
-            let times = sleepManager.nightSleeps.count - 1
+            let times = sleepManager.nightSleeps.filter( {$0.stage == .Awake}).count
             Circle()
                 .fill(Color(UIColor(named: "AppAwakeSleep")!))
                 .frame(width: 10, height: 10)

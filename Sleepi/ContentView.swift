@@ -39,85 +39,91 @@ struct ContentView: View {
     }
     
     var body: some View {
-        LoadingView(isShowing: .constant(loading)) {
-            ScrollView {
-                VStack {
-                    Group {
-                        DateBar(sleepManager: sleepManager, currentDate: $currentDate, disableNextDayButton: $disableNextDayButton)
-        
-                        StatsBar(sleepManager: sleepManager)
-                        
-                        if !sleepManager.nightSleeps.isEmpty {
-                            VStack {
-                                SleepChart(sleeps: sleepManager.nightSleeps)
+        VStack {
+            LoadingView(isShowing: .constant(loading)) {
+            ScrollView(.vertical) {
+                    VStack {
+                        Group {
+                            DateBar(sleepManager: sleepManager, currentDate: $currentDate, disableNextDayButton: $disableNextDayButton)
+            
+                            StatsBar(sleepManager: sleepManager)
+                            
+                            if !sleepManager.nightSleeps.isEmpty {
+                                VStack {
+                                    SleepChart(sleeps: sleepManager.nightSleeps)
+                                }
+                            }
+                            
+                            if !sleepManager.nightSleeps.isEmpty {
+                                AwakeStatistics(sleepManager: sleepManager)
+                                RemStatistics(sleepManager: sleepManager)
+                                LightSleepStatistics(sleepManager: sleepManager)
+                                DeepSleepStatistics(sleepManager: sleepManager)
+                                NapStatistics(sleepManager: sleepManager)
                             }
                         }
-                        
-                        if !sleepManager.nightSleeps.isEmpty {
-                            AwakeStatistics(sleepManager: sleepManager)
-                            RemStatistics(sleepManager: sleepManager)
-                            LightSleepStatistics(sleepManager: sleepManager)
-                            DeepSleepStatistics(sleepManager: sleepManager)
-                            NapStatistics(sleepManager: sleepManager)
+                        .padding(10)
+                        .foregroundColor(Color("TextColorPrim"))
+                        .background(Color("BackgroundSec"))
+                        .cornerRadius(16)
+                    }
+                    .padding()
+                }
+                .background(Color("BackgroundPrim"))
+                .gesture(DragGesture(minimumDistance: 20.0, coordinateSpace: .local)
+                    .onEnded { value in
+                        if value.translation.width < 0 {
+                            if (Calendar.current.compare(Date(), to: currentDate, toGranularity: .day) == .orderedDescending) {
+                                self.currentDate = Calendar.current.date(byAdding: .day, value: 1, to: currentDate)!
+                            }
+                        } else {
+                            self.currentDate = Calendar.current.date(byAdding: .day, value: -1, to: currentDate)!
                         }
                     }
-                    .padding(10)
-                    .foregroundColor(Color("TextColorPrim"))
-                    .background(Color("BackgroundSec"))
-                    .cornerRadius(16)
-                }
-                .padding()
-            }
-            .background(Color("BackgroundPrim"))
-            .gesture(DragGesture(minimumDistance: 20.0, coordinateSpace: .local)
-                .onEnded { value in
-                    if value.translation.width < 0 {
-                        if (Calendar.current.compare(Date(), to: currentDate, toGranularity: .day) == .orderedDescending) {
-                            self.currentDate = Calendar.current.date(byAdding: .day, value: 1, to: currentDate)!
+                )
+                .navigationViewStyle(StackNavigationViewStyle())
+                .onAppear(){
+                    Task.init {
+                        if isFirstTimeRunning() {
+                            try? await sleepDetector.whenFirstimeRunning()
                         }
-                    } else {
-                        self.currentDate = Calendar.current.date(byAdding: .day, value: -1, to: currentDate)!
-                    }
-                }
-            )
-            .navigationViewStyle(StackNavigationViewStyle())
-            .onAppear(){
-                Task.init {
-                    if isFirstTimeRunning() {
-                        try? await sleepDetector.whenFirstimeRunning()
-                    }
-                    try? await sleepDetector.performSleepDetection()
-                    try? await sleepManager.refreshSleeps(date: currentDate)
-                    loading = false
-                }
-            }
-            .onChange(of: currentDate, perform: { value in
-                if (Calendar.current.compare(Date(), to: value, toGranularity: .day) == .orderedDescending) {
-                    self.disableNextDayButton = false
-                } else {
-                    self.disableNextDayButton = true
-                }
-                Task.init {
-                    try await sleepManager.refreshSleeps(date: value)
-                    loading = false
-                }
-            })
-            .onAppCameToForeground {
-                print("onAppCameToForeground")
-                Task.init {
-                    try await sleepDetector.performSleepDetection()
-                    try await sleepManager.refreshSleeps(date: currentDate)
-                }
-            }
-            .onAppWentToBackground {
-                print("onAppWentToBackground")
-            }
-            .refreshable {
-                Task {
-                    try? await sleepDetector.performSleepDetection()
-                    try? await sleepManager.refreshSleeps(date: currentDate)
-                }
+                        try? await sleepDetector.performSleepDetection()
+                        try await Task.sleep(nanoseconds: 100_000_000)
+                        try? await sleepManager.refreshSleeps(date: currentDate)
 
+                        loading = false
+                    }
+
+
+                }
+                .onChange(of: currentDate, perform: { value in
+                    if (Calendar.current.compare(Date(), to: value, toGranularity: .day) == .orderedDescending) {
+                        self.disableNextDayButton = false
+                    } else {
+                        self.disableNextDayButton = true
+                    }
+                    Task.init {
+                        try await sleepManager.refreshSleeps(date: value)
+                        loading = false
+                    }
+                })
+                .onAppCameToForeground {
+                    print("onAppCameToForeground")
+                    Task.init {
+                        try await sleepDetector.performSleepDetection()
+                        try await sleepManager.refreshSleeps(date: currentDate)
+                    }
+                }
+                .onAppWentToBackground {
+                    print("onAppWentToBackground")
+                }
+                .refreshable {
+                    Task {
+                        try? await sleepDetector.performSleepDetection()
+                        try? await sleepManager.refreshSleeps(date: currentDate)
+                    }
+
+                }
             }
         }
     }
