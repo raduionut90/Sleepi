@@ -63,10 +63,14 @@ class SleepDetector: ObservableObject {
 
                     if firstSleepDetectedDate != nil {
                         startDate = firstSleepDetectedDate!
+                        startDate = Calendar.current.startOfDay(for: startDate)
+                        startDate = Calendar.current.date(byAdding: .hour, value: 12, to: startDate)!
                         endDate = Calendar.current.date(byAdding: .hour, value: 24, to: startDate)!
                     } else if !sleeps.isEmpty {
                         startDate = sleeps.last!.startDate > Calendar.current.date(byAdding: .hour, value: -24, to: currentDate)! ?
                                 Calendar.current.date(byAdding: .hour, value: -24, to: currentDate)! : sleeps.last!.startDate
+                        startDate = Calendar.current.startOfDay(for: startDate)
+                        startDate = Calendar.current.date(byAdding: .hour, value: 12, to: startDate)!
                         endDate = Calendar.current.date(byAdding: .hour, value: 24, to: startDate)! >= currentDate ? currentDate : Calendar.current.date(byAdding: .hour, value: 24, to: startDate)!
                     } else {
                         startDate = Calendar.current.date(byAdding: .hour, value: -24, to: currentDate)!
@@ -76,6 +80,7 @@ class SleepDetector: ObservableObject {
                     var lastEndDateExistingSleep: Date? = nil
                     
                     while true {
+                        logger.debug(";startDate;\(startDate.formatted(), privacy: .public);endDate;\(endDate.formatted(), privacy: .public)")
                         let heartRates = await healthStore.getSamples(startDate: startDate, endDate: endDate, type: .heartRate)
                         let activeEnergy = await healthStore.getSamples(startDate: startDate, endDate: endDate, type: .activeEnergyBurned)
                         let steps = await healthStore.getSamples(startDate: startDate, endDate: endDate, type: .stepCount)
@@ -86,10 +91,17 @@ class SleepDetector: ObservableObject {
                             if let identifiedSleeps = processActivities(activeEnergy, heartRates, lastEndSleep, startDate, endDate, steps, healthStore) {
                                 let request = StageRequest(sleeps: identifiedSleeps, date: endDate, activeEnergyBurned: activeEnergy, heartRates: heartRates)
                                 
-                                let stageManager = SleepStageManager(request: request)
-                                try await stageManager.executePipeline()
-                                
-                                lastEndDateExistingSleep = identifiedSleeps.last?.endDate ?? nil
+                                if !identifiedSleeps.isEmpty {
+                                    let stageManager = SleepStageManager(request: request)
+                                    do {
+                                        try await stageManager.executePipeline()
+                                    } catch {
+                                        logger.error("Unexpected error: \(error).")
+                                    }
+
+                                    lastEndDateExistingSleep = identifiedSleeps.last?.endDate ?? nil
+                                }
+
                             }
                         } else {
                             logger.log("no activities; \(startDate) - \(endDate)")
@@ -97,7 +109,7 @@ class SleepDetector: ObservableObject {
                         
                         startDate = Calendar.current.date(byAdding: .hour, value: -2, to: endDate)!
                         endDate = Calendar.current.date(byAdding: .hour, value: 24, to: endDate)!
-                        if startDate >= currentDate {
+                        if endDate >= currentDate {
                             break
                         }
                     }
