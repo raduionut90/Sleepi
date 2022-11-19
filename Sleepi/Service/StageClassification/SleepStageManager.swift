@@ -51,15 +51,19 @@ class SleepStageManager {
     
     private func checkRequest(_ request: Request) throws {
         guard request.sleeps?.isEmpty == false else {
+            logger.error("emptySleeps")
             throw DetectionError.emptySleeps
         }
         guard request.heartRates?.isEmpty == false else {
+            logger.error("emptyHeartRates")
             throw DetectionError.emptyHeartRates
         }
         guard request.activeEnergyBurned?.isEmpty == false else {
+            logger.error("emptyActiveEnergyBurned")
             throw DetectionError.emptyActiveEnergyBurned
         }
         guard request.date != nil else {
+            logger.error("emptyDate")
             throw DetectionError.emptyDate
         }
     }
