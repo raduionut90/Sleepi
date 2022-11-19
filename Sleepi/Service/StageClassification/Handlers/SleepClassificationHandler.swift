@@ -1,5 +1,5 @@
 //
-//  ClassificationHandler.swift
+//  SleepClassificationHandler.swift
 //  Sleepi
 //
 //  Created by Ionut Radu on 16.11.2022.

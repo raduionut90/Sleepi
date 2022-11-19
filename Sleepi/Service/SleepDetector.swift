@@ -208,6 +208,8 @@ class SleepDetector: ObservableObject {
         for sleep in sleeps {
             if activities.contains(where: {$0.startDate > sleep.startDate && $0.startDate < sleep.endDate}) {
                 finalSleeps.append(sleep)
+            } else {
+                logger.debug(";checkSleepActivities;\(sleep.startDate.formatted(), privacy: .public);\(sleep.endDate.formatted(), privacy: .public);\(sleep.getDuration());deleted")
             }
         }
         return finalSleeps
