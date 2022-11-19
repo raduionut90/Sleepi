@@ -148,7 +148,7 @@ class HealthStore {
         
         let sortDescriptor = NSSortDescriptor(key: HKSampleSortIdentifierEndDate, ascending: true)
         
-        let predicate = HKQuery.predicateForSamples(withStart: startTime, end: endTime)
+        let predicate = HKQuery.predicateForSamples(withStart: startTime, end: endTime, options: [.strictStartDate])
         
         return await withCheckedContinuation { continuation in
             let query = HKSampleQuery(sampleType: sleepType, predicate: predicate, limit: 1000, sortDescriptors: [sortDescriptor]) { (query, tmpResult, error) -> Void in
