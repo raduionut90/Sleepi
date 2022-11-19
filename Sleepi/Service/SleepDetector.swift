@@ -54,11 +54,13 @@ class SleepDetector: ObservableObject {
                 let authorized: Bool = try await healthStore.requestAuthorization()
                 if authorized {
                     
-                    let currentDate = Date()
+                    var currentDate = Date()
+                    currentDate = Calendar.current.startOfDay(for: currentDate)
+                    currentDate = Calendar.current.date(byAdding: .hour, value: 12, to: currentDate)!
                     var startDate: Date = Calendar.current.date(byAdding: .day, value: -14, to: currentDate)!
                     var endDate: Date = Calendar.current.date(byAdding: .hour, value: 24, to: startDate)!
                     let sleeps: [HKCategorySample] = await healthStore.getSleeps(startTime: startDate, endTime: currentDate)
-                    
+
                     if firstSleepDetectedDate != nil {
                         startDate = firstSleepDetectedDate!
                         endDate = Calendar.current.date(byAdding: .hour, value: 24, to: startDate)!

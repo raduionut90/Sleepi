@@ -18,11 +18,7 @@ class EpochsToSleepsHandler: BaseHandler {
         var sleepsResult: [Sleep] = []
         if let sleeps = request.sleeps {
             for (index, sleep) in sleeps.enumerated() {
-                let hour = Calendar.current.component(.hour, from: sleep.startDate)
-                let napFlag = (10 ... 18).contains(hour)
-                
                 if sleeps.indices.contains(index - 1) &&
-                    !napFlag &&
                     sleep.startDate.timeIntervalSinceReferenceDate - sleeps[index - 1].endDate.timeIntervalSinceReferenceDate < 18000 // 5 hours
                 {
                     let awake = Sleep(startDate: sleeps[index - 1].endDate, endDate: sleep.startDate, stage: .Awake)

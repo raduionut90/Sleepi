@@ -31,7 +31,7 @@ class SleepClassificationHandler: BaseHandler {
                 logger.debug(";detector;ClassificationHandler;\(sleep.startDate.formatted(), privacy: .public);\(sleep.endDate.formatted(), privacy: .public)")
                 
                 let hour = Calendar.current.component(.hour, from: sleep.startDate)
-                let napFlag = (10 ... 18).contains(hour)
+                let napFlag = (10 ... 19).contains(hour)
                 
                 if napFlag {
                     let nap: Sleep = Sleep(startDate: sleep.startDate, endDate: sleep.endDate, stage: .Nap)
