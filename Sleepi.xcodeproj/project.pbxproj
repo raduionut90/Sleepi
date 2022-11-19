@@ -36,7 +36,7 @@
 		1799D8452924EECD008B5054 /* DetectionError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1799D8442924EECD008B5054 /* DetectionError.swift */; };
 		1799D8472924EEFE008B5054 /* BaseHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1799D8462924EEFE008B5054 /* BaseHandler.swift */; };
 		1799D8492924F013008B5054 /* StageRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1799D8482924F013008B5054 /* StageRequest.swift */; };
-		1799D84B2924F962008B5054 /* ClassificationHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1799D84A2924F962008B5054 /* ClassificationHandler.swift */; };
+		1799D84B2924F962008B5054 /* SleepClassificationHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1799D84A2924F962008B5054 /* SleepClassificationHandler.swift */; };
 		1799D84D2924FECC008B5054 /* SaveHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1799D84C2924FECC008B5054 /* SaveHandler.swift */; };
 		1799D84F292501CB008B5054 /* EpochsClassificationHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1799D84E292501CB008B5054 /* EpochsClassificationHandler.swift */; };
 		1799D85129250BE8008B5054 /* EpochsToSleepsHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1799D85029250BE8008B5054 /* EpochsToSleepsHandler.swift */; };
@@ -93,7 +93,7 @@
 		1799D8442924EECD008B5054 /* DetectionError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DetectionError.swift; sourceTree = "<group>"; };
 		1799D8462924EEFE008B5054 /* BaseHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BaseHandler.swift; sourceTree = "<group>"; };
 		1799D8482924F013008B5054 /* StageRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StageRequest.swift; sourceTree = "<group>"; };
-		1799D84A2924F962008B5054 /* ClassificationHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClassificationHandler.swift; sourceTree = "<group>"; };
+		1799D84A2924F962008B5054 /* SleepClassificationHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepClassificationHandler.swift; sourceTree = "<group>"; };
 		1799D84C2924FECC008B5054 /* SaveHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveHandler.swift; sourceTree = "<group>"; };
 		1799D84E292501CB008B5054 /* EpochsClassificationHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EpochsClassificationHandler.swift; sourceTree = "<group>"; };
 		1799D85029250BE8008B5054 /* EpochsToSleepsHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EpochsToSleepsHandler.swift; sourceTree = "<group>"; };
@@ -218,7 +218,7 @@
 			children = (
 				1799D84C2924FECC008B5054 /* SaveHandler.swift */,
 				1799D85029250BE8008B5054 /* EpochsToSleepsHandler.swift */,
-				1799D84A2924F962008B5054 /* ClassificationHandler.swift */,
+				1799D84A2924F962008B5054 /* SleepClassificationHandler.swift */,
 				1799D84E292501CB008B5054 /* EpochsClassificationHandler.swift */,
 				1799D85329250C6F008B5054 /* EpochsTimeRefactoringHandler.swift */,
 				1799D85529251BCA008B5054 /* EpochsFilterHandler.swift */,
@@ -356,7 +356,7 @@
 				1799D8302924C7DC008B5054 /* SleepStageManager.swift in Sources */,
 				170F2D8828342AA800D00A7C /* SleepStage.swift in Sources */,
 				171535212815C02F00B1A499 /* SleepiApp.swift in Sources */,
-				1799D84B2924F962008B5054 /* ClassificationHandler.swift in Sources */,
+				1799D84B2924F962008B5054 /* SleepClassificationHandler.swift in Sources */,
 				1799D8452924EECD008B5054 /* DetectionError.swift in Sources */,
 				1799D8472924EEFE008B5054 /* BaseHandler.swift in Sources */,
 				17111E5D28744427004169C9 /* SleepDetector.swift in Sources */,

@@ -14,7 +14,7 @@ private let logger = Logger(
 )
 
 //Night Sleeps or Naps
-class ClassificationHandler: BaseHandler {
+class SleepClassificationHandler: BaseHandler {
     var secondHandler: Handler?
     
     init(with handler: Handler? = nil, secodHandler: Handler? = nil) {
@@ -25,19 +25,19 @@ class ClassificationHandler: BaseHandler {
     override func handle(_ request: Request) -> LocalizedError? {
         var nightSleep: [Sleep] = []
         var naps: [Sleep] = []
-        if let date = request.date {
-            let referenceHour = Calendar.current.startOfDay(for: date)
-            let tenAMnextDay = Calendar.current.date(byAdding: .hour, value: 10, to: referenceHour)!
-            let eightPMprevDay = Calendar.current.date(byAdding: .hour, value: -4, to: referenceHour)!
-
-            if let sleeps = request.sleeps {
-                for sleep in sleeps {
-                    if sleep.startDate < eightPMprevDay || sleep.startDate > tenAMnextDay {
-                        let nap: Sleep = Sleep(startDate: sleep.startDate, endDate: sleep.endDate, stage: .Nap)
-                        naps.append(nap)
-                    } else {
-                        nightSleep.append(sleep)
-                    }
+            
+        if let sleeps = request.sleeps {
+            for sleep in sleeps {
+                logger.debug(";detector;ClassificationHandler;\(sleep.startDate.formatted(), privacy: .public);\(sleep.endDate.formatted(), privacy: .public)")
+                
+                let hour = Calendar.current.component(.hour, from: sleep.startDate)
+                let napFlag = (10 ... 18).contains(hour)
+                
+                if napFlag {
+                    let nap: Sleep = Sleep(startDate: sleep.startDate, endDate: sleep.endDate, stage: .Nap)
+                    naps.append(nap)
+                } else {
+                    nightSleep.append(sleep)
                 }
             }
         }

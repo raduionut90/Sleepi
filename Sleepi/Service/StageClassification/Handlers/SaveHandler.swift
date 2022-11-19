@@ -31,6 +31,8 @@ class SaveHandler: BaseHandler {
                 if authorized {
                     if let sleeps = request.sleeps {
                         for sleep in sleeps {
+                            logger.debug(";detector;SaveHandler;\(sleep.startDate.formatted(), privacy: .public);\(sleep.endDate.formatted(), privacy: .public);\(sleep.stage!.rawValue)")
+                            
                             if let stage = sleep.stage {
                                 try await healthStore.saveSleepStages(startTime: sleep.startDate, endTime: sleep.endDate, stage: stage.rawValue)
                             } else {

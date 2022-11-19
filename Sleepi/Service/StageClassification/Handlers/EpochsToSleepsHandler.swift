@@ -6,13 +6,25 @@
 //
 
 import Foundation
+import os
+
+private let logger = Logger(
+    subsystem: Bundle.main.bundleIdentifier!,
+    category: "EpochsToSleepsHandler"
+)
 
 class EpochsToSleepsHandler: BaseHandler {
     override func handle(_ request: Request) -> LocalizedError? {
         var sleepsResult: [Sleep] = []
         if let sleeps = request.sleeps {
             for (index, sleep) in sleeps.enumerated() {
-                if sleeps.indices.contains(index - 1) {
+                let hour = Calendar.current.component(.hour, from: sleep.startDate)
+                let napFlag = (10 ... 18).contains(hour)
+                
+                if sleeps.indices.contains(index - 1) &&
+                    !napFlag &&
+                    sleep.startDate.timeIntervalSinceReferenceDate - sleeps[index - 1].endDate.timeIntervalSinceReferenceDate < 18000 // 5 hours
+                {
                     let awake = Sleep(startDate: sleeps[index - 1].endDate, endDate: sleep.startDate, stage: .Awake)
                     sleepsResult.append(awake)
                 }
@@ -20,6 +32,7 @@ class EpochsToSleepsHandler: BaseHandler {
                     for epoch in epochs {
                         if let stage = epoch.stage {
                             let sleepWithStage = Sleep(startDate: epoch.startDate, endDate: epoch.endDate, stage: stage)
+                            logger.debug(";detector;EpochsToSleepsHandler;\(sleepWithStage.startDate.formatted(), privacy: .public);\(sleepWithStage.endDate.formatted(), privacy: .public);\(sleepWithStage.stage!.rawValue)")
                             sleepsResult.append(sleepWithStage)
                         }
                     }

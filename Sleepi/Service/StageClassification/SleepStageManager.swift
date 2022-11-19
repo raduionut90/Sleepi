@@ -36,8 +36,13 @@ class SleepStageManager {
         // setting epochs to sleep
         let epochsFilterHandler = EpochsFilterHandler(with: epochClassification)
         // night sleeps and naps classification
-        let classificationHandler = ClassificationHandler(with: epochsFilterHandler, secodHandler: saveHandler)
+        let classificationHandler = SleepClassificationHandler(with: epochsFilterHandler, secodHandler: saveHandler)
         
+        if let sleeps = request.sleeps {
+            for sleep in sleeps {
+                logger.debug(";detector;SleepStageManager;\(sleep.startDate.formatted(), privacy: .public);\(sleep.endDate.formatted(), privacy: .public)")
+            }
+        }
         if let error = classificationHandler.handle(self.request) {
             logger.error("\(error.localizedDescription)")
         }

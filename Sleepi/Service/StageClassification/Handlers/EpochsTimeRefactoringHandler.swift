@@ -6,6 +6,12 @@
 //
 
 import Foundation
+import os
+
+private let logger = Logger(
+    subsystem: Bundle.main.bundleIdentifier!,
+    category: "EpochsTimeRefactoringHandler"
+)
 
 class EpochsTimeRefactoringHandler: BaseHandler {
     
@@ -13,6 +19,8 @@ class EpochsTimeRefactoringHandler: BaseHandler {
         if let sleeps = request.sleeps {
             var resultSleeps: [Sleep] = []
             for sleep in sleeps {
+//                logger.debug(";detector;EpochsTimeRefactoringHandler;\(sleep.startDate.formatted(), privacy: .public);\(sleep.endDate.formatted(), privacy: .public)")
+                
                 if let epochs = sleep.epochs {
                     var result: [Epoch] = []
                     for epoch in epochs {

@@ -6,6 +6,12 @@
 //
 
 import Foundation
+import os
+
+private let logger = Logger(
+    subsystem: Bundle.main.bundleIdentifier!,
+    category: "EpochsTimeRefactoringHandler"
+)
 
 class EpochsFilterHandler: BaseHandler {
     override func handle(_ request: Request) -> LocalizedError? {
@@ -16,6 +22,8 @@ class EpochsFilterHandler: BaseHandler {
         if let sleeps = request.sleeps {
             var sleepsWithEpochs: [Sleep] = []
             for var sleep in sleeps {
+                logger.debug(";detector;EpochsFilterHandler;\(sleep.startDate.formatted(), privacy: .public);\(sleep.endDate.formatted(), privacy: .public)")
+                
                 sleep.epochs = epochs.filter({$0.startDate >= sleep.startDate && $0.endDate <= sleep.endDate})
                 sleep.epochs?.first?.startDate = sleep.startDate
                 sleep.epochs?.last?.endDate = sleep.endDate

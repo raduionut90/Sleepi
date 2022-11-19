@@ -17,6 +17,8 @@ class EpochsClassificationHandler: BaseHandler {
     override func handle(_ request: Request) -> LocalizedError? {
         if let sleeps = request.sleeps {
             for sleep in sleeps {
+//                logger.debug(";detector;EpochsClassificationHandler;\(sleep.startDate.formatted(), privacy: .public);\(sleep.endDate.formatted(), privacy: .public)")
+                
                 if let epochs = sleep.epochs {
                     let activityQuartiles = Utils.getQuartiles(values: epochs.map {$0.sumActivity} )
                     let hrQuartiles = Utils.getQuartiles(values: epochs.map {$0.meanHR} )
