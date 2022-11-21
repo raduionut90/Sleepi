@@ -43,9 +43,8 @@ class SleepStageManager {
                 logger.debug(";detector;SleepStageManager;\(sleep.startDate.formatted(), privacy: .public);\(sleep.endDate.formatted(), privacy: .public)")
             }
         }
-        if let error = classificationHandler.handle(self.request) {
-            logger.error("\(error.localizedDescription)")
-        }
+        
+        try await classificationHandler.handle(self.request)
     }
     
     

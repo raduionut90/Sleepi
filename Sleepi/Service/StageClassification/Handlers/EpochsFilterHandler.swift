@@ -14,7 +14,7 @@ private let logger = Logger(
 )
 
 class EpochsFilterHandler: BaseHandler {
-    override func handle(_ request: Request) -> LocalizedError? {
+    override func handle(_ request: Request) async throws {
         
         let activities: [Record] = Utils.getActivitiesFromRawData(heartRates: request.heartRates!, activeEnergy: request.activeEnergyBurned!)
         let epochs: [Epoch] = Utils.getEpochs(activities: activities)
@@ -29,10 +29,9 @@ class EpochsFilterHandler: BaseHandler {
                 sleep.epochs?.last?.endDate = sleep.endDate
                 sleepsWithEpochs.append(sleep)
             }
-            let newRequest = StageRequest(sleeps: sleepsWithEpochs)
-            return next?.handle(newRequest)
+            let newRequest = StageRequest(sleeps: sleepsWithEpochs, date: request.date)
+            try await next?.handle(newRequest)
 
         }
-        return nil
     }
 }

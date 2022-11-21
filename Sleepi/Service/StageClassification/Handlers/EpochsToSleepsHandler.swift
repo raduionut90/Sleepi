@@ -14,13 +14,33 @@ private let logger = Logger(
 )
 
 class EpochsToSleepsHandler: BaseHandler {
-    override func handle(_ request: Request) -> LocalizedError? {
+    
+    fileprivate func checkContinuity(_ request: Request, _ sleep: Sleep, _ sleepsResult: inout [Sleep]) async throws -> Sleep? {
+        let existingSleeps = try await SleepHelper.shared.getSleeps(request.date!)
+        
+        if let lastExistingSleep = existingSleeps?.last {
+            
+            if !sleep.isNap() && !lastExistingSleep.isNap() && sleep.startDate.timeIntervalSinceReferenceDate - lastExistingSleep.endDate.timeIntervalSinceReferenceDate < 10800{ // 3h
+                var awake = Sleep(startDate: lastExistingSleep.endDate, endDate: sleep.startDate)
+                awake.stage = .Awake
+                return awake
+            }
+        }
+        return nil
+    }
+    
+    override func handle(_ request: Request) async throws {
         var sleepsResult: [Sleep] = []
+        
         if let sleeps = request.sleeps {
             for (index, sleep) in sleeps.enumerated() {
-                if sleeps.indices.contains(index - 1) &&
-                    sleep.startDate.timeIntervalSinceReferenceDate - sleeps[index - 1].endDate.timeIntervalSinceReferenceDate < 18000 // 5 hours
-                {
+                if index == 0 {
+                    if let awake = try await checkContinuity(request, sleep, &sleepsResult) {
+                        sleepsResult.append(awake)
+                    }
+                }
+                    
+                if sleeps.indices.contains(index - 1) && !sleep.isNap() {
                     var awake = Sleep(startDate: sleeps[index - 1].endDate, endDate: sleep.startDate)
                     awake.stage = .Awake
                     sleepsResult.append(awake)
@@ -39,8 +59,7 @@ class EpochsToSleepsHandler: BaseHandler {
         }
         if sleepsResult.isEmpty == false {
             let newRequest = StageRequest(sleeps: sleepsResult)
-            return next?.handle(newRequest)
+            try await next?.handle(newRequest)
         }
-        return nil
     }
 }

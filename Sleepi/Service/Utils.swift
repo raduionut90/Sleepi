@@ -121,4 +121,7 @@ class Utils {
             return allRecords
         }
     
+    static func isNap(_ sleep: Sleep) {
+        
+    }
 }

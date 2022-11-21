@@ -10,7 +10,7 @@ import Foundation
 protocol Handler{
     var next: Handler? { get }
     
-    func handle(_ request: Request) -> LocalizedError?
+    func handle(_ request: Request) async throws
 }
 
 class BaseHandler: Handler {
@@ -20,7 +20,7 @@ class BaseHandler: Handler {
         self.next = handler
     }
     
-    func handle(_ request: Request) -> LocalizedError? {
-        return next?.handle(request)
+    func handle(_ request: Request) async throws {
+        try await next?.handle(request)
     }
 }

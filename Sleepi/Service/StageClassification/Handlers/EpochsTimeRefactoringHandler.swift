@@ -15,7 +15,7 @@ private let logger = Logger(
 
 class EpochsTimeRefactoringHandler: BaseHandler {
     
-    override func handle(_ request: Request) -> LocalizedError? {
+    override func handle(_ request: Request) async throws {
         if let sleeps = request.sleeps {
             var resultSleeps: [Sleep] = []
             for sleep in sleeps {
@@ -41,9 +41,8 @@ class EpochsTimeRefactoringHandler: BaseHandler {
                     resultSleeps.append(newSleep)
                 }
             }
-            let newRequest = StageRequest(sleeps: resultSleeps)
-            return next?.handle(newRequest)
+            let newRequest = StageRequest(sleeps: resultSleeps, date: request.date)
+            try await next?.handle(newRequest)
         }
-        return nil
     }
 }

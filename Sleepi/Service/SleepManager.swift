@@ -28,8 +28,7 @@ class SleepManager: ObservableObject {
     
     func refreshSleeps(date: Date) async throws {
         do {
-            if let tmpSleeps = try await SleepHelper.shared.getSleeps(date: date) {
-                let sleeps = tmpSleeps.filter( {$0.origin == Bundle.main.bundleIdentifier} )
+            if let sleeps = try await SleepHelper.shared.getSleeps(date) {
                 DispatchQueue.main.async {
                     self.nightSleeps = sleeps.filter({$0.stage != .Nap})
                     self.naps = sleeps.filter({$0.stage == .Nap})

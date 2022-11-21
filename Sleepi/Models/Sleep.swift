@@ -31,4 +31,9 @@ struct Sleep: Hashable, Identifiable, Equatable {
     func getDuration() -> Double {
         return self.endDate.timeIntervalSinceReferenceDate - self.startDate.timeIntervalSinceReferenceDate
     }
+    
+    func isNap() -> Bool {
+        let hour = Calendar.current.component(.hour, from: startDate)
+        return (10 ... 19).contains(hour)
+    }
 }

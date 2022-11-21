@@ -14,7 +14,7 @@ private let logger = Logger(
 )
 
 class EpochsClassificationHandler: BaseHandler {
-    override func handle(_ request: Request) -> LocalizedError? {
+    override func handle(_ request: Request) async throws {
         if let sleeps = request.sleeps {
             for sleep in sleeps {
 //                logger.debug(";detector;EpochsClassificationHandler;\(sleep.startDate.formatted(), privacy: .public);\(sleep.endDate.formatted(), privacy: .public)")
@@ -55,11 +55,11 @@ class EpochsClassificationHandler: BaseHandler {
                         }
                     }
                 } else {
-                    return DetectionError.emptySleepEpochs
+                    throw DetectionError.emptySleepEpochs
                 }
                 
             }
         }
-        return next?.handle(request)
+        try await next?.handle(request)
     }
 }

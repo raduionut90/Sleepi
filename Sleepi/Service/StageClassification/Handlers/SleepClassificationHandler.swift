@@ -22,7 +22,7 @@ class SleepClassificationHandler: BaseHandler {
         self.secondHandler = secodHandler
     }
     
-    override func handle(_ request: Request) -> LocalizedError? {
+    override func handle(_ request: Request) async throws {
         var nightSleep: [Sleep] = []
         var naps: [Sleep] = []
             
@@ -30,10 +30,7 @@ class SleepClassificationHandler: BaseHandler {
             for sleep in sleeps {
                 logger.debug(";detector;ClassificationHandler;\(sleep.startDate.formatted(), privacy: .public);\(sleep.endDate.formatted(), privacy: .public)")
                 
-                let hour = Calendar.current.component(.hour, from: sleep.startDate)
-                let napFlag = (10 ... 19).contains(hour)
-                
-                if napFlag {
+                if sleep.isNap() {
                     var nap: Sleep = Sleep(startDate: sleep.startDate, endDate: sleep.endDate)
                     nap.stage = .Nap
                     naps.append(nap)
@@ -46,13 +43,11 @@ class SleepClassificationHandler: BaseHandler {
         if naps.isEmpty == false {
             let request = StageRequest(sleeps: naps)
             if let secondHandler = secondHandler {
-                if let error = secondHandler.handle(request) {
-                    logger.error("\(error.localizedDescription)")
-                }
+                try await secondHandler.handle(request)
             }
         }
-        let newRequest = StageRequest(sleeps: nightSleep, activeEnergyBurned: request.activeEnergyBurned, heartRates: request.heartRates)
-        return next?.handle(newRequest)
+        let newRequest = StageRequest(sleeps: nightSleep, date: request.date, activeEnergyBurned: request.activeEnergyBurned, heartRates: request.heartRates)
+        try await next?.handle(newRequest)
     }
     
 }

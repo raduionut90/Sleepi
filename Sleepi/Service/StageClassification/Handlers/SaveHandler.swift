@@ -15,14 +15,10 @@ private let logger = Logger(
 
 class SaveHandler: BaseHandler {
     
-    override func handle(_ request: Request) -> LocalizedError? {
-   
+    override func handle(_ request: Request) async throws {
         if let sleeps = request.sleeps {
-            Task(priority: .high) {
                 try await SleepHelper.shared.save(sleeps)
-            }
         }
-        return nil
     }
 
 }

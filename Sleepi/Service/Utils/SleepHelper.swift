@@ -11,7 +11,7 @@ import os
 
 private let logger = Logger(
     subsystem: Bundle.main.bundleIdentifier!,
-    category: "SleepManager"
+    category: "SleepHelper"
 )
 
 class SleepHelper {
@@ -38,7 +38,7 @@ class SleepHelper {
             let authorized: Bool = try await healthStore.requestAuthorization()
             if authorized {
                         
-                logger.debug(";detector;SaveHandler;\(sleep.startDate.formatted(), privacy: .public);\(sleep.endDate.formatted(), privacy: .public);\(sleep.stage!.rawValue)")
+                logger.debug(";detector;SleepHelper;\(sleep.startDate.formatted(), privacy: .public);\(sleep.endDate.formatted(), privacy: .public);\(sleep.stage!.rawValue)")
                         
                 if let stage = sleep.stage {
                     try await healthStore.saveSleepStages(startTime: sleep.startDate, endTime: sleep.endDate, stage: stage.rawValue)
@@ -49,7 +49,7 @@ class SleepHelper {
         }
     }
     
-    func getSleeps(date: Date) async throws -> [Sleep]? {
+    func getSleeps(_ date: Date) async throws -> [Sleep]? {
         var startDate = Calendar.current.startOfDay(for: date)
         startDate = Calendar.current.date(byAdding: .hour, value: -4, to: startDate)!
         let endDate = Calendar.current.date(byAdding: .day, value: 1, to: startDate)!
