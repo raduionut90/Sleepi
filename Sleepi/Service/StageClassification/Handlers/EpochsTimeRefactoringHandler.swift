@@ -36,7 +36,8 @@ class EpochsTimeRefactoringHandler: BaseHandler {
                     
                     result.last?.endDate = sleep.endDate
                     
-                    let newSleep = Sleep(startDate: sleep.startDate, endDate: sleep.endDate, epochs: result)
+                    var newSleep = Sleep(startDate: sleep.startDate, endDate: sleep.endDate)
+                    newSleep.epochs = result
                     resultSleeps.append(newSleep)
                 }
             }

@@ -21,13 +21,15 @@ class EpochsToSleepsHandler: BaseHandler {
                 if sleeps.indices.contains(index - 1) &&
                     sleep.startDate.timeIntervalSinceReferenceDate - sleeps[index - 1].endDate.timeIntervalSinceReferenceDate < 18000 // 5 hours
                 {
-                    let awake = Sleep(startDate: sleeps[index - 1].endDate, endDate: sleep.startDate, stage: .Awake)
+                    var awake = Sleep(startDate: sleeps[index - 1].endDate, endDate: sleep.startDate)
+                    awake.stage = .Awake
                     sleepsResult.append(awake)
                 }
                 if let epochs = sleep.epochs {
                     for epoch in epochs {
                         if let stage = epoch.stage {
-                            let sleepWithStage = Sleep(startDate: epoch.startDate, endDate: epoch.endDate, stage: stage)
+                            var sleepWithStage = Sleep(startDate: epoch.startDate, endDate: epoch.endDate)
+                            sleepWithStage.stage = stage
                             logger.debug(";detector;EpochsToSleepsHandler;\(sleepWithStage.startDate.formatted(), privacy: .public);\(sleepWithStage.endDate.formatted(), privacy: .public);\(sleepWithStage.stage!.rawValue)")
                             sleepsResult.append(sleepWithStage)
                         }

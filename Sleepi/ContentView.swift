@@ -117,13 +117,13 @@ struct ContentView: View {
                 .onAppWentToBackground {
                     print("onAppWentToBackground")
                 }
-                .refreshable {
-                    Task {
-                        try? await sleepDetector.performSleepDetection()
-                        try? await sleepManager.refreshSleeps(date: currentDate)
-                    }
-
-                }
+//                .refreshable {
+//                    Task {
+//                        try? await sleepDetector.performSleepDetection()
+//                        try? await sleepManager.refreshSleeps(date: currentDate)
+//                    }
+//
+//                }
             }
         }
     }

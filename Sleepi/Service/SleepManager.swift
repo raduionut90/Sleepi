@@ -26,31 +26,18 @@ class SleepManager: ObservableObject {
         }
     }
     
-    fileprivate func setSleep(_ rawSleeps: [HKCategorySample]) {
-        DispatchQueue.main.async {
-            var tmpSleeps: [Sleep] = []
-            for rawSleep in rawSleeps {
-                let sleep: Sleep = Sleep(startDate: rawSleep.startDate, endDate: rawSleep.endDate, stage: SleepStage(rawValue: rawSleep.value)!)
-                tmpSleeps.append(sleep)
-            }
-            self.nightSleeps = tmpSleeps.filter({$0.stage != .Nap})
-            self.naps = tmpSleeps.filter({$0.stage == .Nap})
-        }
-    }
-    
     func refreshSleeps(date: Date) async throws {
-            if let healthStore = healthStore {
-                let authorized: Bool = try await healthStore.requestAuthorization()
-                if authorized {
-                    var startDate = Calendar.current.startOfDay(for: date)
-                    startDate = Calendar.current.date(byAdding: .hour, value: -4, to: startDate)!
-                    let endDate = Calendar.current.date(byAdding: .day, value: 1, to: startDate)!
-                    
-                    let rawSleeps: [HKCategorySample] = await healthStore.getSleeps(startTime: startDate, endTime: endDate)
-                    
-                    setSleep(rawSleeps)
+        do {
+            if let tmpSleeps = try await SleepHelper.shared.getSleeps(date: date) {
+                let sleeps = tmpSleeps.filter( {$0.origin == Bundle.main.bundleIdentifier} )
+                DispatchQueue.main.async {
+                    self.nightSleeps = sleeps.filter({$0.stage != .Nap})
+                    self.naps = sleeps.filter({$0.stage == .Nap})
                 }
             }
+        } catch {
+            logger.error("\(error)")
+        }
     }
 
     func getSleepStageDuration(stage: SleepStage) -> Double {

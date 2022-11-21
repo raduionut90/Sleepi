@@ -217,18 +217,18 @@ struct SleepChart: View {
     }
 }
 
-struct SleepChart_Previews: PreviewProvider {
-    static var previews: some View {
-        SleepChart(sleeps: [
-            Sleep(startDate: Calendar.current.date(byAdding: .hour, value: -10, to: Date())!,
-                  endDate: Calendar.current.date(byAdding: .hour, value: -7, to: Date())!,
-                  stage: .RemSleep),
-            Sleep(startDate: Calendar.current.date(byAdding: .hour, value: -7, to: Date())!,
-                  endDate: Calendar.current.date(byAdding: .hour, value: -6, to: Date())!,
-                  stage: .Awake),
-            Sleep(startDate: Calendar.current.date(byAdding: .hour, value: -6, to: Date())!,
-                  endDate: Calendar.current.date(byAdding: .hour, value: -3, to: Date())!,
-                  stage: .DeepSleep)
-        ])
-    }
-}
+//struct SleepChart_Previews: PreviewProvider {
+//    static var previews: some View {
+//        SleepChart(sleeps: [
+//            Sleep(startDate: Calendar.current.date(byAdding: .hour, value: -10, to: Date())!,
+//                  endDate: Calendar.current.date(byAdding: .hour, value: -7, to: Date())!,
+//                  stage: .RemSleep),
+//            Sleep(startDate: Calendar.current.date(byAdding: .hour, value: -7, to: Date())!,
+//                  endDate: Calendar.current.date(byAdding: .hour, value: -6, to: Date())!,
+//                  stage: .Awake),
+//            Sleep(startDate: Calendar.current.date(byAdding: .hour, value: -6, to: Date())!,
+//                  endDate: Calendar.current.date(byAdding: .hour, value: -3, to: Date())!,
+//                  stage: .DeepSleep)
+//        ])
+//    }
+//}

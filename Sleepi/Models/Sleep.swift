@@ -21,20 +21,11 @@ struct Sleep: Hashable, Identifiable, Equatable {
     let endDate: Date
     var stage: SleepStage?
     var epochs: [Epoch]?
+    var origin: String?
 
     init(startDate: Date, endDate: Date) {
         self.startDate = startDate
         self.endDate = endDate
-    }
-    
-    init(startDate: Date, endDate: Date, stage: SleepStage) {
-        self.init(startDate: startDate, endDate: endDate)
-        self.stage = stage
-    }
-    
-    init(startDate: Date, endDate: Date, epochs: [Epoch]) {
-        self.init(startDate: startDate, endDate: endDate)
-        self.epochs = epochs
     }
     
     func getDuration() -> Double {

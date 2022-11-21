@@ -34,7 +34,8 @@ class SleepClassificationHandler: BaseHandler {
                 let napFlag = (10 ... 19).contains(hour)
                 
                 if napFlag {
-                    let nap: Sleep = Sleep(startDate: sleep.startDate, endDate: sleep.endDate, stage: .Nap)
+                    var nap: Sleep = Sleep(startDate: sleep.startDate, endDate: sleep.endDate)
+                    nap.stage = .Nap
                     naps.append(nap)
                 } else {
                     nightSleep.append(sleep)

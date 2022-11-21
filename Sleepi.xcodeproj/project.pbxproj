@@ -44,6 +44,7 @@
 		1799D85629251BCA008B5054 /* EpochsFilterHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1799D85529251BCA008B5054 /* EpochsFilterHandler.swift */; };
 		1799D85A2925AB74008B5054 /* Request.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1799D8592925AB74008B5054 /* Request.swift */; };
 		17A4C3C7283511F5005D92F7 /* SleepManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17A4C3C6283511F5005D92F7 /* SleepManager.swift */; };
+		17BDBDD0292BECF700C2193C /* SleepHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17BDBDCF292BECF700C2193C /* SleepHelper.swift */; };
 		17D6FAF428AF6AEC00F46F2F /* Epoch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17D6FAF328AF6AEC00F46F2F /* Epoch.swift */; };
 /* End PBXBuildFile section */
 
@@ -101,6 +102,7 @@
 		1799D85529251BCA008B5054 /* EpochsFilterHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EpochsFilterHandler.swift; sourceTree = "<group>"; };
 		1799D8592925AB74008B5054 /* Request.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Request.swift; sourceTree = "<group>"; };
 		17A4C3C6283511F5005D92F7 /* SleepManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepManager.swift; sourceTree = "<group>"; };
+		17BDBDCF292BECF700C2193C /* SleepHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepHelper.swift; sourceTree = "<group>"; };
 		17D6FAF328AF6AEC00F46F2F /* Epoch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Epoch.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -229,6 +231,7 @@
 		17A4C3C5283511DA005D92F7 /* Service */ = {
 			isa = PBXGroup;
 			children = (
+				17BDBDCC292BE60F00C2193C /* Utils */,
 				1799D83D2924EDC4008B5054 /* StageClassification */,
 				17A4C3C6283511F5005D92F7 /* SleepManager.swift */,
 				17111E5C28744427004169C9 /* SleepDetector.swift */,
@@ -236,6 +239,14 @@
 				172553A828ACB39C0055C441 /* Constants.swift */,
 			);
 			path = Service;
+			sourceTree = "<group>";
+		};
+		17BDBDCC292BE60F00C2193C /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				17BDBDCF292BECF700C2193C /* SleepHelper.swift */,
+			);
+			path = Utils;
 			sourceTree = "<group>";
 		};
 		17EA8C85281974BA00545BDD /* Views */ = {
@@ -339,6 +350,7 @@
 				1742CC6D28D7AC2F00979473 /* VerticalLine.swift in Sources */,
 				1799D81429228CAC008B5054 /* AwakeStatistics.swift in Sources */,
 				1799D84D2924FECC008B5054 /* SaveHandler.swift in Sources */,
+				17BDBDD0292BECF700C2193C /* SleepHelper.swift in Sources */,
 				1799D85129250BE8008B5054 /* EpochsToSleepsHandler.swift in Sources */,
 				173A249828DAF22F0077EBBC /* HeartRatesChart.swift in Sources */,
 				173A249628D86AAC0077EBBC /* SleepChart.swift in Sources */,

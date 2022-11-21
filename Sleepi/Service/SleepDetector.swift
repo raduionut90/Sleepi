@@ -61,21 +61,21 @@ class SleepDetector: ObservableObject {
                     var endDate: Date = Calendar.current.date(byAdding: .hour, value: 24, to: startDate)!
                     let sleeps: [HKCategorySample] = await healthStore.getSleeps(startTime: startDate, endTime: currentDate)
 
-                    if firstSleepDetectedDate != nil {
-                        startDate = firstSleepDetectedDate!
-                        startDate = Calendar.current.startOfDay(for: startDate)
-                        startDate = Calendar.current.date(byAdding: .hour, value: 12, to: startDate)!
-                        endDate = Calendar.current.date(byAdding: .hour, value: 24, to: startDate)!
-                    } else if !sleeps.isEmpty {
-                        startDate = sleeps.last!.startDate > Calendar.current.date(byAdding: .hour, value: -24, to: currentDate)! ?
-                                Calendar.current.date(byAdding: .hour, value: -24, to: currentDate)! : sleeps.last!.startDate
-                        startDate = Calendar.current.startOfDay(for: startDate)
-                        startDate = Calendar.current.date(byAdding: .hour, value: 12, to: startDate)!
-                        endDate = Calendar.current.date(byAdding: .hour, value: 24, to: startDate)! >= currentDate ? currentDate : Calendar.current.date(byAdding: .hour, value: 24, to: startDate)!
-                    } else {
-                        startDate = Calendar.current.date(byAdding: .hour, value: -24, to: currentDate)!
-                        endDate = currentDate
-                    }
+//                    if firstSleepDetectedDate != nil {
+//                        startDate = firstSleepDetectedDate!
+//                        startDate = Calendar.current.startOfDay(for: startDate)
+//                        startDate = Calendar.current.date(byAdding: .hour, value: 12, to: startDate)!
+//                        endDate = Calendar.current.date(byAdding: .hour, value: 24, to: startDate)!
+//                    } else if !sleeps.isEmpty {
+//                        startDate = sleeps.last!.startDate > Calendar.current.date(byAdding: .hour, value: -24, to: currentDate)! ?
+//                                Calendar.current.date(byAdding: .hour, value: -24, to: currentDate)! : sleeps.last!.startDate
+//                        startDate = Calendar.current.startOfDay(for: startDate)
+//                        startDate = Calendar.current.date(byAdding: .hour, value: 12, to: startDate)!
+//                        endDate = Calendar.current.date(byAdding: .hour, value: 24, to: startDate)! >= currentDate ? currentDate : Calendar.current.date(byAdding: .hour, value: 24, to: startDate)!
+//                    } else {
+//                        startDate = Calendar.current.date(byAdding: .hour, value: -24, to: currentDate)!
+//                        endDate = currentDate
+//                    }
                     
                     var lastEndDateExistingSleep: Date? = nil
                     
@@ -109,7 +109,7 @@ class SleepDetector: ObservableObject {
                         
                         startDate = Calendar.current.date(byAdding: .hour, value: -2, to: endDate)!
                         endDate = Calendar.current.date(byAdding: .hour, value: 24, to: endDate)!
-                        if endDate >= currentDate {
+                        if startDate >= currentDate {
                             break
                         }
                     }
