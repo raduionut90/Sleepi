@@ -14,6 +14,7 @@ private let logger = Logger(
 )
 
 class EpochsClassificationHandler: BaseHandler {
+    
     override func handle(_ request: Request) async throws {
         if let sleeps = request.sleeps {
             for sleep in sleeps {

@@ -16,16 +16,19 @@ private let logger = Logger(
 class EpochsToSleepsHandler: BaseHandler {
     
     fileprivate func checkContinuity(_ request: Request, _ sleep: Sleep, _ sleepsResult: inout [Sleep]) async throws -> Sleep? {
-        let existingSleeps = try await SleepHelper.shared.getSleeps(request.date!)
-        
-        if let lastExistingSleep = existingSleeps?.last {
+        if let existingSleeps = try await SleepHelper.shared.getSleeps(startDate: Calendar.current.date(byAdding: .hour, value: -48, to: request.date!)!, endDate: request.date!) {
             
-            if !sleep.isNap() && !lastExistingSleep.isNap() && sleep.startDate.timeIntervalSinceReferenceDate - lastExistingSleep.endDate.timeIntervalSinceReferenceDate < 10800{ // 3h
-                var awake = Sleep(startDate: lastExistingSleep.endDate, endDate: sleep.startDate)
-                awake.stage = .Awake
-                return awake
+            if let lastExistingSleep = existingSleeps.last {
+                
+                if !sleep.isNap() && !lastExistingSleep.isNap() && sleep.startDate.timeIntervalSinceReferenceDate - lastExistingSleep.endDate.timeIntervalSinceReferenceDate < 10800{ // 3h
+                    var awake = Sleep(startDate: lastExistingSleep.endDate, endDate: sleep.startDate)
+                    awake.stage = .Awake
+                    return awake
+                }
             }
         }
+        
+
         return nil
     }
     
@@ -37,13 +40,17 @@ class EpochsToSleepsHandler: BaseHandler {
                 if index == 0 {
                     if let awake = try await checkContinuity(request, sleep, &sleepsResult) {
                         sleepsResult.append(awake)
+                        logger.debug(";detector;EpochsToSleepsHandler;\(awake.startDate.formatted(), privacy: .public);\(awake.endDate.formatted(), privacy: .public);\(awake.stage!.rawValue);continuity")
                     }
                 }
                     
-                if sleeps.indices.contains(index - 1) && !sleep.isNap() {
+                if sleeps.indices.contains(index - 1) && !sleeps[index - 1].isNap() && !sleep.isNap() {
                     var awake = Sleep(startDate: sleeps[index - 1].endDate, endDate: sleep.startDate)
-                    awake.stage = .Awake
-                    sleepsResult.append(awake)
+                    if awake.getDuration() < 10800 { // 3h
+                        awake.stage = .Awake
+                        sleepsResult.append(awake)
+                        logger.debug(";detector;EpochsToSleepsHandler;\(awake.startDate.formatted(), privacy: .public);\(awake.endDate.formatted(), privacy: .public);\(awake.stage!.rawValue)")
+                    }
                 }
                 if let epochs = sleep.epochs {
                     for epoch in epochs {

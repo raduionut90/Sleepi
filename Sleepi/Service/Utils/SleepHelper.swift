@@ -70,7 +70,7 @@ class SleepHelper {
                     sleep.origin = rawSleep.sourceRevision.source.bundleIdentifier
                     sleeps.append(sleep)
                 }
-                return sleeps
+                return sleeps.sorted(by: {$0.startDate < $1.startDate})
             }
         }
         return nil
